@@ -235,13 +235,13 @@
 
   <script>
     // ===============================
-    // Configuration / dummy data
+    // Configuration / default data
     // ===============================
 
     const FX_RATE_DEFAULT = 155.0;
 
-    // Dummy listings for now – later we’ll swap this for real scraped data.
-    const listings = [
+    // Built-in sample data as a fallback if listings.json is missing.
+    const defaultListings = [
       {
         id: "izutaiyo-001",
         source: "IZUTAIYO",
@@ -352,8 +352,7 @@
       }
     ];
 
-    // Featured config: choose which IDs appear in the carousel and in which order.
-    // To feature something else later, just change this list.
+    // Featured playlist: specify which IDs to show in the carousel.
     const featuredConfig = [
       { listingId: "tokai-001" },
       { listingId: "izutaiyo-001" },
@@ -368,6 +367,7 @@
     let fxRate = FX_RATE_DEFAULT;
     let activeType = ""; // "", "land", "house", "mansion"
     let featuredIndex = 0;
+    let listings = defaultListings.slice(); // will be overwritten by listings.json if present
 
     // ===============================
     // DOM helpers
@@ -377,16 +377,37 @@
     const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
     // ===============================
+    // Loading listings.json
+    // ===============================
+
+    async function loadListings() {
+      try {
+        const res = await fetch("listings.json", { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+        if (Array.isArray(data.listings)) {
+          listings = data.listings;
+        }
+        if (typeof data.fxRate === "number" && !Number.isNaN(data.fxRate)) {
+          fxRate = data.fxRate;
+        }
+        console.log("Loaded listings.json with", listings.length, "listings");
+      } catch (err) {
+        console.warn("Could not load listings.json, using built-in defaults.", err);
+        listings = defaultListings.slice();
+        fxRate = FX_RATE_DEFAULT;
+      }
+    }
+
+    // ===============================
     // Utility
     // ===============================
 
     function getListingById(id) {
       return listings.find((l) => l.id === id) || null;
     }
-
-    // ===============================
-    // Rendering
-    // ===============================
 
     function formatJpy(value) {
       if (value == null) return "-";
@@ -433,7 +454,9 @@
       `;
     }
 
-    // ----- Featured carousel -----
+    // ===============================
+    // Featured carousel
+    // ===============================
 
     function renderFeatured() {
       const container = $("#featured-card");
@@ -571,7 +594,9 @@
       });
     }
 
-    // ----- Main listings -----
+    // ===============================
+    // Listing grid
+    // ===============================
 
     function applyFilters() {
       const location = $("#location-filter").value;
@@ -723,16 +748,8 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-1 text-[11px] text-slate-400">
-                  ${
-                    l.city
-                      ? `<span>${l.city}</span>`
-                      : ""
-                  }
-                  ${
-                    l.areaLabel
-                      ? `<span>• ${l.areaLabel}</span>`
-                      : ""
-                  }
+                  ${l.city ? `<span>${l.city}</span>` : ""}
+                  ${l.areaLabel ? `<span>• ${l.areaLabel}</span>` : ""}
                   ${
                     l.station
                       ? `<span>• ${l.station}駅${l.walkMinutes != null ? " 徒歩" + l.walkMinutes + "分" : ""}</span>`
@@ -826,7 +843,7 @@
         });
       });
 
-      // Type chips
+      // Property type chips
       $$(".type-chip").forEach((btn) => {
         btn.addEventListener("click", () => {
           const type = btn.getAttribute("data-type") || "";
@@ -867,16 +884,20 @@
     // Init
     // ===============================
 
-    function init() {
+    async function init() {
+      await loadListings();
       $("#fx-rate-label").textContent = fxRate.toFixed(1);
-      setActiveType("");      // sets default type + applies filters
-      setCurrencyMode("JPY"); // also re-renders
       initEvents();
+      setActiveType("");
+      setCurrencyMode("JPY");
       renderFeatured();
       applyFilters();
     }
 
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", () => {
+      init();
+    });
   </script>
 </body>
 </html>
+
