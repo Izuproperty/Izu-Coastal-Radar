@@ -1,1 +1,687 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <title>Izu Coastal Radar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Simple scrollbar tweak for nicer feel */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background-color: rgba(148, 163, 184, 0.8); border-radius: 4px; }
+    ::-webkit-scrollbar-track { background-color: rgba(15, 23, 42, 0.1); }
+  </style>
+</head>
+<body class="h-full bg-slate-950 text-slate-100">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-slate-950 font-black text-xl tracking-tight shadow-lg shadow-sky-500/40">
+            IC
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl font-semibold tracking-tight">
+              Izu Coastal Radar
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-400">
+              Internal dashboard for 伊豆海ビュー物件
+            </p>
+          </div>
+        </div>
+        <div class="text-xs sm:text-sm text-right text-slate-400">
+          <div>FX: <span id="fx-rate-label" class="font-mono">155.0</span> JPY / USD</div>
+          <div class="flex items-center justify-end gap-2 mt-1">
+            <span class="hidden sm:inline">Display:</span>
+            <div class="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-xs">
+              <button data-currency-mode="JPY" class="currency-toggle px-3 py-1 rounded-full bg-slate-100 text-slate-900 font-semibold">
+                ¥
+              </button>
+              <button data-currency-mode="USD" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
+                $
+              </button>
+              <button data-currency-mode="BOTH" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
+                ¥ / $
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
 
+    <!-- Main layout -->
+    <main class="flex-1">
+      <div class="max-w-6xl mx-auto px-4 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-[280px,1fr] gap-4 sm:gap-6">
+        <!-- Filters -->
+        <aside class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg shadow-slate-900/60">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold tracking-wide text-slate-200 uppercase">
+              Filters
+            </h2>
+            <button id="reset-filters" class="text-xs text-sky-400 hover:text-sky-300">
+              Reset
+            </button>
+          </div>
+
+          <div class="space-y-4 text-sm">
+            <!-- Location -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+                Area / City
+              </label>
+              <select id="location-filter" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500">
+                <option value="">All Izu</option>
+                <option value="河津町">河津町</option>
+                <option value="下田市">下田市</option>
+                <option value="東伊豆町">東伊豆町</option>
+                <option value="伊東市">伊東市</option>
+              </select>
+            </div>
+
+            <!-- Property type -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+                Property Type
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button data-type="" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-600 bg-slate-800/80 text-slate-100 font-medium">
+                  All
+                </button>
+                <button data-type="land" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300">
+                  Land
+                </button>
+                <button data-type="house" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300">
+                  House
+                </button>
+                <button data-type="mansion" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300">
+                  Apartment
+                </button>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+                Price Range (JPY)
+              </label>
+              <div class="flex items-center gap-2 text-xs">
+                <div class="flex-1">
+                  <input id="min-price" type="number" inputmode="numeric" placeholder="Min" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500" />
+                </div>
+                <span class="text-slate-500">–</span>
+                <div class="flex-1">
+                  <input id="max-price" type="number" inputmode="numeric" placeholder="Max" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500" />
+                </div>
+              </div>
+              <p class="mt-1 text-[11px] text-slate-500">
+                e.g. 15000000 – 40000000
+              </p>
+            </div>
+
+            <!-- Land size -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+                Min Land Size (㎡)
+              </label>
+              <input id="min-land" type="number" inputmode="numeric" placeholder="0" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500" />
+            </div>
+
+            <!-- Sea view -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+                Sea View
+              </label>
+              <select id="sea-view-filter" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500">
+                <option value="1">Any</option>
+                <option value="3">Sea visible (3+)</option>
+                <option value="4">Strong sea view (4+)</option>
+                <option value="5">Wow factor only (5)</option>
+              </select>
+              <p class="mt-1 text-[11px] text-slate-500 leading-snug">
+                1–2: weak/none, 3: visible, 4: strong, 5: “wow”.
+              </p>
+            </div>
+
+            <!-- Time since listing -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+                Listing Age
+              </label>
+              <select id="age-filter" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500">
+                <option value="">Any time</option>
+                <option value="1">New today (≤ 1 day)</option>
+                <option value="3">Last 3 days</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+              </select>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Results -->
+        <section class="space-y-3 sm:space-y-4">
+          <!-- Top controls / stats -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold">
+                Listings
+              </p>
+              <p class="text-sm text-slate-300">
+                <span id="results-count" class="font-semibold">0</span>
+                <span> matching properties</span>
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400">Sort by:</span>
+                <select id="sort-order" class="rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500">
+                  <option value="newest">Newest first seen</option>
+                  <option value="updated">Recently updated</option>
+                  <option value="price_low">Price (low → high)</option>
+                  <option value="price_high">Price (high → low)</option>
+                  <option value="sea_view">Sea view strength</option>
+                </select>
+              </div>
+              <div class="hidden sm:flex items-center gap-2 text-slate-500">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="text-[11px]">
+                  Internal, read-only: links go to original brokers
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Listing grid -->
+          <div id="listings-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+            <!-- Cards rendered by JS -->
+          </div>
+
+          <!-- Empty state -->
+          <div id="empty-state" class="hidden rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 p-6 text-center text-sm text-slate-400">
+            No properties match your filters.
+            <button id="clear-filters-empty" class="ml-1 text-sky-400 hover:text-sky-300 underline">
+              Clear filters
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===============================
+    // Configuration / dummy data
+    // ===============================
+
+    const FX_RATE_DEFAULT = 155.0;
+
+    // Dummy listings for now – later we’ll swap this for real scraped data.
+    const listings = [
+      {
+        id: "izutaiyo-001",
+        source: "IZUTAIYO",
+        sourceLabel: "伊豆太陽ホーム",
+        sourceUrl: "https://www.izutaiyo.co.jp/",
+        title: "海一望の高台別荘地（今井浜）",
+        propertyType: "land",
+        prefecture: "静岡県",
+        city: "河津町",
+        areaLabel: "今井浜",
+        addressRaw: "賀茂郡河津町見高",
+        station: "今井浜海岸",
+        line: "伊豆急行線",
+        walkMinutes: 8,
+        priceJpy: 19800000,
+        landSqm: 310,
+        buildingSqm: null,
+        yearBuilt: null,
+        seaViewScore: 4,
+        viewNotes: "相模湾一望の高台、オーシャンビュー",
+        zoningNotes: "自然公園法第2種特別地域 / 建ぺい率20% / 容積率60%",
+        roadNotes: "南側約4.0m私道、43条但し書き要確認",
+        firstSeenDaysAgo: 2,
+        lastUpdatedDaysAgo: 0,
+        imageUrl: "https://images.pexels.com/photos/240526/pexels-photo-240526.jpeg?auto=compress&cs=tinysrgb&w=800",
+        highlightTags: ["New", "Land only", "Sea view 4/5"]
+      },
+      {
+        id: "tokai-001",
+        source: "TOKAIYAJIMA",
+        sourceLabel: "東海ヤジマ",
+        sourceUrl: "https://tokaiyajima.com/",
+        title: "白浜オーシャンフロント戸建",
+        propertyType: "house",
+        prefecture: "静岡県",
+        city: "下田市",
+        areaLabel: "白浜",
+        addressRaw: "下田市白浜",
+        station: "伊豆急下田",
+        line: "伊豆急行線",
+        walkMinutes: 25,
+        priceJpy: 42800000,
+        landSqm: 420,
+        buildingSqm: 95,
+        yearBuilt: 1998,
+        seaViewScore: 5,
+        viewNotes: "オーシャンフロント、白浜ビーチを一望",
+        zoningNotes: "非線引き区域 / 建ぺい率60% / 容積率200%",
+        roadNotes: "北側公道約5.0mに接道",
+        firstSeenDaysAgo: 5,
+        lastUpdatedDaysAgo: 1,
+        imageUrl: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=800",
+        highlightTags: ["Wow sea view", "House", "Price cut"]
+      },
+      {
+        id: "suumo-001",
+        source: "SUUMO",
+        sourceLabel: "SUUMO",
+        sourceUrl: "https://suumo.jp/tokai/",
+        title: "伊豆高原別荘地内 中古戸建",
+        propertyType: "house",
+        prefecture: "静岡県",
+        city: "伊東市",
+        areaLabel: "伊豆高原",
+        addressRaw: "伊東市富戸",
+        station: "城ヶ崎海岸",
+        line: "伊豆急行線",
+        walkMinutes: 18,
+        priceJpy: 24800000,
+        landSqm: 500,
+        buildingSqm: 88,
+        yearBuilt: 1992,
+        seaViewScore: 3,
+        viewNotes: "2階テラスより海遠望",
+        zoningNotes: "分譲地管理規約あり",
+        roadNotes: "南西側約4m私道",
+        firstSeenDaysAgo: 10,
+        lastUpdatedDaysAgo: 3,
+        imageUrl: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=800",
+        highlightTags: ["Sea distant 3/5", "Large land"]
+      },
+      {
+        id: "maple-001",
+        source: "MAPLE",
+        sourceLabel: "メープルハウジング",
+        sourceUrl: "https://www.maple-h.co.jp/",
+        title: "稲取高台別荘地 海遠望土地",
+        propertyType: "land",
+        prefecture: "静岡県",
+        city: "東伊豆町",
+        areaLabel: "稲取",
+        addressRaw: "賀茂郡東伊豆町稲取",
+        station: "伊豆稲取",
+        line: "伊豆急行線",
+        walkMinutes: 20,
+        priceJpy: 9800000,
+        landSqm: 260,
+        buildingSqm: null,
+        yearBuilt: null,
+        seaViewScore: 3,
+        viewNotes: "リビングから海遠望のプランが可能",
+        zoningNotes: "自然公園法第3種特別地域 / 建ぺい率40% / 容積率80%",
+        roadNotes: "北側約3.8m私道",
+        firstSeenDaysAgo: 1,
+        lastUpdatedDaysAgo: 1,
+        imageUrl: "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=800",
+        highlightTags: ["Budget", "Land only"]
+      }
+    ];
+
+    // ===============================
+    // State
+    // ===============================
+
+    let currencyMode = "JPY"; // "JPY" | "USD" | "BOTH"
+    let fxRate = FX_RATE_DEFAULT;
+    let activeType = ""; // "", "land", "house", "mansion"
+
+    // ===============================
+    // DOM helpers
+    // ===============================
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    // ===============================
+    // Rendering
+    // ===============================
+
+    function formatJpy(value) {
+      if (value == null) return "-";
+      return "¥" + value.toLocaleString("ja-JP");
+    }
+
+    function formatUsd(valueJpy) {
+      if (valueJpy == null) return "-";
+      const usd = valueJpy / fxRate;
+      return "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+
+    function renderPrice(listing) {
+      if (listing.priceJpy == null) return "<span class='text-slate-400'>Ask</span>";
+      const jpyStr = formatJpy(listing.priceJpy);
+      const usdStr = formatUsd(listing.priceJpy);
+
+      if (currencyMode === "JPY") {
+        return `<span class="font-semibold text-slate-50">${jpyStr}</span>`;
+      } else if (currencyMode === "USD") {
+        return `<span class="font-semibold text-slate-50">${usdStr}</span>`;
+      } else {
+        return `
+          <div class="flex flex-col leading-tight">
+            <span class="font-semibold text-slate-50">${jpyStr}</span>
+            <span class="text-xs text-slate-400">${usdStr}</span>
+          </div>
+        `;
+      }
+    }
+
+    function renderSeaViewBadge(score) {
+      if (!score) return "";
+      let label = "";
+      if (score === 5) label = "Sea view 5/5 • Wow";
+      else if (score === 4) label = "Sea view 4/5 • Strong";
+      else if (score === 3) label = "Sea view 3/5 • Visible";
+      else label = `Sea view ${score}/5`;
+
+      return `
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-500/15 text-[11px] text-sky-300 border border-sky-500/40">
+          ${label}
+        </span>
+      `;
+    }
+
+    function applyFilters() {
+      const location = $("#location-filter").value;
+      const seaViewMin = parseInt($("#sea-view-filter").value || "1", 10);
+      const ageLimit = $("#age-filter").value ? parseInt($("#age-filter").value, 10) : null;
+
+      const minPrice = $("#min-price").value ? parseInt($("#min-price").value, 10) : null;
+      const maxPrice = $("#max-price").value ? parseInt($("#max-price").value, 10) : null;
+      const minLand = $("#min-land").value ? parseInt($("#min-land").value, 10) : null;
+
+      let filtered = listings.slice();
+
+      filtered = filtered.filter((l) => {
+        if (location && l.city !== location) return false;
+        if (activeType && l.propertyType !== activeType) return false;
+        if (l.seaViewScore == null || l.seaViewScore < seaViewMin) return false;
+
+        if (ageLimit != null && l.firstSeenDaysAgo != null && l.firstSeenDaysAgo > ageLimit) {
+          return false;
+        }
+
+        if (minPrice != null && l.priceJpy != null && l.priceJpy < minPrice) return false;
+        if (maxPrice != null && l.priceJpy != null && l.priceJpy > maxPrice) return false;
+
+        if (minLand != null && l.landSqm != null && l.landSqm < minLand) return false;
+
+        return true;
+      });
+
+      const sortOrder = $("#sort-order").value;
+      filtered.sort((a, b) => {
+        if (sortOrder === "newest") {
+          return (a.firstSeenDaysAgo || 9999) - (b.firstSeenDaysAgo || 9999);
+        } else if (sortOrder === "updated") {
+          return (a.lastUpdatedDaysAgo || 9999) - (b.lastUpdatedDaysAgo || 9999);
+        } else if (sortOrder === "price_low") {
+          return (a.priceJpy || Infinity) - (b.priceJpy || Infinity);
+        } else if (sortOrder === "price_high") {
+          return (b.priceJpy || -Infinity) - (a.priceJpy || -Infinity);
+        } else if (sortOrder === "sea_view") {
+          return (b.seaViewScore || 0) - (a.seaViewScore || 0);
+        }
+        return 0;
+      });
+
+      renderListings(filtered);
+    }
+
+    function renderListings(list) {
+      const grid = $("#listings-grid");
+      const empty = $("#empty-state");
+      $("#results-count").textContent = list.length.toString();
+
+      if (list.length === 0) {
+        grid.innerHTML = "";
+        empty.classList.remove("hidden");
+        return;
+      } else {
+        empty.classList.add("hidden");
+      }
+
+      const html = list
+        .map((l) => {
+          const typeLabel =
+            l.propertyType === "land"
+              ? "Land"
+              : l.propertyType === "house"
+              ? "House"
+              : l.propertyType === "mansion"
+              ? "Apartment"
+              : "Property";
+
+          const ageLabel =
+            l.firstSeenDaysAgo === 0
+              ? "Today"
+              : l.firstSeenDaysAgo === 1
+              ? "1 day ago"
+              : `${l.firstSeenDaysAgo} days ago`;
+
+          const updateLabel =
+            l.lastUpdatedDaysAgo === 0
+              ? "Today"
+              : l.lastUpdatedDaysAgo === 1
+              ? "1 day ago"
+              : `${l.lastUpdatedDaysAgo} days ago`;
+
+          const tags = l.highlightTags && l.highlightTags.length
+            ? l.highlightTags
+            : [];
+
+          return `
+            <article class="group bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-lg shadow-slate-900/70 flex flex-col hover:border-sky-500/70 hover:shadow-sky-900/60 transition">
+              <div class="relative h-40 sm:h-44 overflow-hidden bg-slate-800">
+                <img
+                  src="${l.imageUrl}"
+                  alt="${l.title}"
+                  class="w-full h-full object-cover transform group-hover:scale-[1.03] transition"
+                  loading="lazy"
+                />
+                <div class="absolute top-2 left-2 flex flex-wrap gap-1">
+                  ${tags
+                    .map(
+                      (t) => `
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-950/70 text-slate-100 border border-slate-700">
+                          ${t}
+                        </span>
+                      `
+                    )
+                    .join("")}
+                </div>
+                <div class="absolute bottom-2 left-2">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-950/80 text-slate-200 border border-slate-700">
+                    ${typeLabel}
+                  </span>
+                </div>
+                <div class="absolute bottom-2 right-2 text-[10px] px-2 py-1 rounded-full bg-slate-950/80 text-slate-300 border border-slate-700 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>${l.sourceLabel}</span>
+                </div>
+              </div>
+
+              <div class="flex-1 p-4 flex flex-col gap-2">
+                <div class="flex items-start justify-between gap-2">
+                  <h3 class="text-sm font-semibold leading-snug text-slate-50 line-clamp-2">
+                    ${l.title}
+                  </h3>
+                </div>
+
+                <div class="text-sm">
+                  ${renderPrice(l)}
+                </div>
+
+                <div class="flex flex-wrap gap-1 text-[11px] text-slate-400">
+                  ${
+                    l.landSqm
+                      ? `<span>${l.landSqm.toLocaleString("ja-JP")}㎡ land</span>`
+                      : ""
+                  }
+                  ${
+                    l.buildingSqm
+                      ? `<span>• ${l.buildingSqm.toLocaleString("ja-JP")}㎡ building</span>`
+                      : ""
+                  }
+                  ${
+                    l.yearBuilt
+                      ? `<span>• Built ${l.yearBuilt}</span>`
+                      : ""
+                  }
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1 text-[11px] text-slate-400">
+                  ${
+                    l.city
+                      ? `<span>${l.city}</span>`
+                      : ""
+                  }
+                  ${
+                    l.areaLabel
+                      ? `<span>• ${l.areaLabel}</span>`
+                      : ""
+                  }
+                  ${
+                    l.station
+                      ? `<span>• ${l.station}駅${l.walkMinutes != null ? " 徒歩" + l.walkMinutes + "分" : ""}</span>`
+                      : ""
+                  }
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1">
+                  ${renderSeaViewBadge(l.seaViewScore)}
+                </div>
+
+                <div class="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                  <span>First seen: ${ageLabel}</span>
+                  <span>Updated: ${updateLabel}</span>
+                </div>
+              </div>
+
+              <div class="px-4 pb-4 flex items-center justify-between text-xs">
+                <span class="text-slate-500">
+                  Internal view only
+                </span>
+                <a
+                  href="${l.sourceUrl}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-sky-400 hover:text-sky-300"
+                >
+                  <span class="underline">Open broker site</span>
+                  <span>↗</span>
+                </a>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      grid.innerHTML = html;
+    }
+
+    // ===============================
+    // Event bindings
+    // ===============================
+
+    function setCurrencyMode(mode) {
+      currencyMode = mode;
+      $$(".currency-toggle").forEach((btn) => {
+        const m = btn.getAttribute("data-currency-mode");
+        if (m === mode) {
+          btn.classList.add("bg-slate-100", "text-slate-900", "font-semibold");
+          btn.classList.remove("text-slate-300");
+        } else {
+          btn.classList.remove("bg-slate-100", "text-slate-900", "font-semibold");
+          btn.classList.add("text-slate-300");
+        }
+      });
+      applyFilters();
+    }
+
+    function setActiveType(type) {
+      activeType = type;
+      $$(".type-chip").forEach((btn) => {
+        const t = btn.getAttribute("data-type") || "";
+        if (t === type) {
+          btn.classList.add("bg-slate-800/80", "border-slate-600", "text-slate-100", "font-medium");
+        } else {
+          btn.classList.remove("bg-slate-800/80", "border-slate-600", "text-slate-100", "font-medium");
+          btn.classList.add("border-slate-700", "text-slate-300");
+        }
+      });
+      applyFilters();
+    }
+
+    function resetFilters() {
+      $("#location-filter").value = "";
+      $("#sea-view-filter").value = "1";
+      $("#age-filter").value = "";
+      $("#min-price").value = "";
+      $("#max-price").value = "";
+      $("#min-land").value = "";
+      setActiveType("");
+      applyFilters();
+    }
+
+    function initEvents() {
+      // Currency toggle
+      $$(".currency-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const mode = btn.getAttribute("data-currency-mode");
+          setCurrencyMode(mode);
+        });
+      });
+
+      // Type chips
+      $$(".type-chip").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const type = btn.getAttribute("data-type") || "";
+          setActiveType(type);
+        });
+      });
+
+      // Filters
+      ["location-filter", "sea-view-filter", "age-filter", "sort-order"].forEach((id) => {
+        $("#" + id).addEventListener("change", applyFilters);
+      });
+
+      ["min-price", "max-price", "min-land"].forEach((id) => {
+        $("#" + id).addEventListener("input", () => {
+          // Slight debounce for typing feel is overkill here; just apply directly.
+          applyFilters();
+        });
+      });
+
+      $("#reset-filters").addEventListener("click", resetFilters);
+      $("#clear-filters-empty").addEventListener("click", resetFilters);
+    }
+
+    // ===============================
+    // Init
+    // ===============================
+
+    function init() {
+      $("#fx-rate-label").textContent = fxRate.toFixed(1);
+      setCurrencyMode("JPY");
+      setActiveType("");
+      initEvents();
+      applyFilters();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
