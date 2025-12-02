@@ -169,7 +169,7 @@
                   Featured Properties
                 </p>
                 <p class="text-sm text-slate-200">
-                  Hand-picked beach and view candidates
+                  Auto-selected sea-view highlights
                 </p>
               </div>
               <div class="flex items-center gap-2">
@@ -352,13 +352,6 @@
       }
     ];
 
-    // Featured playlist: specify which IDs to show in the carousel.
-    const featuredConfig = [
-      { listingId: "tokai-001" },
-      { listingId: "izutaiyo-001" },
-      { listingId: "maple-001" }
-    ];
-
     // ===============================
     // State
     // ===============================
@@ -368,6 +361,7 @@
     let activeType = ""; // "", "land", "house", "mansion"
     let featuredIndex = 0;
     let listings = defaultListings.slice(); // will be overwritten by listings.json if present
+    let featuredListingIds = []; // auto-selected featured listings
 
     // ===============================
     // DOM helpers
@@ -421,7 +415,9 @@
     }
 
     function renderPrice(listing) {
-      if (listing.priceJpy == null) return "<span class='text-slate-400'>Ask</span>";
+      if (listing.priceJpy == null) {
+        return `<span class="text-slate-400">Ask</span>`;
+      }
       const jpyStr = formatJpy(listing.priceJpy);
       const usdStr = formatUsd(listing.priceJpy);
 
@@ -455,18 +451,53 @@
     }
 
     // ===============================
-    // Featured carousel
+    // Featured carousel - auto selection
     // ===============================
+
+    function computeFeaturedListingIds() {
+      // Candidates: listings with at least a moderate sea view
+      const candidates = listings
+        .filter((l) => l.seaViewScore != null && l.seaViewScore >= 3)
+        .sort((a, b) => {
+          // 1) Stronger sea view first
+          const svDiff = (b.seaViewScore || 0) - (a.seaViewScore || 0);
+          if (svDiff !== 0) return svDiff;
+          // 2) Newer (smaller firstSeenDaysAgo) first
+          const ageA = a.firstSeenDaysAgo != null ? a.firstSeenDaysAgo : 9999;
+          const ageB = b.firstSeenDaysAgo != null ? b.firstSeenDaysAgo : 9999;
+          return ageA - ageB;
+        });
+
+      const top = candidates.slice(0, 5); // top N featured
+      featuredListingIds = top.map((l) => l.id);
+      featuredIndex = 0;
+    }
 
     function renderFeatured() {
       const container = $("#featured-card");
       const dotsContainer = $("#featured-dots");
-      if (!container || !dotsContainer || featuredConfig.length === 0) return;
+      if (!container || !dotsContainer) return;
 
-      const cfg = featuredConfig[featuredIndex];
-      const listing = cfg ? getListingById(cfg.listingId) : null;
+      if (!featuredListingIds.length) {
+        container.innerHTML = `
+          <div class="text-sm text-slate-400">
+            No strong sea-view properties at the moment.
+          </div>
+        `;
+        dotsContainer.innerHTML = "";
+        return;
+      }
+
+      const currentId =
+        featuredListingIds[featuredIndex] || featuredListingIds[0];
+      const listing = getListingById(currentId);
+
       if (!listing) {
-        container.innerHTML = `<div class="text-sm text-slate-400">No featured property configured.</div>`;
+        container.innerHTML = `
+          <div class="text-sm text-slate-400">
+            No featured property configured.
+          </div>
+        `;
         dotsContainer.innerHTML = "";
         return;
       }
@@ -538,7 +569,11 @@
               ${listing.areaLabel ? `<span>• ${listing.areaLabel}</span>` : ""}
               ${
                 listing.station
-                  ? `<span>• ${listing.station}駅${listing.walkMinutes != null ? " 徒歩" + listing.walkMinutes + "分" : ""}</span>`
+                  ? `<span>• ${listing.station}駅${
+                      listing.walkMinutes != null
+                        ? " 徒歩" + listing.walkMinutes + "分"
+                        : ""
+                    }</span>`
                   : ""
               }
             </div>
@@ -566,9 +601,8 @@
         </article>
       `;
 
-      // Dots
-      dotsContainer.innerHTML = featuredConfig
-        .map((_, idx) => {
+      dotsContainer.innerHTML = featuredListingIds
+        .map((id, idx) => {
           const active = idx === featuredIndex;
           return `
             <button
@@ -586,7 +620,7 @@
       $$("#featured-dots button").forEach((btn) => {
         btn.addEventListener("click", () => {
           const idx = parseInt(btn.getAttribute("data-featured-index"), 10);
-          if (!isNaN(idx)) {
+          if (!Number.isNaN(idx)) {
             featuredIndex = idx;
             renderFeatured();
           }
@@ -752,7 +786,9 @@
                   ${l.areaLabel ? `<span>• ${l.areaLabel}</span>` : ""}
                   ${
                     l.station
-                      ? `<span>• ${l.station}駅${l.walkMinutes != null ? " 徒歩" + l.walkMinutes + "分" : ""}</span>`
+                      ? `<span>• ${l.station}駅${
+                          l.walkMinutes != null ? " 徒歩" + l.walkMinutes + "分" : ""
+                        }</span>`
                       : ""
                   }
                 </div>
@@ -857,9 +893,7 @@
       });
 
       ["min-price", "max-price", "min-land"].forEach((id) => {
-        $("#" + id).addEventListener("input", () => {
-          applyFilters();
-        });
+        $("#" + id).addEventListener("input", applyFilters);
       });
 
       $("#reset-filters").addEventListener("click", resetFilters);
@@ -868,13 +902,17 @@
       // Featured nav
       const prevBtn = $("#featured-prev");
       const nextBtn = $("#featured-next");
-      if (prevBtn && nextBtn && featuredConfig.length > 0) {
+      if (prevBtn && nextBtn) {
         prevBtn.addEventListener("click", () => {
-          featuredIndex = (featuredIndex - 1 + featuredConfig.length) % featuredConfig.length;
+          if (!featuredListingIds.length) return;
+          featuredIndex =
+            (featuredIndex - 1 + featuredListingIds.length) %
+            featuredListingIds.length;
           renderFeatured();
         });
         nextBtn.addEventListener("click", () => {
-          featuredIndex = (featuredIndex + 1) % featuredConfig.length;
+          if (!featuredListingIds.length) return;
+          featuredIndex = (featuredIndex + 1) % featuredListingIds.length;
           renderFeatured();
         });
       }
@@ -887,6 +925,7 @@
     async function init() {
       await loadListings();
       $("#fx-rate-label").textContent = fxRate.toFixed(1);
+      computeFeaturedListingIds();
       initEvents();
       setActiveType("");
       setCurrencyMode("JPY");
@@ -900,4 +939,3 @@
   </script>
 </body>
 </html>
-
