@@ -1,6 +1,6 @@
 {
   "fxRate": 155.0,
-  "generatedAt": "2025-12-09T13:34:18.976288Z",
+  "generatedAt": "2025-12-09T13:43:15.806690Z",
   "listings": [
     {
       "id": "izutaiyo-KWB235H",
@@ -9,7 +9,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
       "title": "河津町 桜坂温泉別荘地の検索物件詳細",
       "titleEn": "河津町 桜坂温泉Villa Areaの検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "河津町",
       "areaLabel": null,
@@ -19,17 +19,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 88.92,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://www.izutaiyo.co.jp/img/ico/view.gif",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -39,7 +39,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
       "title": "南伊豆町 子浦の検索物件詳細",
       "titleEn": "南伊豆町 子浦の検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -49,17 +49,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 135.76,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -69,7 +69,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
       "title": "南伊豆町 下賀茂の検索物件詳細",
       "titleEn": "南伊豆町 下賀茂の検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -79,17 +79,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 115.51,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -99,7 +99,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
       "title": "下田市 須崎の検索物件詳細",
       "titleEn": "下田市 須崎の検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -109,17 +109,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 72.87,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -129,7 +129,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2008H",
       "title": "下田市 須崎の検索物件詳細",
       "titleEn": "下田市 須崎の検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -139,17 +139,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 57.96,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://www.izutaiyo.co.jp/img/ico/view.gif",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -159,7 +159,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
       "title": "下田市 田牛の検索物件詳細",
       "titleEn": "下田市 田牛の検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -169,17 +169,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 82.81,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -189,7 +189,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
       "title": "下田市 白浜の検索物件詳細",
       "titleEn": "下田市 Shirahamaの検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -199,17 +199,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 104.34,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -231,13 +231,13 @@
       "landSqm": null,
       "buildingSqm": null,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
         "Land"
       ]
@@ -261,13 +261,13 @@
       "landSqm": null,
       "buildingSqm": null,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
         "Land"
       ]
@@ -279,7 +279,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
       "title": "下田市 パレスサイドヴィラの検索物件詳細",
       "titleEn": "下田市 パレスサイドヴィラの検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -289,17 +289,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 65.55,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -309,7 +309,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB392H",
       "title": "下田市 柿崎の検索物件詳細",
       "titleEn": "下田市 柿崎の検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -319,17 +319,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 298.98,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://www.izutaiyo.co.jp/img/ico/view.gif",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -351,13 +351,13 @@
       "landSqm": null,
       "buildingSqm": null,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
         "Land"
       ]
@@ -381,13 +381,13 @@
       "landSqm": null,
       "buildingSqm": null,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
         "Land"
       ]
@@ -399,7 +399,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
       "title": "下田市 白浜の検索物件詳細",
       "titleEn": "下田市 Shirahamaの検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -409,17 +409,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 125.86,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     },
     {
@@ -429,7 +429,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
       "title": "下田市 武ガ浜の検索物件詳細",
       "titleEn": "下田市 武ガ浜の検索物件詳細",
-      "propertyType": "land",
+      "propertyType": "house",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -439,17 +439,17 @@
       "walkMinutes": null,
       "priceJpy": null,
       "landSqm": null,
-      "buildingSqm": null,
+      "buildingSqm": 71.22,
       "yearBuilt": null,
-      "seaViewScore": 2,
+      "seaViewScore": null,
       "viewNotes": null,
       "zoningNotes": null,
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/pct/navigation/nav-1.svg",
+      "imageUrl": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/881571913/?value=0&guid=ON&script=0",
       "highlightTags": [
-        "Land"
+        "House"
       ]
     }
   ]
