@@ -16,7 +16,7 @@
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
     <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-slate-950 font-black text-xl tracking-tight shadow-lg shadow-sky-500/40">
             IC
@@ -30,20 +30,37 @@
             </p>
           </div>
         </div>
-        <div class="text-xs sm:text-sm text-right text-slate-400">
-          <div>FX: <span id="fx-rate-label">155.0</span> JPY / USD</div>
-          <div class="flex items-center justify-end gap-2 mt-1">
-            <span class="hidden sm:inline">Display:</span>
-            <div class="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-xs">
-              <button data-currency-mode="JPY" class="currency-toggle px-3 py-1 rounded-full bg-slate-100 text-slate-900 font-semibold">
-                ¥
-              </button>
-              <button data-currency-mode="USD" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
-                $
-              </button>
-              <button data-currency-mode="BOTH" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
-                ¥ / $
-              </button>
+        <div class="flex flex-col items-end gap-1 text-xs sm:text-sm text-slate-400">
+          <div>
+            FX: <span id="fx-rate-label">155.0</span> JPY / USD
+          </div>
+          <div class="flex items-center gap-3">
+            <!-- Currency -->
+            <div class="flex items-center gap-1">
+              <span class="hidden sm:inline" data-i18n="display_label">Display:</span>
+              <div class="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-xs">
+                <button data-currency-mode="JPY" class="currency-toggle px-3 py-1 rounded-full bg-slate-100 text-slate-900 font-semibold">
+                  ¥
+                </button>
+                <button data-currency-mode="USD" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
+                  $
+                </button>
+                <button data-currency-mode="BOTH" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
+                  ¥ / $
+                </button>
+              </div>
+            </div>
+            <!-- Language -->
+            <div class="flex items-center gap-1">
+              <span class="hidden sm:inline" data-i18n="language_label">Language:</span>
+              <div class="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-xs">
+                <button data-lang="JA" class="lang-toggle px-3 py-1 rounded-full bg-slate-100 text-slate-900 font-semibold">
+                  日本語
+                </button>
+                <button data-lang="EN" class="lang-toggle px-3 py-1 rounded-full text-slate-300">
+                  EN
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -56,10 +73,10 @@
         <!-- Filters -->
         <aside class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg shadow-slate-900/60">
           <div class="flex items-center justify-between mb-3">
-            <h2 class="text-sm font-semibold tracking-wide text-slate-200 uppercase">
+            <h2 class="text-sm font-semibold tracking-wide text-slate-200 uppercase" data-i18n="filters_title">
               Filters
             </h2>
-            <button id="reset-filters" class="text-xs text-sky-400 hover:text-sky-300">
+            <button id="reset-filters" class="text-xs text-sky-400 hover:text-sky-300" data-i18n="reset">
               Reset
             </button>
           </div>
@@ -67,11 +84,11 @@
           <div class="space-y-4 text-sm">
             <!-- Location -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide" data-i18n="filter_location">
                 Area / City
               </label>
               <select id="location-filter" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500">
-                <option value="">All Izu</option>
+                <option value="" data-i18n="location_all">All Izu</option>
                 <option value="河津町">河津町</option>
                 <option value="下田市">下田市</option>
                 <option value="東伊豆町">東伊豆町</option>
@@ -81,20 +98,20 @@
 
             <!-- Property type -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide" data-i18n="filter_type">
                 Property Type
               </label>
               <div class="flex flex-wrap gap-2">
-                <button data-type="" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-600 bg-slate-800/80 text-slate-100 font-medium">
+                <button data-type="" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-600 bg-slate-800/80 text-slate-100 font-medium" data-i18n="type_all">
                   All
                 </button>
-                <button data-type="land" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300">
+                <button data-type="land" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300" data-i18n="type_land">
                   Land
                 </button>
-                <button data-type="house" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300">
+                <button data-type="house" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300" data-i18n="type_house">
                   House
                 </button>
-                <button data-type="mansion" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300">
+                <button data-type="mansion" class="type-chip px-3 py-1.5 rounded-full text-xs border border-slate-700 text-slate-300" data-i18n="type_mansion">
                   Apartment
                 </button>
               </div>
@@ -102,7 +119,7 @@
 
             <!-- Price -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide" data-i18n="filter_price">
                 Price Range (JPY)
               </label>
               <div class="flex items-center gap-2 text-xs">
@@ -114,14 +131,14 @@
                   <input id="max-price" type="number" inputmode="numeric" placeholder="Max" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500" />
                 </div>
               </div>
-              <p class="mt-1 text-[11px] text-slate-500">
+              <p class="mt-1 text-[11px] text-slate-500" data-i18n="filter_price_hint">
                 e.g. 15000000 – 40000000
               </p>
             </div>
 
             <!-- Land size -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide" data-i18n="filter_land">
                 Min Land Size (㎡)
               </label>
               <input id="min-land" type="number" inputmode="numeric" placeholder="0" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500" />
@@ -129,31 +146,31 @@
 
             <!-- Sea view -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide" data-i18n="filter_seaview">
                 Sea View
               </label>
               <select id="sea-view-filter" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500">
-                <option value="1">Any</option>
-                <option value="3">Sea visible (3+)</option>
-                <option value="4">Strong sea view (4+)</option>
-                <option value="5">Wow factor only (5)</option>
+                <option value="1" data-i18n="seaview_any">Any</option>
+                <option value="3" data-i18n="seaview_3">Sea visible (3+)</option>
+                <option value="4" data-i18n="seaview_4">Strong sea view (4+)</option>
+                <option value="5" data-i18n="seaview_5">Wow factor only (5)</option>
               </select>
-              <p class="mt-1 text-[11px] text-slate-500 leading-snug">
+              <p class="mt-1 text-[11px] text-slate-500 leading-snug" data-i18n="seaview_hint">
                 1–2: weak/none, 3: visible, 4: strong, 5: “wow”.
               </p>
             </div>
 
             <!-- Time since listing -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide" data-i18n="filter_age">
                 Listing Age
               </label>
               <select id="age-filter" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500">
-                <option value="">Any time</option>
-                <option value="1">New today (≤ 1 day)</option>
-                <option value="3">Last 3 days</option>
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
+                <option value="" data-i18n="age_any">Any time</option>
+                <option value="1" data-i18n="age_1">New today (≤ 1 day)</option>
+                <option value="3" data-i18n="age_3">Last 3 days</option>
+                <option value="7" data-i18n="age_7">Last 7 days</option>
+                <option value="30" data-i18n="age_30">Last 30 days</option>
               </select>
             </div>
           </div>
@@ -165,10 +182,10 @@
           <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg shadow-slate-900/70">
             <div class="flex items-center justify-between gap-3">
               <div>
-                <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold">
+                <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold" data-i18n="featured_title">
                   Featured Properties
                 </p>
-                <p class="text-sm text-slate-200">
+                <p class="text-sm text-slate-200" data-i18n="featured_subtitle">
                   Auto-selected sea-view highlights
                 </p>
               </div>
@@ -188,28 +205,28 @@
           <!-- Top controls / stats -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold">
+              <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold" data-i18n="listings_title">
                 Listings
               </p>
               <p class="text-sm text-slate-300">
                 <span id="results-count" class="font-semibold">0</span>
-                <span> matching properties</span>
+                <span data-i18n="listings_match_suffix"> matching properties</span>
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-3 text-xs">
               <div class="flex items-center gap-2">
-                <span class="text-slate-400">Sort by:</span>
+                <span class="text-slate-400" data-i18n="sort_label">Sort by:</span>
                 <select id="sort-order" class="rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500">
-                  <option value="newest">Newest first seen</option>
-                  <option value="updated">Recently updated</option>
-                  <option value="price_low">Price (low → high)</option>
-                  <option value="price_high">Price (high → low)</option>
-                  <option value="sea_view">Sea view strength</option>
+                  <option value="newest" data-i18n="sort_newest">Newest first seen</option>
+                  <option value="updated" data-i18n="sort_updated">Recently updated</option>
+                  <option value="price_low" data-i18n="sort_price_low">Price (low → high)</option>
+                  <option value="price_high" data-i18n="sort_price_high">Price (high → low)</option>
+                  <option value="sea_view" data-i18n="sort_sea_view">Sea view strength</option>
                 </select>
               </div>
               <div class="hidden sm:flex items-center gap-2 text-slate-500">
                 <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span class="text-[11px]">
+                <span class="text-[11px]" data-i18n="internal_note">
                   Internal, read-only: links go to original brokers
                 </span>
               </div>
@@ -223,8 +240,8 @@
 
           <!-- Empty state -->
           <div id="empty-state" class="hidden rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 p-6 text-center text-sm text-slate-400">
-            No properties match your filters.
-            <button id="clear-filters-empty" class="ml-1 text-sky-400 hover:text-sky-300 underline">
+            <span data-i18n="empty_message">No properties match your filters.</span>
+            <button id="clear-filters-empty" class="ml-1 text-sky-400 hover:text-sky-300 underline" data-i18n="empty_clear">
               Clear filters
             </button>
           </div>
@@ -240,7 +257,6 @@
 
     const FX_RATE_DEFAULT = 155.0;
 
-    // Built-in sample data as a fallback if listings.json is missing.
     const defaultListings = [
       {
         id: "izutaiyo-001",
@@ -248,6 +264,7 @@
         sourceLabel: "伊豆太陽ホーム",
         sourceUrl: "https://www.izutaiyo.co.jp/",
         title: "海一望の高台別荘地（今井浜）",
+        titleEn: "Hilltop villa land with panoramic ocean view (Imaihama)",
         propertyType: "land",
         prefecture: "静岡県",
         city: "河津町",
@@ -268,89 +285,97 @@
         lastUpdatedDaysAgo: 0,
         imageUrl: "https://images.pexels.com/photos/240526/pexels-photo-240526.jpeg?auto=compress&cs=tinysrgb&w=800",
         highlightTags: ["New", "Land only", "Sea view 4/5"]
-      },
-      {
-        id: "tokai-001",
-        source: "TOKAIYAJIMA",
-        sourceLabel: "東海ヤジマ",
-        sourceUrl: "https://tokaiyajima.com/",
-        title: "白浜オーシャンフロント戸建",
-        propertyType: "house",
-        prefecture: "静岡県",
-        city: "下田市",
-        areaLabel: "白浜",
-        addressRaw: "下田市白浜",
-        station: "伊豆急下田",
-        line: "伊豆急行線",
-        walkMinutes: 25,
-        priceJpy: 42800000,
-        landSqm: 420,
-        buildingSqm: 95,
-        yearBuilt: 1998,
-        seaViewScore: 5,
-        viewNotes: "オーシャンフロント、白浜ビーチを一望",
-        zoningNotes: "非線引き区域 / 建ぺい率60% / 容積率200%",
-        roadNotes: "北側公道約5.0mに接道",
-        firstSeenDaysAgo: 5,
-        lastUpdatedDaysAgo: 1,
-        imageUrl: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=800",
-        highlightTags: ["Wow sea view", "House", "Price cut"]
-      },
-      {
-        id: "suumo-001",
-        source: "SUUMO",
-        sourceLabel: "SUUMO",
-        sourceUrl: "https://suumo.jp/tokai/",
-        title: "伊豆高原別荘地内 中古戸建",
-        propertyType: "house",
-        prefecture: "静岡県",
-        city: "伊東市",
-        areaLabel: "伊豆高原",
-        addressRaw: "伊東市富戸",
-        station: "城ヶ崎海岸",
-        line: "伊豆急行線",
-        walkMinutes: 18,
-        priceJpy: 24800000,
-        landSqm: 500,
-        buildingSqm: 88,
-        yearBuilt: 1992,
-        seaViewScore: 3,
-        viewNotes: "2階テラスより海遠望",
-        zoningNotes: "分譲地管理規約あり",
-        roadNotes: "南西側約4m私道",
-        firstSeenDaysAgo: 10,
-        lastUpdatedDaysAgo: 3,
-        imageUrl: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=800",
-        highlightTags: ["Sea distant 3/5", "Large land"]
-      },
-      {
-        id: "maple-001",
-        source: "MAPLE",
-        sourceLabel: "メープルハウジング",
-        sourceUrl: "https://www.maple-h.co.jp/",
-        title: "稲取高台別荘地 海遠望土地",
-        propertyType: "land",
-        prefecture: "静岡県",
-        city: "東伊豆町",
-        areaLabel: "稲取",
-        addressRaw: "賀茂郡東伊豆町稲取",
-        station: "伊豆稲取",
-        line: "伊豆急行線",
-        walkMinutes: 20,
-        priceJpy: 9800000,
-        landSqm: 260,
-        buildingSqm: null,
-        yearBuilt: null,
-        seaViewScore: 3,
-        viewNotes: "リビングから海遠望のプランが可能",
-        zoningNotes: "自然公園法第3種特別地域 / 建ぺい率40% / 容積率80%",
-        roadNotes: "北側約3.8m私道",
-        firstSeenDaysAgo: 1,
-        lastUpdatedDaysAgo: 1,
-        imageUrl: "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=800",
-        highlightTags: ["Budget", "Land only"]
       }
     ];
+
+    // ===============================
+    // i18n
+    // ===============================
+
+    const I18N = {
+      EN: {
+        display_label: "Display:",
+        language_label: "Language:",
+        filters_title: "Filters",
+        reset: "Reset",
+        filter_location: "Area / City",
+        location_all: "All Izu",
+        filter_type: "Property Type",
+        type_all: "All",
+        type_land: "Land",
+        type_house: "House",
+        type_mansion: "Apartment",
+        filter_price: "Price Range (JPY)",
+        filter_price_hint: "e.g. 15000000 – 40000000",
+        filter_land: "Min Land Size (㎡)",
+        filter_seaview: "Sea View",
+        seaview_any: "Any",
+        seaview_3: "Sea visible (3+)",
+        seaview_4: "Strong sea view (4+)",
+        seaview_5: "Wow factor only (5)",
+        seaview_hint: "1–2: weak/none, 3: visible, 4: strong, 5: “wow”.",
+        filter_age: "Listing Age",
+        age_any: "Any time",
+        age_1: "New today (≤ 1 day)",
+        age_3: "Last 3 days",
+        age_7: "Last 7 days",
+        age_30: "Last 30 days",
+        featured_title: "Featured Properties",
+        featured_subtitle: "Auto-selected sea-view highlights",
+        listings_title: "Listings",
+        listings_match_suffix: " matching properties",
+        sort_label: "Sort by:",
+        sort_newest: "Newest first seen",
+        sort_updated: "Recently updated",
+        sort_price_low: "Price (low → high)",
+        sort_price_high: "Price (high → low)",
+        sort_sea_view: "Sea view strength",
+        internal_note: "Internal, read-only: links go to original brokers",
+        empty_message: "No properties match your filters.",
+        empty_clear: "Clear filters"
+      },
+      JA: {
+        display_label: "表示通貨：",
+        language_label: "言語：",
+        filters_title: "絞り込み",
+        reset: "リセット",
+        filter_location: "エリア / 市町",
+        location_all: "伊豆エリア全体",
+        filter_type: "物件種別",
+        type_all: "すべて",
+        type_land: "土地",
+        type_house: "戸建",
+        type_mansion: "マンション",
+        filter_price: "価格帯（円）",
+        filter_price_hint: "例）15000000 – 40000000",
+        filter_land: "最低土地面積（㎡）",
+        filter_seaview: "海の見え方",
+        seaview_any: "こだわらない",
+        seaview_3: "海が見える（3以上）",
+        seaview_4: "海眺望良好（4以上）",
+        seaview_5: "絶景のみ（5）",
+        seaview_hint: "1–2：ほぼ見えない, 3：見える, 4：良好, 5：絶景",
+        filter_age: "掲載日数",
+        age_any: "指定なし",
+        age_1: "本日新着（1日以内）",
+        age_3: "直近3日",
+        age_7: "直近7日",
+        age_30: "直近30日",
+        featured_title: "注目物件",
+        featured_subtitle: "自動ピックアップされた海ビュー物件",
+        listings_title: "物件一覧",
+        listings_match_suffix: " 件ヒット",
+        sort_label: "並び替え：",
+        sort_newest: "新着順（初掲載日）",
+        sort_updated: "更新順",
+        sort_price_low: "価格（安い順）",
+        sort_price_high: "価格（高い順）",
+        sort_sea_view: "海眺望の強さ",
+        internal_note: "内輪用ビューのみ：リンク先は元の仲介サイト",
+        empty_message: "条件に一致する物件がありません。",
+        empty_clear: "条件をクリア"
+      }
+    };
 
     // ===============================
     // State
@@ -360,8 +385,9 @@
     let fxRate = FX_RATE_DEFAULT;
     let activeType = ""; // "", "land", "house", "mansion"
     let featuredIndex = 0;
-    let listings = defaultListings.slice(); // will be overwritten by listings.json if present
+    let listings = defaultListings.slice(); // overwritten by listings.json if present
     let featuredListingIds = []; // auto-selected featured listings
+    let lang = "JA"; // "JA" | "EN"
 
     // ===============================
     // DOM helpers
@@ -414,9 +440,14 @@
       return "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 0 });
     }
 
+    function getListingTitle(listing) {
+      if (lang === "EN" && listing.titleEn) return listing.titleEn;
+      return listing.titleEn || listing.title || "";
+    }
+
     function renderPrice(listing) {
       if (listing.priceJpy == null) {
-        return `<span class="text-slate-400">Ask</span>`;
+        return `<span class="text-slate-400">${lang === "JA" ? "応相談" : "Ask"}</span>`;
       }
       const jpyStr = formatJpy(listing.priceJpy);
       const usdStr = formatUsd(listing.priceJpy);
@@ -438,10 +469,17 @@
     function renderSeaViewBadge(score) {
       if (!score) return "";
       let label = "";
-      if (score === 5) label = "Sea view 5/5 • Wow";
-      else if (score === 4) label = "Sea view 4/5 • Strong";
-      else if (score === 3) label = "Sea view 3/5 • Visible";
-      else label = `Sea view ${score}/5`;
+      if (lang === "JA") {
+        if (score === 5) label = "海眺望 5/5・絶景";
+        else if (score === 4) label = "海眺望 4/5・良好";
+        else if (score === 3) label = "海眺望 3/5・見える";
+        else label = `海眺望 ${score}/5`;
+      } else {
+        if (score === 5) label = "Sea view 5/5 • Wow";
+        else if (score === 4) label = "Sea view 4/5 • Strong";
+        else if (score === 3) label = "Sea view 3/5 • Visible";
+        else label = `Sea view ${score}/5`;
+      }
 
       return `
         <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-500/15 text-[11px] text-sky-300 border border-sky-500/40">
@@ -451,24 +489,39 @@
     }
 
     // ===============================
+    // i18n apply
+    // ===============================
+
+    function applyLanguage() {
+      const dict = I18N[lang] || I18N.EN;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key] != null) {
+          el.textContent = dict[key];
+        }
+      });
+
+      // Re-render components that embed text programmatically
+      renderFeatured();
+      applyFilters();
+    }
+
+    // ===============================
     // Featured carousel - auto selection
     // ===============================
 
     function computeFeaturedListingIds() {
-      // Candidates: listings with at least a moderate sea view
       const candidates = listings
         .filter((l) => l.seaViewScore != null && l.seaViewScore >= 3)
         .sort((a, b) => {
-          // 1) Stronger sea view first
           const svDiff = (b.seaViewScore || 0) - (a.seaViewScore || 0);
           if (svDiff !== 0) return svDiff;
-          // 2) Newer (smaller firstSeenDaysAgo) first
           const ageA = a.firstSeenDaysAgo != null ? a.firstSeenDaysAgo : 9999;
           const ageB = b.firstSeenDaysAgo != null ? b.firstSeenDaysAgo : 9999;
           return ageA - ageB;
         });
 
-      const top = candidates.slice(0, 5); // top N featured
+      const top = candidates.slice(0, 5);
       featuredListingIds = top.map((l) => l.id);
       featuredIndex = 0;
     }
@@ -481,21 +534,24 @@
       if (!featuredListingIds.length) {
         container.innerHTML = `
           <div class="text-sm text-slate-400">
-            No strong sea-view properties at the moment.
+            ${lang === "JA"
+              ? "現在、強い海眺望の物件はありません。"
+              : "No strong sea-view properties at the moment."}
           </div>
         `;
         dotsContainer.innerHTML = "";
         return;
       }
 
-      const currentId =
-        featuredListingIds[featuredIndex] || featuredListingIds[0];
+      const currentId = featuredListingIds[featuredIndex] || featuredListingIds[0];
       const listing = getListingById(currentId);
 
       if (!listing) {
         container.innerHTML = `
           <div class="text-sm text-slate-400">
-            No featured property configured.
+            ${lang === "JA"
+              ? "注目物件が設定されていません。"
+              : "No featured property configured."}
           </div>
         `;
         dotsContainer.innerHTML = "";
@@ -504,32 +560,38 @@
 
       const typeLabel =
         listing.propertyType === "land"
-          ? "Land"
+          ? (lang === "JA" ? "土地" : "Land")
           : listing.propertyType === "house"
-          ? "House"
+          ? (lang === "JA" ? "戸建" : "House")
           : listing.propertyType === "mansion"
-          ? "Apartment"
-          : "Property";
+          ? (lang === "JA" ? "マンション" : "Apartment")
+          : (lang === "JA" ? "物件" : "Property");
 
       const ageLabel =
         listing.firstSeenDaysAgo === 0
-          ? "Today"
+          ? (lang === "JA" ? "本日" : "Today")
           : listing.firstSeenDaysAgo === 1
-          ? "1 day ago"
-          : `${listing.firstSeenDaysAgo} days ago`;
+          ? (lang === "JA" ? "1日前" : "1 day ago")
+          : listing.firstSeenDaysAgo != null
+          ? (lang === "JA"
+            ? `${listing.firstSeenDaysAgo}日前`
+            : `${listing.firstSeenDaysAgo} days ago`)
+          : "";
+
+      const titleText = getListingTitle(listing);
 
       container.innerHTML = `
         <article class="group bg-slate-950/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl shadow-slate-900/80 flex flex-col sm:flex-row">
           <div class="relative w-full sm:w-1/2 h-44 sm:h-auto overflow-hidden bg-slate-800">
             <img
               src="${listing.imageUrl}"
-              alt="${listing.title}"
+              alt="${titleText}"
               class="w-full h-full object-cover transform group-hover:scale-[1.03] transition"
               loading="lazy"
             />
             <div class="absolute top-2 left-2 flex flex-wrap gap-1">
               <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-sky-500 text-slate-950">
-                Featured
+                ${lang === "JA" ? "注目" : "Featured"}
               </span>
               <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-950/80 text-slate-100 border border-slate-700">
                 ${typeLabel}
@@ -542,7 +604,7 @@
           </div>
           <div class="flex-1 p-4 sm:p-5 flex flex-col gap-2">
             <h3 class="text-sm sm:text-base font-semibold leading-snug text-slate-50 line-clamp-2">
-              ${listing.title}
+              ${titleText}
             </h3>
             <div class="text-sm sm:text-base">
               ${renderPrice(listing)}
@@ -550,17 +612,17 @@
             <div class="flex flex-wrap gap-2 text-[11px] text-slate-400">
               ${
                 listing.landSqm
-                  ? `<span>${listing.landSqm.toLocaleString("ja-JP")}㎡ land</span>`
+                  ? `<span>${listing.landSqm.toLocaleString("ja-JP")}㎡ ${lang === "JA" ? "土地" : "land"}</span>`
                   : ""
               }
               ${
                 listing.buildingSqm
-                  ? `<span>• ${listing.buildingSqm.toLocaleString("ja-JP")}㎡ building</span>`
+                  ? `<span>• ${listing.buildingSqm.toLocaleString("ja-JP")}㎡ ${lang === "JA" ? "建物" : "building"}</span>`
                   : ""
               }
               ${
                 listing.yearBuilt
-                  ? `<span>• Built ${listing.yearBuilt}</span>`
+                  ? `<span>• ${lang === "JA" ? "築" : "Built "} ${listing.yearBuilt}</span>`
                   : ""
               }
             </div>
@@ -570,30 +632,27 @@
               ${
                 listing.station
                   ? `<span>• ${listing.station}駅${
-                      listing.walkMinutes != null
-                        ? " 徒歩" + listing.walkMinutes + "分"
-                        : ""
+                      listing.walkMinutes != null ? (lang === "JA" ? " 徒歩" + listing.walkMinutes + "分" : " " + listing.walkMinutes + " min walk") : ""
                     }</span>`
                   : ""
               }
             </div>
             <div class="flex flex-wrap items-center gap-2 mt-1">
               ${renderSeaViewBadge(listing.seaViewScore)}
-              ${
-                listing.viewNotes
-                  ? `<span class="text-[11px] text-slate-400 line-clamp-2">${listing.viewNotes}</span>`
-                  : ""
-              }
             </div>
             <div class="mt-auto flex items-center justify-between text-[11px] text-slate-500 pt-2">
-              <span>First seen: ${ageLabel}</span>
+              <span>
+                ${lang === "JA" ? "初掲載：" : "First seen: "} ${ageLabel}
+              </span>
               <a
                 href="${listing.sourceUrl}"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-1 text-sky-400 hover:text-sky-300"
               >
-                <span class="underline">Open broker site</span>
+                <span class="underline">
+                  ${lang === "JA" ? "仲介サイトを開く" : "Open broker site"}
+                </span>
                 <span>↗</span>
               </a>
             </div>
@@ -696,37 +755,47 @@
         .map((l) => {
           const typeLabel =
             l.propertyType === "land"
-              ? "Land"
+              ? (lang === "JA" ? "土地" : "Land")
               : l.propertyType === "house"
-              ? "House"
+              ? (lang === "JA" ? "戸建" : "House")
               : l.propertyType === "mansion"
-              ? "Apartment"
-              : "Property";
+              ? (lang === "JA" ? "マンション" : "Apartment")
+              : (lang === "JA" ? "物件" : "Property");
 
           const ageLabel =
             l.firstSeenDaysAgo === 0
-              ? "Today"
+              ? (lang === "JA" ? "本日" : "Today")
               : l.firstSeenDaysAgo === 1
-              ? "1 day ago"
-              : `${l.firstSeenDaysAgo} days ago`;
+              ? (lang === "JA" ? "1日前" : "1 day ago")
+              : l.firstSeenDaysAgo != null
+              ? (lang === "JA"
+                ? `${l.firstSeenDaysAgo}日前`
+                : `${l.firstSeenDaysAgo} days ago`)
+              : "";
 
           const updateLabel =
             l.lastUpdatedDaysAgo === 0
-              ? "Today"
+              ? (lang === "JA" ? "本日" : "Today")
               : l.lastUpdatedDaysAgo === 1
-              ? "1 day ago"
-              : `${l.lastUpdatedDaysAgo} days ago`;
+              ? (lang === "JA" ? "1日前" : "1 day ago")
+              : l.lastUpdatedDaysAgo != null
+              ? (lang === "JA"
+                ? `${l.lastUpdatedDaysAgo}日前`
+                : `${l.lastUpdatedDaysAgo} days ago`)
+              : "";
 
           const tags = l.highlightTags && l.highlightTags.length
             ? l.highlightTags
             : [];
+
+          const titleText = getListingTitle(l);
 
           return `
             <article class="group bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-lg shadow-slate-900/70 flex flex-col hover:border-sky-500/70 hover:shadow-sky-900/60 transition">
               <div class="relative h-40 sm:h-44 overflow-hidden bg-slate-800">
                 <img
                   src="${l.imageUrl}"
-                  alt="${l.title}"
+                  alt="${titleText}"
                   class="w-full h-full object-cover transform group-hover:scale-[1.03] transition"
                   loading="lazy"
                 />
@@ -755,7 +824,7 @@
               <div class="flex-1 p-4 flex flex-col gap-2">
                 <div class="flex items-start justify-between gap-2">
                   <h3 class="text-sm font-semibold leading-snug text-slate-50 line-clamp-2">
-                    ${l.title}
+                    ${titleText}
                   </h3>
                 </div>
 
@@ -766,17 +835,17 @@
                 <div class="flex flex-wrap gap-1 text-[11px] text-slate-400">
                   ${
                     l.landSqm
-                      ? `<span>${l.landSqm.toLocaleString("ja-JP")}㎡ land</span>`
+                      ? `<span>${l.landSqm.toLocaleString("ja-JP")}㎡ ${lang === "JA" ? "土地" : "land"}</span>`
                       : ""
                   }
                   ${
                     l.buildingSqm
-                      ? `<span>• ${l.buildingSqm.toLocaleString("ja-JP")}㎡ building</span>`
+                      ? `<span>• ${l.buildingSqm.toLocaleString("ja-JP")}㎡ ${lang === "JA" ? "建物" : "building"}</span>`
                       : ""
                   }
                   ${
                     l.yearBuilt
-                      ? `<span>• Built ${l.yearBuilt}</span>`
+                      ? `<span>• ${lang === "JA" ? "築" : "Built "} ${l.yearBuilt}</span>`
                       : ""
                   }
                 </div>
@@ -787,7 +856,9 @@
                   ${
                     l.station
                       ? `<span>• ${l.station}駅${
-                          l.walkMinutes != null ? " 徒歩" + l.walkMinutes + "分" : ""
+                          l.walkMinutes != null
+                            ? (lang === "JA" ? " 徒歩" + l.walkMinutes + "分" : " " + l.walkMinutes + " min walk")
+                            : ""
                         }</span>`
                       : ""
                   }
@@ -798,14 +869,20 @@
                 </div>
 
                 <div class="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
-                  <span>First seen: ${ageLabel}</span>
-                  <span>Updated: ${updateLabel}</span>
+                  <span>
+                    ${lang === "JA" ? "初掲載：" : "First seen: "} ${ageLabel}
+                  </span>
+                  <span>
+                    ${lang === "JA" ? "更新：" : "Updated: "} ${updateLabel}
+                  </span>
                 </div>
               </div>
 
               <div class="px-4 pb-4 flex items-center justify-between text-xs">
                 <span class="text-slate-500">
-                  Internal view only
+                  ${lang === "JA"
+                    ? "内輪用ビューのみ"
+                    : "Internal view only"}
                 </span>
                 <a
                   href="${l.sourceUrl}"
@@ -813,7 +890,9 @@
                   rel="noopener noreferrer"
                   class="inline-flex items-center gap-1 text-sky-400 hover:text-sky-300"
                 >
-                  <span class="underline">Open broker site</span>
+                  <span class="underline">
+                    ${lang === "JA" ? "仲介サイトを開く" : "Open broker site"}
+                  </span>
                   <span>↗</span>
                 </a>
               </div>
@@ -870,12 +949,35 @@
       applyFilters();
     }
 
+    function setLanguage(nextLang) {
+      lang = nextLang === "EN" ? "EN" : "JA";
+      $$(".lang-toggle").forEach((btn) => {
+        const l = btn.getAttribute("data-lang");
+        if (l === lang) {
+          btn.classList.add("bg-slate-100", "text-slate-900", "font-semibold");
+          btn.classList.remove("text-slate-300");
+        } else {
+          btn.classList.remove("bg-slate-100", "text-slate-900", "font-semibold");
+          btn.classList.add("text-slate-300");
+        }
+      });
+      applyLanguage();
+    }
+
     function initEvents() {
       // Currency toggle
       $$(".currency-toggle").forEach((btn) => {
         btn.addEventListener("click", () => {
           const mode = btn.getAttribute("data-currency-mode");
           setCurrencyMode(mode);
+        });
+      });
+
+      // Language toggle
+      $$(".lang-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-lang");
+          setLanguage(next);
         });
       });
 
@@ -927,10 +1029,9 @@
       $("#fx-rate-label").textContent = fxRate.toFixed(1);
       computeFeaturedListingIds();
       initEvents();
+      setLanguage("JA");
       setActiveType("");
       setCurrencyMode("JPY");
-      renderFeatured();
-      applyFilters();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
