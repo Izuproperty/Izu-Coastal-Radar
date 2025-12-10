@@ -1,313 +1,193 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Izu Coastal Radar | Real Estate Listings</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        /* Modernized Styles */
-        :root {
-            --primary-color: #004d40; /* Dark Teal */
-            --accent-color: #d84315; /* Orange/Red for emphasis */
-            --bg-light: #f4f7f9;
-            --bg-control: #e0f2f1;
-            --text-dark: #222;
-            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            --radius: 6px;
-        }
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-        }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 30px 0;
-            text-align: center;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        h1 {
-            margin: 0;
-            font-size: 2.8em;
-            font-weight: 700;
-        }
-        header p {
-            font-weight: 300;
-            margin-top: 5px;
-            opacity: 0.9;
-        }
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Izu Coastal Radar -- 伊豆太陽ホーム scraper (FINAL CLEAN VERSION)
+- Fixes the TypeError and ensures clean data output.
+- Prioritizes property photos.
+"""
+
+import json
+import re
+from datetime import datetime
+from urllib.parse import urljoin
+import time
+
+import requests
+from bs4 import BeautifulSoup
+
+BASE_DOMAIN = "https://www.izutaiyo.co.jp"
+
+FALLBACK_FX_RATE = 156.69
+
+ENTRY_URLS = [
+    "https://www.izutaiyo.co.jp/tokusen.php?-Token=True&hpkind=0&hpno=SMB410H+SMB408M+SM2013M+KWB235H+MI2001H+SMB407M+SMB409H+SMB391H+SMB342G+SMB392H+SM2009H+SM2010H+SM2008H+SM2003H+MIB375H+&hptantou=shimoda"
+]
+
+JAPANESE_CITIES = {
+    "下田市": "Shimoda City",
+    "伊東市": "Ito City",
+    "東伊豆町": "Higashi-Izu Town",
+    "河津町": "Kawazu Town",
+    "南伊豆町": "Minami-Izu Town",
+}
+
+# --- FX Rate and Helpers ---
+def fetch_current_fx_rate() -> float:
+    fx_url = "https://api.exchangerate-api.com/v4/latest/USD"
+    try:
+        response = requests.get(fx_url, timeout=5)
+        response.raise_for_status() 
+        return float(response.json()['rates'].get('JPY', FALLBACK_FX_RATE))
+    except Exception:
+        return FALLBACK_FX_RATE
+
+def text_clean(s: str) -> str:
+    if not s: return ""
+    return re.sub(r"\s+", " ", s).strip()
+
+def to_float(x):
+    if x is None: return None
+    s = str(x).strip().replace(",", "")
+    try: return float(s)
+    except Exception: return None
+
+def to_int(x):
+    if x is None: return None
+    s = str(x).strip().replace(",", "")
+    try: return int(float(s))
+    except Exception: return None
+
+def translate_title_to_en(jp_title: str) -> str:
+    t = jp_title
+    for jp_city, en_city in JAPANESE_CITIES.items():
+        t = t.replace(jp_city, en_city.replace(" City", "").replace(" Town", ""))
+    t = t.replace("海一望", "Ocean View").replace("海遠望", "Distant Sea View").replace("土地", "Land")
+    return text_clean(t) or jp_title
+
+def compute_sea_view_score(text: str) -> int | None:
+    if any(k in text for k in ["オーシャンフロント", "海一望", "海が目の前"]): return 5
+    if any(k in text for k in ["オーシャンビュー", "海望む", "海が見えます", "海が見える"]): return 4
+    if "海遠望" in text: return 3
+    if "海" in text and "見えない" not in text and "不可" not in text: return 2
+    return None
+
+# --- Image Handling ---
+SKIP_FRAGMENTS = ["/img/ico", "icon", "logo", "noimage", "header", "menu"]
+PHOTO_FRAGMENTS = ["/bb/", "bukken", "photo", "gaikan", "room", "外観", "内観"]
+
+def pick_best_image(soup: BeautifulSoup) -> str | None:
+    imgs = soup.find_all("img")
+    best_src, best_score = None, -1
+    for img in imgs:
+        src = img.get("src")
+        if not src: continue
+        lower = src.lower()
+        if any(b in lower for b in SKIP_FRAGMENTS): continue
+        if any(k in lower for k in ["madori", "間取", "間取り"]): continue 
+        score = 0
+        if any(g in lower for g in PHOTO_FRAGMENTS): score += 300
+        w = to_float(img.get("width") or "0") or 0
+        h = to_float(img.get("height") or "0") or 0
+        if w > 200 and h > 150: score += (w * h) / 100.0
+        else: score += 50
+        if score > best_score: best_score, best_src = score, src
+    
+    if not best_src: return None
+    return urljoin(BASE_DOMAIN, best_src)
+
+def find_property_image(detail_soup: BeautifulSoup) -> str | None:
+    # Prioritizing image directly from the detail page (d.php)
+    best_image = pick_best_image(detail_soup)
+    if best_image:
+        return best_image
+    return None
+
+def parse_year_built(text: str) -> int | None:
+    # Age disabled
+    return None
+
+# --- Main Parsing Loop ---
+def parse_detail_page(detail_url: str) -> dict | None:
+    try:
+        res = requests.get(detail_url, timeout=20)
+        soup = BeautifulSoup(res.text, "html.parser")
+        full_text = soup.get_text(" ", strip=True)
         
-        /* Control Bar Styling */
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--card-shadow);
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .controls label {
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-right: -5px;
-        }
-        .controls select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: var(--radius);
-            background-color: #fff;
-            min-width: 120px;
-            font-size: 0.95em;
-        }
-
-        /* Toggle Button Styling */
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--primary-color);
-            border-radius: var(--radius);
-            overflow: hidden;
-            background-color: var(--primary-color);
-        }
-        .toggle-group .toggle-btn {
-            background-color: #fff;
-            color: var(--primary-color);
-            border: none;
-            padding: 8px 15px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .toggle-group .toggle-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        #fx-display {
-            font-size: 0.9em;
-            color: #666;
-            margin-left: -5px;
-        }
-        #listing-count {
-            margin-left: auto;
-            font-weight: 400;
-            color: var(--accent-color);
-        }
-
-        /* Stats Panel Styling */
-        #stats-panel {
-            background-color: white;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-radius: var(--radius);
-            box-shadow: var(--card-shadow);
-        }
-        #stats-panel h2 {
-            margin-top: 0;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            color: var(--primary-color);
-            font-size: 1.6em;
-        }
-        .chart-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .chart-box {
-            background-color: var(--bg-light);
-            padding: 15px;
-            border-radius: var(--radius);
-            text-align: center;
-        }
-        .chart-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-top: 5px;
-            margin-bottom: 0;
-        }
-        .chart-value.secondary {
-            font-size: 1.5em;
-            color: #666;
-            margin-top: 2px;
-            margin-bottom: 0;
-        }
-        .chart-label {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
+        # --- Data Extraction ---
+        title = text_clean(soup.find("h2").get_text()) if soup.find("h2") else "物件"
+        price_jpy = to_float(re.search(r"([0-9,]+)\s*万円", full_text).group(1)) * 10000 if re.search(r"([0-9,]+)\s*万円", full_text) else None
+        land_sqm = to_float(re.search(r"(?:土地地積|地積|土地面積)[:：]\s*([\d,\.]+)", full_text).group(1)) if re.search(r"(?:土地地積|地積|土地面積)[:：]\s*([\d,\.]+)", full_text) else None
+        building_sqm = to_float(re.search(r"(?:床面積|建物).*?([\d,\.]+)\s*㎡", full_text).group(1)) if re.search(r"(?:床面積|建物).*?([\d,\.]+)\s*㎡", full_text) else None
+        sea_view_score = compute_sea_view_score(full_text)
         
-        /* Listing Card Styling */
-        .listing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-        }
-        .listing-card {
-            background-color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .listing-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        .card-image {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s;
-        }
-        .listing-card:hover .card-image {
-            transform: scale(1.05);
-        }
-        .card-content {
-            padding: 18px 20px;
-        }
-        .card-title {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 8px;
-            text-decoration: none;
-            display: block;
-            line-height: 1.3;
-        }
-        .card-title:hover {
-            text-decoration: underline;
-        }
-        .card-price {
-            font-size: 1.6em;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 12px;
-        }
-        .card-tags {
-            margin-bottom: 15px;
-        }
-        .card-tags span {
-            display: inline-block;
-            background-color: var(--bg-control);
-            color: var(--primary-color);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 400;
-            margin-right: 8px;
-            margin-bottom: 5px;
-        }
-        .card-details p {
-            margin: 4px 0;
-            font-size: 0.9em;
-            color: #444;
-        }
-        .card-details strong {
-            font-weight: 700;
-            margin-right: 5px;
-        }
-        .no-listings {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px;
-            font-size: 1.2em;
-            color: #666;
-            background-color: white;
-            border-radius: var(--radius);
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>Izu Coastal Radar</h1>
-        <p>Curated Real Estate Listings from 伊豆太陽ホーム (Izu Taiyo Home)</p>
-    </header>
-
-    <div class="container">
-
-        <div id="stats-panel">
-            <h2>Market Snapshot (Averages)</h2>
-            <div class="chart-container">
-                <div id="avg-price-box" class="chart-box"></div>
-                <div id="avg-sqm-box" class="chart-box"></div>
-                </div>
-        </div>
+        city = next((jp for jp in JAPANESE_CITIES if jp in full_text), "下田市")
+        property_type = "land" if not building_sqm and land_sqm else ("mansion" if any(k in title for k in ["マンション", "アーク", "リゾート"]) else "house")
         
-        <div class="controls">
-            <label>Language:</label>
-            <div class="toggle-group">
-                <button id="lang-en" class="toggle-btn active" onclick="setLanguage('en')">EN</button>
-                <button id="lang-jp" class="toggle-btn" onclick="setLanguage('jp')">JP</button>
-            </div>
-
-            <label>Currency:</label>
-            <div class="toggle-group">
-                <button id="currency-jpy" class="toggle-btn active" onclick="setCurrency('jpy')">JPY</button>
-                <button id="currency-usd" class="toggle-btn" onclick="setCurrency('usd')">USD</button>
-            </div>
-            <div id="fx-display"></div>
-
-            <label for="location-filter">Location:</label>
-            <select id="location-filter" onchange="filterListings()">
-                <option value="all">All Locations</option>
-                </select>
-
-            <label for="type-filter">Type:</label>
-            <select id="type-filter" onchange="filterListings()">
-                <option value="all">All Types</option>
-                <option value="house">House</option>
-                <option value="mansion">Mansion</option>
-                <option value="land">Land</option>
-            </select>
-
-            <label for="seaview-filter">Sea View:</label>
-            <select id="seaview-filter" onchange="filterListings()">
-                <option value="all">Any</option>
-                <option value="4">Strong View (4+)</option>
-                <option value="5">Ocean Front (5)</option>
-                <option value="none">No Sea View</option>
-            </select>
+        # --- Tagging: FIX for TypeError ---
+        highlightTags = [property_type.capitalize()]
+        
+        # Check if score is an integer (not None) before comparison
+        if isinstance(sea_view_score, int) and sea_view_score >= 4:
+            highlightTags.append("Sea view")
             
-            <div id="listing-count"></div>
-        </div>
+        listing = {
+            "id": f"izutaiyo-{hash(detail_url)}",
+            "sourceUrl": detail_url,
+            "title": title,
+            "titleEn": translate_title_to_en(title),
+            "propertyType": property_type,
+            "city": city,
+            "priceJpy": price_jpy,
+            "landSqm": land_sqm,
+            "buildingSqm": building_sqm,
+            "yearBuilt": None,
+            "seaViewScore": sea_view_score,
+            "imageUrl": find_property_image(soup),
+            "highlightTags": highlightTags,
+        }
+        return listing
+    except Exception:
+        # Catch-all to prevent script crash and allow the other listings to be processed
+        return None
 
-        <div class="listing-grid" id="listing-container">
-            <p class="no-listings">Loading listings...</p>
-        </div>
-    </div>
+def parse_recommended_page(url: str) -> list[dict]:
+    try:
+        res = requests.get(url, timeout=20)
+        soup = BeautifulSoup(res.text, "html.parser")
+        detail_links = sorted(set([urljoin(BASE_DOMAIN + "/", a["href"]) for a in soup.find_all("a", href=True) if "d.php?hpno=" in a["href"]]))
+    except Exception:
+        return []
+    
+    listings = []
+    for durl in detail_links:
+        # Time.sleep is inside the loop where it belongs
+        time.sleep(0.3) 
+        l = parse_detail_page(durl)
+        if l:
+            listings.append(l)
+    return listings
 
-    <script>
-        let allListings = [];
-        let fxRate = 1.0;
-        let currentLang = 'en'; 
-        let currentCurrency = 'jpy'; 
-        let siteStats = {};
-        // Use a public CORS proxy to fetch cross-origin images
-        const CORS_PROXY = 'https://corsproxy.io/?'; 
-        const FX_API_URL = "https://api.exchangerate-api.com/v4/latest/USD"; 
+def main():
+    listings = list({l["id"]: l for url in ENTRY_URLS for l in parse_recommended_page(url)}.values())
+    
+    FX_RATE = fetch_current_fx_rate()
+    prices = [l['priceJpy'] for l in listings if l['priceJpy'] is not None]
+    buildings = [l['buildingSqm'] for l in listings if l['buildingSqm'] is not None]
+
+    stats = {
+        "avgPriceM": (sum(prices) / len(prices)) / 1000000 if prices else 0,
+        "avgBuildingSqm": sum(buildings) / len(buildings) if buildings else 0,
+        "avgAge": 0
+    }
+    
+    out = {"fxRate": FX_RATE, "generatedAt": datetime.utcnow().isoformat() + "Z", "listings": listings, "stats": stats}
+
+    with open("listings.json", "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, indent=2)
         
-        // --- Location Mapping for Localization ---
-        const locationMap = {
-            "下田市": "Shimoda City",
-            "伊東市": "Ito City",
-            "東伊豆町": "Higashi-Izu Town",
-            "河津町": "Kawazu Town",
+    print(f"Successfully scraped {len(listings)} listings and saved to listings.json")
+
+if __name__ == "__main__":
+    import requests
+    main()
