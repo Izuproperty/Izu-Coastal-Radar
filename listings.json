@@ -1,6 +1,6 @@
 {
   "fxRate": 155.0,
-  "generatedAt": "2025-12-10T07:31:45.979003Z",
+  "generatedAt": "2025-12-10T07:40:46.173829Z",
   "listings": [
     {
       "id": "izutaiyo-KWB235H",
@@ -18,7 +18,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 5800000,
-      "landSqm": null,
+      "landSqm": 146.0,
       "buildingSqm": 88.92,
       "yearBuilt": null,
       "seaViewScore": 4,
@@ -27,7 +27,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235hmadori.gif",
       "highlightTags": [
         "House",
         "Sea view"
@@ -49,7 +49,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 8300000,
-      "landSqm": null,
+      "landSqm": 382.85,
       "buildingSqm": 135.76,
       "yearBuilt": null,
       "seaViewScore": 4,
@@ -58,7 +58,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001hmadori.gif",
       "highlightTags": [
         "House",
         "Sea view"
@@ -80,7 +80,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 31800000,
-      "landSqm": null,
+      "landSqm": 273.18,
       "buildingSqm": 115.51,
       "yearBuilt": null,
       "seaViewScore": null,
@@ -89,7 +89,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib375hmadori.gif",
       "highlightTags": [
         "House"
       ]
@@ -110,7 +110,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 18800000,
-      "landSqm": null,
+      "landSqm": 136.7,
       "buildingSqm": 72.87,
       "yearBuilt": null,
       "seaViewScore": null,
@@ -119,7 +119,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2003hmadori.gif",
       "highlightTags": [
         "House"
       ]
@@ -140,7 +140,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 12800000,
-      "landSqm": null,
+      "landSqm": 271.62,
       "buildingSqm": 57.96,
       "yearBuilt": null,
       "seaViewScore": 5,
@@ -149,7 +149,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2008hmadori.gif",
       "highlightTags": [
         "House",
         "Sea view"
@@ -171,7 +171,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 23000000,
-      "landSqm": null,
+      "landSqm": 330.57,
       "buildingSqm": 82.81,
       "yearBuilt": null,
       "seaViewScore": null,
@@ -180,7 +180,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009hmadori.gif",
       "highlightTags": [
         "House"
       ]
@@ -201,7 +201,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 15000000,
-      "landSqm": null,
+      "landSqm": 245.0,
       "buildingSqm": 104.34,
       "yearBuilt": null,
       "seaViewScore": null,
@@ -210,7 +210,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010hmadori.gif",
       "highlightTags": [
         "House"
       ]
@@ -240,7 +240,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2013mmadori.gif",
       "highlightTags": [
         "House"
       ]
@@ -261,7 +261,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 9000000,
-      "landSqm": null,
+      "landSqm": 333.0,
       "buildingSqm": null,
       "yearBuilt": null,
       "seaViewScore": null,
@@ -270,7 +270,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb342gmadori.gif",
       "highlightTags": [
         "Land"
       ]
@@ -291,7 +291,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 6800000,
-      "landSqm": null,
+      "landSqm": 132.0,
       "buildingSqm": 65.55,
       "yearBuilt": null,
       "seaViewScore": 4,
@@ -300,7 +300,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb391hmadori.gif",
       "highlightTags": [
         "House",
         "Sea view"
@@ -322,7 +322,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 198000000,
-      "landSqm": null,
+      "landSqm": 646.32,
       "buildingSqm": 298.98,
       "yearBuilt": null,
       "seaViewScore": 5,
@@ -331,7 +331,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb392hmadori.gif",
       "highlightTags": [
         "House",
         "Sea view"
@@ -362,7 +362,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb407mmadori.gif",
       "highlightTags": [
         "House",
         "Sea view"
@@ -393,7 +393,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408mmadori.gif",
       "highlightTags": [
         "House",
         "Sea view"
@@ -415,7 +415,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 12800000,
-      "landSqm": null,
+      "landSqm": 219.79,
       "buildingSqm": 125.86,
       "yearBuilt": null,
       "seaViewScore": null,
@@ -424,7 +424,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409hmadori.gif",
       "highlightTags": [
         "House"
       ]
@@ -445,7 +445,7 @@
       "line": null,
       "walkMinutes": null,
       "priceJpy": 10800000,
-      "landSqm": null,
+      "landSqm": 84.12,
       "buildingSqm": 71.22,
       "yearBuilt": null,
       "seaViewScore": null,
@@ -454,7 +454,7 @@
       "roadNotes": null,
       "firstSeenDaysAgo": 0,
       "lastUpdatedDaysAgo": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/img/menu/obj_ta_notitle.gif",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410hmadori.gif",
       "highlightTags": [
         "House"
       ]
