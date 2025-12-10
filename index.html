@@ -30,33 +30,20 @@
             </p>
           </div>
         </div>
-        <div class="flex flex-col items-end gap-1 text-xs sm:text-sm text-slate-400">
-          <div class="flex items-center gap-2">
-            <span>Language:</span>
-            <div class="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-[11px] sm:text-xs">
-              <button data-language="ja" class="lang-toggle px-2.5 sm:px-3 py-1 rounded-full bg-slate-100 text-slate-900 font-semibold">
-                日本語
+        <div class="text-xs sm:text-sm text-right text-slate-400">
+          <div>FX: <span id="fx-rate-label">155.0</span> JPY / USD</div>
+          <div class="flex items-center justify-end gap-2 mt-1">
+            <span class="hidden sm:inline">Display:</span>
+            <div class="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-xs">
+              <button data-currency-mode="JPY" class="currency-toggle px-3 py-1 rounded-full bg-slate-100 text-slate-900 font-semibold">
+                ¥
               </button>
-              <button data-language="en" class="lang-toggle px-2.5 sm:px-3 py-1 rounded-full text-slate-300">
-                EN
+              <button data-currency-mode="USD" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
+                $
               </button>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <div>FX: <span id="fx-rate-label">155.0</span> JPY / USD</div>
-            <div class="flex items-center gap-2">
-              <span class="hidden sm:inline">Display:</span>
-              <div class="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-xs">
-                <button data-currency-mode="JPY" class="currency-toggle px-3 py-1 rounded-full bg-slate-100 text-slate-900 font-semibold">
-                  ¥
-                </button>
-                <button data-currency-mode="USD" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
-                  $
-                </button>
-                <button data-currency-mode="BOTH" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
-                  ¥ / $
-                </button>
-              </div>
+              <button data-currency-mode="BOTH" class="currency-toggle px-3 py-1 rounded-full text-slate-300">
+                ¥ / $
+              </button>
             </div>
           </div>
         </div>
@@ -146,7 +133,8 @@
                 Sea View
               </label>
               <select id="sea-view-filter" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500">
-                <option value="1">Any</option>
+                <!-- IMPORTANT: empty value means "Any" (no filtering) -->
+                <option value="">Any</option>
                 <option value="3">Sea visible (3+)</option>
                 <option value="4">Strong sea view (4+)</option>
                 <option value="5">Wow factor only (5)</option>
@@ -254,8 +242,6 @@
     const FX_RATE_DEFAULT = 155.0;
 
     // Built-in sample data as a fallback if listings.json is missing.
-    // These do not yet have English titles; the bilingual logic
-    // will use titleEn when present in JSON and fall back to title.
     const defaultListings = [
       {
         id: "izutaiyo-001",
@@ -377,7 +363,6 @@
     let featuredIndex = 0;
     let listings = defaultListings.slice(); // will be overwritten by listings.json if present
     let featuredListingIds = []; // auto-selected featured listings
-    let language = "ja"; // "ja" | "en"
 
     // ===============================
     // DOM helpers
@@ -466,59 +451,6 @@
       `;
     }
 
-    // Bilingual: pick title based on language and available fields.
-    function getListingTitle(listing) {
-      if (!listing) return "";
-      if (language === "en" && listing.titleEn) {
-        return listing.titleEn;
-      }
-      return listing.title || "";
-    }
-
-    // ===============================
-    // Image helper (fallback for bad URLs)
-    // ===============================
-
-    const FALLBACK_IMAGES = [
-      "https://images.pexels.com/photos/240526/pexels-photo-240526.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=800",
-      "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ];
-
-    function hashString(str) {
-      let hash = 0;
-      if (!str) return hash;
-      for (let i = 0; i < str.length; i++) {
-        const chr = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0;
-      }
-      return hash;
-    }
-
-    function getDisplayImage(listing) {
-      const raw = (listing && listing.imageUrl ? String(listing.imageUrl) : "").trim();
-      const lower = raw.toLowerCase();
-
-      const badPatterns = [
-        "googleads.g.doubleclick.net",
-        "doubleclick.net",
-        "viewthroughconversion",
-        "/img/ico/",
-        "/img/btn",
-        "pagead/",
-        "analytics",
-        "conversion"
-      ];
-
-      if (!raw || badPatterns.some((k) => lower.includes(k))) {
-        const idx = Math.abs(hashString(listing && listing.id ? listing.id : "")) % FALLBACK_IMAGES.length;
-        return FALLBACK_IMAGES[idx];
-      }
-      return raw;
-    }
-
     // ===============================
     // Featured carousel - auto selection
     // ===============================
@@ -591,8 +523,8 @@
         <article class="group bg-slate-950/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl shadow-slate-900/80 flex flex-col sm:flex-row">
           <div class="relative w-full sm:w-1/2 h-44 sm:h-auto overflow-hidden bg-slate-800">
             <img
-              src="${getDisplayImage(listing)}"
-              alt="${getListingTitle(listing)}"
+              src="${listing.imageUrl}"
+              alt="${listing.title}"
               class="w-full h-full object-cover transform group-hover:scale-[1.03] transition"
               loading="lazy"
             />
@@ -611,7 +543,7 @@
           </div>
           <div class="flex-1 p-4 sm:p-5 flex flex-col gap-2">
             <h3 class="text-sm sm:text-base font-semibold leading-snug text-slate-50 line-clamp-2">
-              ${getListingTitle(listing)}
+              ${listing.title}
             </h3>
             <div class="text-sm sm:text-base">
               ${renderPrice(listing)}
@@ -703,8 +635,14 @@
 
     function applyFilters() {
       const location = $("#location-filter").value;
-      const seaViewMin = parseInt($("#sea-view-filter").value || "1", 10);
-      const ageLimit = $("#age-filter").value ? parseInt($("#age-filter").value, 10) : null;
+
+      // NEW: interpret sea-view filter so that empty string = "Any" (no filter)
+      const seaViewValue = $("#sea-view-filter").value;
+      const seaViewMin = seaViewValue ? parseInt(seaViewValue, 10) : null;
+
+      const ageLimit = $("#age-filter").value
+        ? parseInt($("#age-filter").value, 10)
+        : null;
 
       const minPrice = $("#min-price").value ? parseInt($("#min-price").value, 10) : null;
       const maxPrice = $("#max-price").value ? parseInt($("#max-price").value, 10) : null;
@@ -716,8 +654,8 @@
         if (location && l.city !== location) return false;
         if (activeType && l.propertyType !== activeType) return false;
 
-        // Sea view filter: only enforce when user selects 3, 4 or 5.
-        if (seaViewMin > 1) {
+        // Sea view filter: only apply when user chose 3,4,5 – not for "Any"
+        if (seaViewMin !== null) {
           if (l.seaViewScore == null || l.seaViewScore < seaViewMin) return false;
         }
 
@@ -798,8 +736,8 @@
             <article class="group bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-lg shadow-slate-900/70 flex flex-col hover:border-sky-500/70 hover:shadow-sky-900/60 transition">
               <div class="relative h-40 sm:h-44 overflow-hidden bg-slate-800">
                 <img
-                  src="${getDisplayImage(l)}"
-                  alt="${getListingTitle(l)}"
+                  src="${l.imageUrl}"
+                  alt="${l.title}"
                   class="w-full h-full object-cover transform group-hover:scale-[1.03] transition"
                   loading="lazy"
                 />
@@ -828,7 +766,7 @@
               <div class="flex-1 p-4 flex flex-col gap-2">
                 <div class="flex items-start justify-between gap-2">
                   <h3 class="text-sm font-semibold leading-snug text-slate-50 line-clamp-2">
-                    ${getListingTitle(l)}
+                    ${l.title}
                   </h3>
                 </div>
 
@@ -932,25 +870,9 @@
       applyFilters();
     }
 
-    function setLanguage(lang) {
-      language = lang;
-      $$(".lang-toggle").forEach((btn) => {
-        const l = btn.getAttribute("data-language");
-        if (l === lang) {
-          btn.classList.add("bg-slate-100", "text-slate-900", "font-semibold");
-          btn.classList.remove("text-slate-300");
-        } else {
-          btn.classList.remove("bg-slate-100", "text-slate-900", "font-semibold");
-          btn.classList.add("text-slate-300");
-        }
-      });
-      renderFeatured();
-      applyFilters();
-    }
-
     function resetFilters() {
       $("#location-filter").value = "";
-      $("#sea-view-filter").value = "1";
+      $("#sea-view-filter").value = ""; // reset to "Any"
       $("#age-filter").value = "";
       $("#min-price").value = "";
       $("#max-price").value = "";
@@ -968,14 +890,6 @@
         });
       });
 
-      // Language toggle
-      $$(".lang-toggle").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const lang = btn.getAttribute("data-language") || "ja";
-          setLanguage(lang);
-        });
-      });
-
       // Property type chips
       $$(".type-chip").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -986,19 +900,15 @@
 
       // Filters
       ["location-filter", "sea-view-filter", "age-filter", "sort-order"].forEach((id) => {
-        const el = $("#" + id);
-        if (el) el.addEventListener("change", applyFilters);
+        $("#" + id).addEventListener("change", applyFilters);
       });
 
       ["min-price", "max-price", "min-land"].forEach((id) => {
-        const el = $("#" + id);
-        if (el) el.addEventListener("input", applyFilters);
+        $("#" + id).addEventListener("input", applyFilters);
       });
 
-      const resetBtn = $("#reset-filters");
-      const clearEmptyBtn = $("#clear-filters-empty");
-      if (resetBtn) resetBtn.addEventListener("click", resetFilters);
-      if (clearEmptyBtn) clearEmptyBtn.addEventListener("click", resetFilters);
+      $("#reset-filters").addEventListener("click", resetFilters);
+      $("#clear-filters-empty").addEventListener("click", resetFilters);
 
       // Featured nav
       const prevBtn = $("#featured-prev");
@@ -1030,7 +940,6 @@
       initEvents();
       setActiveType("");
       setCurrencyMode("JPY");
-      setLanguage("ja");
       renderFeatured();
       applyFilters();
     }
