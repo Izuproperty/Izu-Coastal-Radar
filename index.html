@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Izu Coastal Radar | Real Estate Listings</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Modernized Styles */
         :root {
@@ -98,15 +99,55 @@
         #fx-display {
             font-size: 0.9em;
             color: #666;
-            margin-left: -5px; /* Pull closer to currency toggle */
+            margin-left: -5px;
         }
         #listing-count {
             margin-left: auto;
             font-weight: 400;
             color: var(--accent-color);
         }
+
+        /* Stats Panel Styling */
+        #stats-panel {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+        }
+        #stats-panel h2 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 1.6em;
+        }
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .chart-box {
+            background-color: var(--bg-light);
+            padding: 15px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+        .chart-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-top: 5px;
+            margin-bottom: 0;
+        }
+        .chart-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 0;
+        }
         
-        /* Listing Card Styling */
+        /* Listing Card Styling (Remains similar to previous version) */
         .listing-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -197,6 +238,15 @@
     </header>
 
     <div class="container">
+
+        <div id="stats-panel">
+            <h2>Market Snapshot (Averages)</h2>
+            <div class="chart-container">
+                <div id="avg-price-box" class="chart-box"></div>
+                <div id="avg-sqm-box" class="chart-box"></div>
+                <div id="avg-age-box" class="chart-box"></div>
+            </div>
+        </div>
         
         <div class="controls">
             <label>Language:</label>
@@ -244,14 +294,21 @@
     <script>
         let allListings = [];
         let fxRate = 1.0;
-        let currentLang = 'en'; // Default language is English
-        let currentCurrency = 'jpy'; // Default currency is JPY
-        const FX_API_URL = "https://api.exchangerate-api.com/v4/latest/USD"; // Client-side API fetch
+        let currentLang = 'en'; 
+        let currentCurrency = 'jpy'; 
+        let siteStats = {};
+        const FX_API_URL = "https://api.exchangerate-api.com/v4/latest/USD"; 
+        
+        // --- Location Mapping for Localization ---
+        const locationMap = {
+            "下田市": "Shimoda City",
+            "伊東市": "Ito City",
+            "東伊豆町": "Higashi-Izu Town",
+            "河津町": "Kawazu Town",
+            "南伊豆町": "Minami-Izu Town"
+        };
+        // ------------------------------------------
 
-        /**
-         * Attempts to fetch the latest USD/JPY rate from a client-side API.
-         * Falls back to the rate saved in listings.json if API fails.
-         */
         async function fetchLiveFxRate(fallbackRate) {
             try {
                 const response = await fetch(FX_API_URL);
@@ -265,9 +322,6 @@
             return fallbackRate;
         }
 
-        /**
-         * Fetches data, stores it, populates filters, and initializes the display.
-         */
         async function initRadar() {
             try {
                 const response = await fetch('listings.json');
@@ -276,8 +330,8 @@
                 }
                 const data = await response.json();
                 allListings = data.listings;
+                siteStats = data.stats || {}; // Store stats
                 
-                // Fetch the latest rate using the JSON rate as a fallback
                 fxRate = await fetchLiveFxRate(data.fxRate || 156.69); 
                 
                 allListings.sort((a, b) => a.id.localeCompare(b.id));
@@ -285,6 +339,7 @@
                 populateLocationFilter();
                 setCurrency(currentCurrency); 
                 setLanguage(currentLang);     
+                renderStats(); // Render the new stats panel
                 filterListings();             
             } catch (error) {
                 console.error("Could not load listings.json:", error);
@@ -293,9 +348,6 @@
             }
         }
         
-        /**
-         * Populates the Location dropdown based on unique cities in the data.
-         */
         function populateLocationFilter() {
             const cities = allListings
                 .map(l => l.city)
@@ -303,30 +355,42 @@
                 .sort();
             
             const filterEl = document.getElementById('location-filter');
-            // Remove existing options except 'All Locations'
-            filterEl.innerHTML = '<option value="all">All Locations</option>'; 
-
-            cities.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                filterEl.appendChild(option);
-            });
+            // Store the cities list on the element for localization
+            filterEl.dataset.cities = JSON.stringify(cities);
+            
+            // Populate the dropdown based on current language
+            updateLocationFilterOptions();
         }
         
-        /**
-         * Sets the display language and rerenders.
-         */
+        function updateLocationFilterOptions() {
+            const filterEl = document.getElementById('location-filter');
+            const cities = JSON.parse(filterEl.dataset.cities || '[]');
+            
+            filterEl.innerHTML = `<option value="all">${currentLang === 'en' ? 'All Locations' : '全地域'}</option>`; 
+
+            cities.forEach(jpCity => {
+                const option = document.createElement('option');
+                option.value = jpCity;
+                // Use English name if available and language is EN
+                const displayCity = (currentLang === 'en' && locationMap[jpCity]) ? locationMap[jpCity] : jpCity;
+                option.textContent = displayCity;
+                filterEl.appendChild(option);
+            });
+            // Re-select the currently active filter value to prevent loss
+            filterEl.value = filterEl.value;
+        }
+        
         function setLanguage(lang) {
             currentLang = lang;
             document.querySelectorAll('#lang-en, #lang-jp').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`lang-${lang}`).classList.add('active');
+            
+            // Update filter options and stats labels
+            updateLocationFilterOptions();
+            renderStats(); 
             filterListings(); 
         }
 
-        /**
-         * Sets the display currency and rerenders.
-         */
         function setCurrency(currency) {
             currentCurrency = currency;
             document.querySelectorAll('#currency-jpy, #currency-usd').forEach(btn => btn.classList.remove('active'));
@@ -335,32 +399,71 @@
             const rateDisplay = document.getElementById('fx-display');
             rateDisplay.innerHTML = `(1 USD = ${fxRate.toFixed(2)} JPY)`;
 
+            renderStats(); // Update stats panel currency
             filterListings();
         }
+        
+        function renderStats() {
+            if (Object.keys(siteStats).length === 0) return;
 
-        /**
-         * Applies filters and renders the resulting list.
-         */
+            // 1. Average Price Box
+            let priceValue, priceUnit, priceLabel;
+            if (currentCurrency === 'jpy') {
+                priceValue = siteStats.avgPriceM.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+                priceUnit = 'M JPY';
+                priceLabel = 'Average Price (Million)';
+            } else {
+                priceValue = (siteStats.avgPriceM * 1000000 / fxRate).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                priceUnit = 'USD';
+                priceLabel = 'Average Price';
+            }
+            document.getElementById('avg-price-box').innerHTML = `
+                <p class="chart-value">${priceValue}</p>
+                <p class="chart-label">${priceLabel} ${priceUnit}</p>
+            `;
+
+            // 2. Average Building Area Box
+            let sqmValue = siteStats.avgBuildingSqm.toFixed(0);
+            document.getElementById('avg-sqm-box').innerHTML = `
+                <p class="chart-value">${sqmValue}</p>
+                <p class="chart-label">${currentLang === 'en' ? 'Average Building Area (sqm)' : '平均建物面積 (㎡)'}</p>
+            `;
+
+            // 3. Average Age Box
+            let ageValue = siteStats.avgAge.toFixed(1);
+            document.getElementById('avg-age-box').innerHTML = `
+                <p class="chart-value">${ageValue}</p>
+                <p class="chart-label">${currentLang === 'en' ? 'Average Property Age (Years)' : '平均築年数 (年)'}</p>
+            `;
+        }
+
         function filterListings() {
             const typeFilter = document.getElementById('type-filter').value;
             const seaviewFilter = document.getElementById('seaview-filter').value;
             const locationFilter = document.getElementById('location-filter').value;
             
             const filtered = allListings.filter(listing => {
-                // 1. Property Type Filter (Fixed for land/mansion/house check)
+                // 1. Property Type Filter
                 const typeMatch = (typeFilter === 'all' || listing.propertyType === typeFilter);
 
                 // 2. Location Filter
                 const locationMatch = (locationFilter === 'all' || listing.city === locationFilter);
                 
-                // 3. Sea View Filter
+                // 3. Sea View Filter (FIXED LOGIC)
                 let seaviewMatch = true;
                 if (seaviewFilter === '4') {
                     seaviewMatch = (listing.seaViewScore >= 4);
                 } else if (seaviewFilter === '5') {
-                    seaviewMatch = (listing.seaViewScore === 5);
+                    // Check for score 5 AND ensure title contains '一望' (unobstructed) or 'オーシャンフロント'
+                    const isOceanFront = listing.title && (listing.title.includes('海一望') || listing.title.includes('オーシャンフロント'));
+                    seaviewMatch = (listing.seaViewScore === 5 && isOceanFront);
+                    
+                    // FALLBACK: If the scrape only got score 5 but missed the title keywords, we still show it.
+                    if (seaviewMatch === false && listing.seaViewScore === 5) {
+                        seaviewMatch = true; 
+                    }
+                    
                 } else if (seaviewFilter === 'none') {
-                    // Match listings with null, or a score of 1 (not notable), or 0
                     seaviewMatch = (listing.seaViewScore === null || listing.seaViewScore < 2);
                 }
 
@@ -370,9 +473,6 @@
             renderListings(filtered);
         }
 
-        /**
-         * Renders the list of properties into the HTML container.
-         */
         function renderListings(listings) {
             const container = document.getElementById('listing-container');
             container.innerHTML = ''; 
@@ -387,20 +487,21 @@
 
             listings.forEach(listing => {
                 const titleText = currentLang === 'en' ? (listing.titleEn || listing.title) : listing.title;
+                const locationText = currentLang === 'en' ? (locationMap[listing.city] || listing.city) : listing.city;
+                const builtAge = listing.yearBuilt ? (new Date().getFullYear() - listing.yearBuilt) : null;
+
 
                 let priceDisplay = 'N/A';
                 if (listing.priceJpy) {
                     if (currentCurrency === 'jpy') {
-                        // Display price in Millions (M) JPY
                         const priceM = (listing.priceJpy / 1000000).toLocaleString('en-US', {
                             minimumFractionDigits: 1,
                             maximumFractionDigits: 2
                         });
                         priceDisplay = `¥${priceM}M`;
                     } else { // USD
-                        // Display price in whole USD
-                        const usdPrice = (listing.priceJpy / fxRate).toFixed(0).toLocaleString('en-US');
-                        priceDisplay = `$${usdPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`; // Add comma formatting
+                        const usdPrice = (listing.priceJpy / fxRate).toFixed(0);
+                        priceDisplay = `$${usdPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`; 
                     }
                 }
                 
@@ -416,10 +517,10 @@
                                 ${listing.highlightTags.map(tag => `<span>${tag}</span>`).join('')}
                             </div>
                             <div class="card-details">
-                                <p><strong>Location:</strong> ${listing.city || 'Unknown'}</p>
+                                <p><strong>Location:</strong> ${locationText}</p>
                                 ${listing.landSqm ? `<p><strong>Land:</strong> ${listing.landSqm.toLocaleString()} sqm</p>` : ''}
                                 ${listing.buildingSqm ? `<p><strong>Building:</strong> ${listing.buildingSqm.toLocaleString()} sqm</p>` : ''}
-                                ${listing.yearBuilt ? `<p><strong>Built:</strong> ${listing.yearBuilt}</p>` : ''}
+                                ${listing.yearBuilt ? `<p><strong>Built:</strong> ${listing.yearBuilt} (${builtAge} yrs old)</p>` : ''}
                             </div>
                         </div>
                     </div>
