@@ -250,7 +250,11 @@
             <div class="chart-container">
                 <div id="avg-price-box" class="chart-box"></div>
                 <div id="avg-sqm-box" class="chart-box"></div>
-                <div id="avg-age-box" class="chart-box"></div>
+                <style>
+                    #stats-panel .chart-container {
+                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    }
+                </style>
             </div>
         </div>
         
@@ -379,7 +383,6 @@
                 option.textContent = displayCity;
                 filterEl.appendChild(option);
             });
-            // Re-select the currently active filter value to prevent loss
             filterEl.value = filterEl.value;
         }
         
@@ -408,7 +411,7 @@
         function renderStats() {
             if (Object.keys(siteStats).length === 0) return;
 
-            // 1. Average Price Box (FIXED FOR DUAL CURRENCY DISPLAY)
+            // 1. Average Price Box
             const avgPriceM = siteStats.avgPriceM;
             
             // JPY Display (Primary)
@@ -432,12 +435,8 @@
                 <p class="chart-label">${currentLang === 'en' ? 'Average Building Area (sqm)' : '平均建物面積 (㎡)'}</p>
             `;
 
-            // 3. Average Age Box
-            let ageValue = siteStats.avgAge.toFixed(1);
-            document.getElementById('avg-age-box').innerHTML = `
-                <p class="chart-value">${ageValue}</p>
-                <p class="chart-label">${currentLang === 'en' ? 'Average Property Age (Years)' : '平均築年数 (年)'}</p>
-            `;
+            // AGE BOX REMOVED FROM DISPLAY LOGIC
+            // document.getElementById('avg-age-box').style.display = 'none'; 
         }
 
         function filterListings() {
@@ -446,26 +445,19 @@
             const locationFilter = document.getElementById('location-filter').value;
             
             const filtered = allListings.filter(listing => {
-                // 1. Property Type Filter
                 const typeMatch = (typeFilter === 'all' || listing.propertyType === typeFilter);
-
-                // 2. Location Filter
                 const locationMatch = (locationFilter === 'all' || listing.city === locationFilter);
                 
-                // 3. Sea View Filter (Refined Logic)
+                // Sea View Filter (Using refined logic)
                 let seaviewMatch = true;
                 if (seaviewFilter === '4') {
                     seaviewMatch = (listing.seaViewScore >= 4);
                 } else if (seaviewFilter === '5') {
-                    // Filter for true Ocean Front: Score 5 AND explicit keyword check in JP title
                     const isOceanFront = listing.title && (listing.title.includes('海一望') || listing.title.includes('オーシャンフロント') || listing.title.includes('海が目の前'));
                     
-                    // Show if score is 5 AND keywords are present
                     if (listing.seaViewScore === 5 && isOceanFront) {
                         seaviewMatch = true;
                     } else if (listing.seaViewScore === 5 && !isOceanFront) {
-                        // If score 5 but no explicit keyword, we might still show it to be safe, but prioritize keyword match.
-                        // For a strict filter, we'll keep it as the strong keyword presence.
                         seaviewMatch = false; 
                     } else {
                         seaviewMatch = false;
@@ -496,10 +488,9 @@
             listings.forEach(listing => {
                 const titleText = currentLang === 'en' ? (listing.titleEn || listing.title) : listing.title;
                 const locationText = currentLang === 'en' ? (locationMap[listing.city] || listing.city) : listing.city;
-                // Calculate and display age of property
-                const builtAge = listing.yearBuilt ? (new Date().getFullYear() - listing.yearBuilt) : null;
-
-
+                
+                // Built age removed from display since it's unreliable
+                
                 let priceDisplay = 'N/A';
                 if (listing.priceJpy) {
                     if (currentCurrency === 'jpy') {
@@ -514,6 +505,7 @@
                     }
                 }
                 
+                // Note: The yearBuilt line is removed from the cardHtml below
                 const cardHtml = `
                     <div class="listing-card">
                         <img src="${listing.imageUrl || 'noimage.gif'}" alt="Image for ${listing.titleEn}" class="card-image" onerror="this.onerror=null; this.src='https://via.placeholder.com/320x220?text=No+Image+Available';">
@@ -529,7 +521,6 @@
                                 <p><strong>Location:</strong> ${locationText}</p>
                                 ${listing.landSqm ? `<p><strong>Land:</strong> ${listing.landSqm.toLocaleString()} sqm</p>` : ''}
                                 ${listing.buildingSqm ? `<p><strong>Building:</strong> ${listing.buildingSqm.toLocaleString()} sqm</p>` : ''}
-                                ${listing.yearBuilt ? `<p><strong>Built:</strong> ${listing.yearBuilt} (${builtAge} yrs old)</p>` : ''}
                             </div>
                         </div>
                     </div>
