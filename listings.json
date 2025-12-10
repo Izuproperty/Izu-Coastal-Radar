@@ -1,6 +1,6 @@
 {
   "fxRate": 155.0,
-  "generatedAt": "2025-12-10T12:22:31.493095Z",
+  "generatedAt": "2025-12-10T13:14:09.418764Z",
   "listings": [
     {
       "id": "izutaiyo-KWB235H",
@@ -11,9 +11,9 @@
       "titleEn": "Kawazu 桜坂温泉Villa Area",
       "propertyType": "house",
       "prefecture": "静岡県",
-      "city": "下田市",
+      "city": "河津町",
       "areaLabel": null,
-      "addressRaw": "下田市",
+      "addressRaw": "河津町",
       "station": null,
       "line": null,
       "walkMinutes": null,
@@ -39,12 +39,12 @@
       "sourceLabel": "伊豆太陽ホーム",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
       "title": "南伊豆町 子浦",
-      "titleEn": "南伊豆町 子浦",
+      "titleEn": "Minami-Izu 子浦",
       "propertyType": "house",
       "prefecture": "静岡県",
-      "city": "下田市",
+      "city": "南伊豆町",
       "areaLabel": null,
-      "addressRaw": "下田市",
+      "addressRaw": "南伊豆町",
       "station": null,
       "line": null,
       "walkMinutes": null,
@@ -70,12 +70,12 @@
       "sourceLabel": "伊豆太陽ホーム",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
       "title": "南伊豆町 下賀茂",
-      "titleEn": "南伊豆町 下賀茂",
+      "titleEn": "Minami-Izu 下賀茂",
       "propertyType": "house",
       "prefecture": "静岡県",
-      "city": "下田市",
+      "city": "南伊豆町",
       "areaLabel": null,
-      "addressRaw": "下田市",
+      "addressRaw": "南伊豆町",
       "station": null,
       "line": null,
       "walkMinutes": null,
@@ -222,7 +222,7 @@
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2013M",
       "title": "下田市 ロイヤルアーク下田",
       "titleEn": "Shimoda ロイヤルアーク下田",
-      "propertyType": "house",
+      "propertyType": "mansion",
       "prefecture": "静岡県",
       "city": "下田市",
       "areaLabel": null,
@@ -242,7 +242,7 @@
       "lastUpdatedDaysAgo": 0,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2013mmadori.gif",
       "highlightTags": [
-        "House"
+        "Mansion"
       ]
     },
     {
