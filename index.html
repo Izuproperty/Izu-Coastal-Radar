@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Izu Coastal Radar | Real Estate Listings</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Modernized Styles */
+        /* Modernized Styles (Kept for brevity, assumed from previous step) */
         :root {
-            --primary-color: #004d40; /* Dark Teal */
-            --accent-color: #d84315; /* Orange/Red for emphasis */
+            --primary-color: #004d40;
+            --accent-color: #d84315;
             --bg-light: #f4f7f9;
             --bg-control: #e0f2f1;
             --text-dark: #222;
@@ -250,11 +249,6 @@
             <div class="chart-container">
                 <div id="avg-price-box" class="chart-box"></div>
                 <div id="avg-sqm-box" class="chart-box"></div>
-                <style>
-                    #stats-panel .chart-container {
-                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                    }
-                </style>
             </div>
         </div>
         
@@ -307,6 +301,8 @@
         let currentLang = 'en'; 
         let currentCurrency = 'jpy'; 
         let siteStats = {};
+        // Use a public CORS proxy to fetch cross-origin images
+        const CORS_PROXY = 'https://corsproxy.io/?'; 
         const FX_API_URL = "https://api.exchangerate-api.com/v4/latest/USD"; 
         
         // --- Location Mapping for Localization ---
@@ -342,6 +338,7 @@
                 allListings = data.listings;
                 siteStats = data.stats || {}; 
                 
+                // Fetch the live rate, falling back to the rate scraped by Python
                 fxRate = await fetchLiveFxRate(data.fxRate || 156.69); 
                 
                 allListings.sort((a, b) => a.id.localeCompare(b.id));
@@ -354,7 +351,7 @@
             } catch (error) {
                 console.error("Could not load listings.json:", error);
                 document.getElementById('listing-container').innerHTML = 
-                    '<p class="no-listings">Error loading property data. Please check the JSON file path.</p>';
+                    '<p class="no-listings">Error loading property data. Please ensure listings.json is correctly deployed.</p>';
             }
         }
         
@@ -402,14 +399,26 @@
             document.getElementById(`currency-${currency}`).classList.add('active');
 
             const rateDisplay = document.getElementById('fx-display');
-            rateDisplay.innerHTML = `(1 USD = ${fxRate.toFixed(2)} JPY)`;
+            // Check if fxRate is a valid number before displaying
+            if (!isNaN(fxRate)) {
+                rateDisplay.innerHTML = `(1 USD = ${fxRate.toFixed(2)} JPY)`;
+            } else {
+                rateDisplay.innerHTML = `(FX Rate N/A)`;
+            }
+
 
             renderStats(); 
             filterListings();
         }
         
         function renderStats() {
-            if (Object.keys(siteStats).length === 0) return;
+            if (Object.keys(siteStats).length === 0 || siteStats.avgPriceM === 0) {
+                 // Hide panel if no data is available
+                 document.getElementById('stats-panel').style.display = 'none';
+                 return;
+            } else {
+                 document.getElementById('stats-panel').style.display = 'block';
+            }
 
             // 1. Average Price Box
             const avgPriceM = siteStats.avgPriceM;
@@ -419,9 +428,12 @@
             const jpyDisplay = `¥${jpyPrice}M`;
             
             // USD Display (Secondary)
-            const avgPriceUSD = (avgPriceM * 1000000 / fxRate).toFixed(0);
-            const usdDisplay = `$${avgPriceUSD.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-            
+            let usdDisplay = 'N/A';
+            if (!isNaN(fxRate) && fxRate > 0) {
+                 const avgPriceUSD = (avgPriceM * 1000000 / fxRate).toFixed(0);
+                 usdDisplay = `$${avgPriceUSD.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+            }
+
             document.getElementById('avg-price-box').innerHTML = `
                 <p class="chart-value">${jpyDisplay}</p>
                 <p class="chart-value secondary">(${usdDisplay})</p>
@@ -434,9 +446,6 @@
                 <p class="chart-value">${sqmValue}</p>
                 <p class="chart-label">${currentLang === 'en' ? 'Average Building Area (sqm)' : '平均建物面積 (㎡)'}</p>
             `;
-
-            // AGE BOX REMOVED FROM DISPLAY LOGIC
-            // document.getElementById('avg-age-box').style.display = 'none'; 
         }
 
         function filterListings() {
@@ -457,10 +466,8 @@
                     
                     if (listing.seaViewScore === 5 && isOceanFront) {
                         seaviewMatch = true;
-                    } else if (listing.seaViewScore === 5 && !isOceanFront) {
-                        seaviewMatch = false; 
                     } else {
-                        seaviewMatch = false;
+                        seaviewMatch = false; 
                     }
 
                 } else if (seaviewFilter === 'none') {
@@ -489,10 +496,14 @@
                 const titleText = currentLang === 'en' ? (listing.titleEn || listing.title) : listing.title;
                 const locationText = currentLang === 'en' ? (locationMap[listing.city] || listing.city) : listing.city;
                 
-                // Built age removed from display since it's unreliable
+                // PREPARE IMAGE URL with CORS proxy
+                let imageUrl = 'https://via.placeholder.com/320x220?text=No+Image+Available';
+                if (listing.imageUrl) {
+                    imageUrl = `${CORS_PROXY}${encodeURIComponent(listing.imageUrl)}`;
+                }
                 
                 let priceDisplay = 'N/A';
-                if (listing.priceJpy) {
+                if (listing.priceJpy && !isNaN(fxRate)) {
                     if (currentCurrency === 'jpy') {
                         const priceM = (listing.priceJpy / 1000000).toLocaleString('en-US', {
                             minimumFractionDigits: 1,
@@ -505,10 +516,9 @@
                     }
                 }
                 
-                // Note: The yearBuilt line is removed from the cardHtml below
                 const cardHtml = `
                     <div class="listing-card">
-                        <img src="${listing.imageUrl || 'noimage.gif'}" alt="Image for ${listing.titleEn}" class="card-image" onerror="this.onerror=null; this.src='https://via.placeholder.com/320x220?text=No+Image+Available';">
+                        <img src="${imageUrl}" alt="Image for ${listing.titleEn}" class="card-image">
                         <div class="card-content">
                             <a href="${listing.sourceUrl}" target="_blank" class="card-title" title="${listing.title}">${titleText}</a>
                             <div class="card-price">
