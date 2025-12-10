@@ -141,13 +141,19 @@
             margin-top: 5px;
             margin-bottom: 0;
         }
+        .chart-value.secondary {
+            font-size: 1.5em;
+            color: #666;
+            margin-top: 2px;
+            margin-bottom: 0;
+        }
         .chart-label {
             font-size: 0.9em;
             color: #666;
-            margin-top: 0;
+            margin-top: 5px;
         }
         
-        /* Listing Card Styling (Remains similar to previous version) */
+        /* Listing Card Styling */
         .listing-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -330,7 +336,7 @@
                 }
                 const data = await response.json();
                 allListings = data.listings;
-                siteStats = data.stats || {}; // Store stats
+                siteStats = data.stats || {}; 
                 
                 fxRate = await fetchLiveFxRate(data.fxRate || 156.69); 
                 
@@ -339,7 +345,7 @@
                 populateLocationFilter();
                 setCurrency(currentCurrency); 
                 setLanguage(currentLang);     
-                renderStats(); // Render the new stats panel
+                renderStats(); 
                 filterListings();             
             } catch (error) {
                 console.error("Could not load listings.json:", error);
@@ -355,10 +361,8 @@
                 .sort();
             
             const filterEl = document.getElementById('location-filter');
-            // Store the cities list on the element for localization
             filterEl.dataset.cities = JSON.stringify(cities);
             
-            // Populate the dropdown based on current language
             updateLocationFilterOptions();
         }
         
@@ -371,7 +375,6 @@
             cities.forEach(jpCity => {
                 const option = document.createElement('option');
                 option.value = jpCity;
-                // Use English name if available and language is EN
                 const displayCity = (currentLang === 'en' && locationMap[jpCity]) ? locationMap[jpCity] : jpCity;
                 option.textContent = displayCity;
                 filterEl.appendChild(option);
@@ -385,7 +388,6 @@
             document.querySelectorAll('#lang-en, #lang-jp').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`lang-${lang}`).classList.add('active');
             
-            // Update filter options and stats labels
             updateLocationFilterOptions();
             renderStats(); 
             filterListings(); 
@@ -399,27 +401,28 @@
             const rateDisplay = document.getElementById('fx-display');
             rateDisplay.innerHTML = `(1 USD = ${fxRate.toFixed(2)} JPY)`;
 
-            renderStats(); // Update stats panel currency
+            renderStats(); 
             filterListings();
         }
         
         function renderStats() {
             if (Object.keys(siteStats).length === 0) return;
 
-            // 1. Average Price Box
-            let priceValue, priceUnit, priceLabel;
-            if (currentCurrency === 'jpy') {
-                priceValue = siteStats.avgPriceM.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-                priceUnit = 'M JPY';
-                priceLabel = 'Average Price (Million)';
-            } else {
-                priceValue = (siteStats.avgPriceM * 1000000 / fxRate).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                priceUnit = 'USD';
-                priceLabel = 'Average Price';
-            }
+            // 1. Average Price Box (FIXED FOR DUAL CURRENCY DISPLAY)
+            const avgPriceM = siteStats.avgPriceM;
+            
+            // JPY Display (Primary)
+            const jpyPrice = avgPriceM.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+            const jpyDisplay = `¥${jpyPrice}M`;
+            
+            // USD Display (Secondary)
+            const avgPriceUSD = (avgPriceM * 1000000 / fxRate).toFixed(0);
+            const usdDisplay = `$${avgPriceUSD.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+            
             document.getElementById('avg-price-box').innerHTML = `
-                <p class="chart-value">${priceValue}</p>
-                <p class="chart-label">${priceLabel} ${priceUnit}</p>
+                <p class="chart-value">${jpyDisplay}</p>
+                <p class="chart-value secondary">(${usdDisplay})</p>
+                <p class="chart-label">${currentLang === 'en' ? 'Average Price' : '平均価格'}</p>
             `;
 
             // 2. Average Building Area Box
@@ -449,20 +452,25 @@
                 // 2. Location Filter
                 const locationMatch = (locationFilter === 'all' || listing.city === locationFilter);
                 
-                // 3. Sea View Filter (FIXED LOGIC)
+                // 3. Sea View Filter (Refined Logic)
                 let seaviewMatch = true;
                 if (seaviewFilter === '4') {
                     seaviewMatch = (listing.seaViewScore >= 4);
                 } else if (seaviewFilter === '5') {
-                    // Check for score 5 AND ensure title contains '一望' (unobstructed) or 'オーシャンフロント'
-                    const isOceanFront = listing.title && (listing.title.includes('海一望') || listing.title.includes('オーシャンフロント'));
-                    seaviewMatch = (listing.seaViewScore === 5 && isOceanFront);
+                    // Filter for true Ocean Front: Score 5 AND explicit keyword check in JP title
+                    const isOceanFront = listing.title && (listing.title.includes('海一望') || listing.title.includes('オーシャンフロント') || listing.title.includes('海が目の前'));
                     
-                    // FALLBACK: If the scrape only got score 5 but missed the title keywords, we still show it.
-                    if (seaviewMatch === false && listing.seaViewScore === 5) {
-                        seaviewMatch = true; 
+                    // Show if score is 5 AND keywords are present
+                    if (listing.seaViewScore === 5 && isOceanFront) {
+                        seaviewMatch = true;
+                    } else if (listing.seaViewScore === 5 && !isOceanFront) {
+                        // If score 5 but no explicit keyword, we might still show it to be safe, but prioritize keyword match.
+                        // For a strict filter, we'll keep it as the strong keyword presence.
+                        seaviewMatch = false; 
+                    } else {
+                        seaviewMatch = false;
                     }
-                    
+
                 } else if (seaviewFilter === 'none') {
                     seaviewMatch = (listing.seaViewScore === null || listing.seaViewScore < 2);
                 }
@@ -488,6 +496,7 @@
             listings.forEach(listing => {
                 const titleText = currentLang === 'en' ? (listing.titleEn || listing.title) : listing.title;
                 const locationText = currentLang === 'en' ? (locationMap[listing.city] || listing.city) : listing.city;
+                // Calculate and display age of property
                 const builtAge = listing.yearBuilt ? (new Date().getFullYear() - listing.yearBuilt) : null;
 
 
