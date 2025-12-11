@@ -37,7 +37,6 @@
         .card-title { font-size: 1.15em; font-weight: 600; margin-bottom: 12px; line-height: 1.4; color: var(--text); text-decoration: none; }
         .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; margin-bottom: 15px; padding: 15px 0; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
         .meta-item { display: flex; align-items: center; gap: 6px; }
-        .details-row { font-size: 0.85em; color: #64748b; margin-bottom: 4px; display: flex; justify-content: space-between; }
         .card-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.85rem; color: var(--text-light); }
         .card-tags { margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
         .tag { background: #e0f2f1; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
@@ -89,18 +88,15 @@
 
     async function init() {
         try {
-            // CACHE BUSTER ADDED HERE
-            const res = await fetch('listings.json?v=' + Date.now());
+            // Simplified fetch to reduce errors
+            const res = await fetch('listings.json');
             if (!res.ok) throw new Error("JSON not found");
             const json = await res.json();
             DATA.listings = json.listings;
             DATA.rate = json.fxRate || 155;
             populateLocations();
             applyFilters();
-        } catch (e) { 
-            console.error(e);
-            document.getElementById('listings-container').innerHTML = "<p class='no-listings'>Failed to load data. Try refreshing.</p>"; 
-        }
+        } catch (e) { document.getElementById('listings-container').innerHTML = "<p class='no-listings'>Failed to load data. Please ensure listings.json is in the repo.</p>"; }
     }
 
     function setLang(l) { STATE.lang = l; document.getElementById('btn-en').className = l==='EN'?'toggle-btn active':'toggle-btn'; document.getElementById('btn-jp').className = l==='JP'?'toggle-btn active':'toggle-btn'; populateLocations(); applyFilters(); }
@@ -121,7 +117,7 @@
 
     function fmtPrice(v) {
         if (!v) return "N/A";
-        return STATE.curr === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
+        return STATE.currency === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
     }
 
     function renderStats(items) {
