@@ -12,7 +12,6 @@
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 50px; }
         
-        /* HERO */
         header { background: #fff; border-bottom: 1px solid var(--border); }
         .vintage-hero { 
             display: flex; gap: 15px; padding: 30px; overflow-x: auto; 
@@ -72,7 +71,7 @@
         .tag { background: #e0f2f1; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
         .tag.sea-view { background: #e3f2fd; color: #0277bd; }
         .no-listings { grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-light); }
-        .error-msg { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; text-align: center; }
+        .error-msg { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; text-align: center; margin: 20px; }
     </style>
 </head>
 <body>
@@ -93,9 +92,9 @@
 
 <div class="container">
     <div class="stats-bar" id="stats-panel" style="display:none">
-        <div class="stat-item"><div class="stat-val" id="stat-price">-</div><div class="stat-label" id="lbl-price">Avg Price</div></div>
-        <div class="stat-item"><div class="stat-val" id="stat-size">-</div><div class="stat-label" id="lbl-size">Avg Size</div></div>
-        <div class="stat-item"><div class="stat-val" id="stat-unit">-</div><div class="stat-label" id="lbl-unit">Price/Unit</div><div class="stat-sub" id="stat-unit-sub">-</div></div>
+        <div class="stat-item"><div class="stat-val" id="stat-price">-</div><div class="stat-label" id="lbl-avg-price">Avg Price</div></div>
+        <div class="stat-item"><div class="stat-val" id="stat-size">-</div><div class="stat-label" id="lbl-avg-size">Avg Size</div></div>
+        <div class="stat-item"><div class="stat-val" id="stat-unit">-</div><div class="stat-label" id="lbl-unit-price">Price/Unit</div><div class="stat-sub" id="stat-unit-sub">-</div></div>
     </div>
 
     <div class="controls">
@@ -135,7 +134,7 @@
     const PROXY = "https://corsproxy.io/?";
     const LOC_MAP = { "下田市": "Shimoda City", "伊東市": "Ito City", "東伊豆町": "Higashi-Izu Town", "河津町": "Kawazu Town", "南伊豆町": "Minami-Izu Town" };
     
-    // VARIABLE RENAMED TO MATCH REFERENCES
+    // RENAMED TO MATCH REFERENCES
     const TXT = { 
         'EN': { avgP: "Avg Price", avgS: "Avg Size", unit: "Price/Unit", perSqm: "per sqm", perSqft: "per sqft", built: "Built", upd: "Updated", locAll: "All Locations" }, 
         'JP': { avgP: "平均価格", avgS: "平均面積", unit: "単価", perSqm: "平米単価", perSqft: "sqft単価", built: "築年", upd: "更新", locAll: "全地域" } 
@@ -169,7 +168,7 @@
         const sel = document.getElementById('location-select');
         const currentVal = sel.value;
         const cities = [...new Set(DATA.listings.map(l => l.city))].sort();
-        const t = TXT[STATE.lang]; // Fixed reference
+        const t = TXT[STATE.lang];
         sel.innerHTML = `<option value="all">${t.locAll}</option>`;
         cities.forEach(city => {
             const label = STATE.lang === 'EN' ? (LOC_MAP[city] || city) : city;
@@ -186,18 +185,22 @@
     function renderStats(items) {
         if (items.length === 0) { document.getElementById('stats-panel').style.display = 'none'; return; }
         document.getElementById('stats-panel').style.display = 'flex';
-        const t = TXT[STATE.lang]; // Fixed reference
+        const t = TXT[STATE.lang];
+        
         const totalP = items.reduce((a, b) => a + (b.priceJpy || 0), 0);
         const totalS = items.reduce((a, b) => a + (b.buildingSqm || 0), 0);
         const countP = items.filter(i => i.priceJpy).length;
         const countS = items.filter(i => i.buildingSqm).length;
+        
         const avgP = countP ? totalP / countP : 0;
         const avgS = countS ? totalS / countS : 0;
         const pricePerSqm = (avgS > 0) ? avgP / avgS : 0;
         
+        // UPDATED IDs TO MATCH HTML
         document.getElementById('lbl-avg-price').innerText = t.avgP;
         document.getElementById('lbl-avg-size').innerText = t.avgS;
         document.getElementById('lbl-unit-price').innerText = t.unit;
+
         document.getElementById('stat-price').innerText = fmtPrice(avgP);
         document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
         
@@ -237,7 +240,7 @@
         const container = document.getElementById('listings-container');
         container.innerHTML = "";
         document.getElementById('count-display').innerText = `${items.length} Listings`;
-        const t = TXT[STATE.lang]; // Fixed reference
+        const t = TXT[STATE.language];
 
         if (items.length === 0) {
             container.innerHTML = `<p class="no-listings">No listings match your filters.</p>`;
@@ -246,7 +249,7 @@
 
         items.forEach(l => {
             const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400x300?text=No+Photo";
-            const title = STATE.lang === 'EN' ? (l.titleEn || l.title) : l.title;
+            const title = STATE.language === 'EN' ? (l.titleEn || l.title) : l.title;
             
             let metaHtml = "";
             if (l.buildingSqm) metaHtml += `<div class="meta-item"><span>🏠</span> <span>${l.buildingSqm} m²</span></div>`;
@@ -260,7 +263,6 @@
                 <div class="card">
                     <div class="card-img-wrap">
                         <a href="${l.sourceUrl}" target="_blank"><img src="${imgUrl}" class="card-img" loading="lazy"></a>
-                        ${l.seaViewScore >=4 ? '<div class="card-tag sea-view">🌊 Sea View</div>' : ''}
                     </div>
                     <div class="card-body">
                         <div class="card-price">${fmtPrice(l.priceJpy)}</div>
