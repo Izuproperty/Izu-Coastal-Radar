@@ -85,11 +85,15 @@
     let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', sort: 'price-desc', type: 'all', view: 'all' };
     const PROXY = "https://corsproxy.io/?";
     const LOC_MAP = { "下田市": "Shimoda City", "伊東市": "Ito City", "東伊豆町": "Higashi-Izu Town", "河津町": "Kawazu Town", "南伊豆町": "Minami-Izu Town" };
-    const TXT = { 'EN': { avgP: "Avg Price", avgS: "Avg Size", unit: "Price/Unit", perSqm: "per sqm", perSqft: "per sqft", built: "Built", upd: "Updated", locAll: "All Locations" }, 'JP': { avgP: "平均価格", avgS: "平均面積", unit: "単価", perSqm: "平米単価", perSqft: "sqft単価", built: "築年", upd: "更新", locAll: "全地域" } };
+    
+    // RENAMED BACK TO 'TXT' TO MATCH FUNCTION CALLS
+    const TXT = { 
+        'EN': { avgP: "Avg Price", avgS: "Avg Size", unit: "Price/Unit", perSqm: "per sqm", perSqft: "per sqft", built: "Built", upd: "Updated", locAll: "All Locations" }, 
+        'JP': { avgP: "平均価格", avgS: "平均面積", unit: "単価", perSqm: "平米単価", perSqft: "sqft単価", built: "築年", upd: "更新", locAll: "全地域" } 
+    };
 
     async function init() {
         try {
-            // THE FIX: Adding '?v=' + Date.now() forces a fresh download, bypassing cache.
             const res = await fetch('listings.json?v=' + Date.now());
             if (!res.ok) throw new Error("JSON not found");
             const json = await res.json();
@@ -98,8 +102,7 @@
             populateLocations();
             applyFilters();
         } catch (e) { 
-            document.getElementById('listings-container').innerHTML = 
-            `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`; 
+            document.getElementById('listings-container').innerHTML = `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`; 
         }
     }
 
