@@ -10,7 +10,7 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 50px; }
         header { background: #fff; border-bottom: 1px solid var(--border); }
         .vintage-hero { display: flex; gap: 15px; padding: 30px; overflow-x: auto; background: #FDFBF7; justify-content: center; }
-        .poster-frame { height: 220px; flex-shrink: 0; border: 6px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; }
+        .poster-frame { height: 220px; flex-shrink: 0; border: 6px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer; }
         .poster-frame:hover { transform: scale(1.02); z-index: 10; }
         .poster-frame img { height: 100%; width: auto; display: block; }
         .header-content { text-align: center; padding: 30px 20px; }
@@ -42,7 +42,7 @@
         .tag { background: #e0f2f1; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
         .tag.sea-view { background: #e3f2fd; color: #0277bd; }
         .no-listings { grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-light); }
-        .error-msg { color: #d32f2f; background: #ffebee; padding: 20px; border-radius: 8px; text-align: center; margin: 20px; font-family: monospace; }
+        .error-msg { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -89,26 +89,17 @@
 
     async function init() {
         try {
-            // CACHE BUSTER + Safety Checks
+            // THE FIX: Adding '?v=' + Date.now() forces a fresh download, bypassing cache.
             const res = await fetch('listings.json?v=' + Date.now());
-            if (!res.ok) throw new Error(`Server returned ${res.status} ${res.statusText}`);
-            
+            if (!res.ok) throw new Error("JSON not found");
             const json = await res.json();
-            if (!json || !Array.isArray(json.listings)) throw new Error("Invalid JSON structure: 'listings' array missing.");
-            
             DATA.listings = json.listings;
             DATA.rate = json.fxRate || 155;
-            
             populateLocations();
             applyFilters();
-        } catch (e) {
-            console.error(e);
+        } catch (e) { 
             document.getElementById('listings-container').innerHTML = 
-                `<div class='no-listings error-msg'>
-                    <strong>Failed to load data.</strong><br>
-                    Error details: ${e.message}<br><br>
-                    <em>Ensure 'listings.json' is in the root directory.</em>
-                </div>`;
+            `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`; 
         }
     }
 
@@ -116,10 +107,9 @@
     function setCurr(c) { STATE.curr = c; document.getElementById('btn-jpy').className = c==='JPY'?'toggle-btn active':'toggle-btn'; document.getElementById('btn-usd').className = c==='USD'?'toggle-btn active':'toggle-btn'; applyFilters(); }
 
     function populateLocations() {
-        // FIXED: Correct ID reference
         const sel = document.getElementById('location-select');
         const currentVal = sel.value;
-        const cities = [...new Set(DATA.listings.map(l => l.city || "Unknown"))].sort();
+        const cities = [...new Set(DATA.listings.map(l => l.city))].sort();
         const t = TXT[STATE.language];
         sel.innerHTML = `<option value="all">${t.locAll}</option>`;
         cities.forEach(city => {
