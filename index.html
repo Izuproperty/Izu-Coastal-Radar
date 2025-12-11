@@ -89,14 +89,18 @@
 
     async function init() {
         try {
-            const res = await fetch('listings.json');
+            // CACHE BUSTER ADDED HERE
+            const res = await fetch('listings.json?v=' + Date.now());
             if (!res.ok) throw new Error("JSON not found");
             const json = await res.json();
             DATA.listings = json.listings;
             DATA.rate = json.fxRate || 155;
             populateLocations();
             applyFilters();
-        } catch (e) { document.getElementById('listings-container').innerHTML = "<p class='no-listings'>Failed to load data.</p>"; }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('listings-container').innerHTML = "<p class='no-listings'>Failed to load data. Try refreshing.</p>"; 
+        }
     }
 
     function setLang(l) { STATE.lang = l; document.getElementById('btn-en').className = l==='EN'?'toggle-btn active':'toggle-btn'; document.getElementById('btn-jp').className = l==='JP'?'toggle-btn active':'toggle-btn'; populateLocations(); applyFilters(); }
@@ -117,7 +121,7 @@
 
     function fmtPrice(v) {
         if (!v) return "N/A";
-        return STATE.currency === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
+        return STATE.curr === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
     }
 
     function renderStats(items) {
@@ -185,6 +189,10 @@
             const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400x300?text=No+Photo";
             const title = STATE.language === 'EN' ? (l.titleEn || l.title) : l.title;
             
+            let metaHtml = "";
+            if (l.buildingSqm) metaHtml += `<div class="meta-item"><span>🏠</span> <span>${l.buildingSqm} m²</span></div>`;
+            if (l.landSqm) metaHtml += `<div class="meta-item"><span>🌳</span> <span>${l.landSqm} m²</span></div>`;
+            
             let details = [];
             if (l.yearBuilt) details.push(`<span>${t.built}: ${l.yearBuilt}</span>`);
             if (l.lastUpdated) details.push(`<span>${t.upd}: ${l.lastUpdated}</span>`);
@@ -198,10 +206,7 @@
                     <div class="card-body">
                         <div class="card-price">${fmtPrice(l.priceJpy)}</div>
                         <a href="${l.sourceUrl}" target="_blank" class="card-title">${title}</a>
-                        <div class="card-meta">
-                            <div class="meta-item"><span>🏠</span> <span>${l.buildingSqm || '-'} m²</span></div>
-                            <div class="meta-item"><span>🌳</span> <span>${l.landSqm || '-'} m²</span></div>
-                        </div>
+                        <div class="card-meta">${metaHtml}</div>
                         <div class="card-footer">${details.join(' &bull; ')}</div>
                         <div class="card-tags">
                             ${l.highlightTags.map(tag => tag==='Sea View'?'':`<span class="tag">${tag}</span>`).join('')}
