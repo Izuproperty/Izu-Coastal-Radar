@@ -12,17 +12,16 @@
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         
-        /* Vintage Hero Header */
         header { background: #fff; border-bottom: 1px solid var(--border); }
         .vintage-hero { 
-            display: flex; gap: 10px; padding: 20px; overflow-x: auto; 
+            display: flex; gap: 15px; padding: 30px; overflow-x: auto; 
             background: #FDFBF7; justify-content: center;
         }
         .poster-frame { 
-            height: 180px; flex-shrink: 0; border: 4px solid #fff; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; 
+            height: 220px; flex-shrink: 0; border: 6px solid #fff; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; 
         }
-        .poster-frame:hover { transform: scale(1.05); z-index: 10; }
+        .poster-frame:hover { transform: scale(1.02); z-index: 10; }
         .poster-frame img { height: 100%; width: auto; display: block; }
         
         .header-content { text-align: center; padding: 30px 20px; }
@@ -31,14 +30,12 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        /* Dashboard */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--border); }
         .stat-val { font-size: 1.6em; font-weight: 700; color: var(--primary); }
         .stat-lbl { font-size: 0.8em; color: var(--text-light); text-transform: uppercase; margin-top: 5px; }
         .stat-sub { font-size: 0.85em; color: var(--accent); margin-top: 2px; font-weight: 600; }
 
-        /* Controls */
         .controls-wrapper { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid var(--border); }
         .toggles-row { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
         .toggle-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; color: #64748b; }
@@ -48,7 +45,6 @@
         select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95em; min-width: 150px; }
         .results-count { margin-left: auto; font-weight: 600; color: var(--text-light); }
 
-        /* Grid */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; }
         .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s; display: flex; flex-direction: column; border: 1px solid var(--border); }
         .card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
@@ -73,11 +69,11 @@
 
 <header>
     <div class="vintage-hero">
-        <div class="poster-frame"><img src="images/17E88B82-01F3-4A60-9571-935741E304B9.jpeg" alt="Vintage Izu"></div>
-        <div class="poster-frame"><img src="images/42DD5202-2825-48D4-BC01-1AF67FD8BFBE.jpeg" alt="Vintage Izu"></div>
-        <div class="poster-frame"><img src="images/57D6E8AA-D359-417A-AB92-037676775478.jpeg" alt="Vintage Izu"></div>
-        <div class="poster-frame"><img src="images/715105E4-F9EB-405D-A0E4-3D0C8C82EDE6.jpeg" alt="Vintage Izu"></div>
-        <div class="poster-frame"><img src="images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg" alt="Vintage Izu"></div>
+        <div class="poster-frame"><img src="assets/images/17E88B82-01F3-4A60-9571-935741E304B9.jpeg" alt="Vintage Izu"></div>
+        <div class="poster-frame"><img src="assets/images/42DD5202-2825-48D4-BC01-1AF67FD8BFBE.jpeg" alt="Vintage Izu"></div>
+        <div class="poster-frame"><img src="assets/images/57D6E8AA-D359-417A-AB92-037676775478.jpeg" alt="Vintage Izu"></div>
+        <div class="poster-frame"><img src="assets/images/715105E4-F9EB-405D-A0E4-3D0C8C82EDE6.jpeg" alt="Vintage Izu"></div>
+        <div class="poster-frame"><img src="assets/images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg" alt="Vintage Izu"></div>
     </div>
     
     <div class="header-content">
@@ -146,26 +142,12 @@
 <script>
     let DATA = { listings: [], rate: 155.0 };
     let STATE = { currency: 'JPY', language: 'EN' };
-    
-    // NEW PROXY: wsrv.nl is extremely reliable for images
     const PROXY = "https://wsrv.nl/?url=";
-    
-    const LOC_MAP = {
-        "下田市": "Shimoda City", "伊東市": "Ito City", "東伊豆町": "Higashi-Izu Town",
-        "河津町": "Kawazu Town", "南伊豆町": "Minami-Izu Town"
-    };
+    const LOC_MAP = { "下田市": "Shimoda City", "伊東市": "Ito City", "東伊豆町": "Higashi-Izu Town", "河津町": "Kawazu Town", "南伊豆町": "Minami-Izu Town" };
 
     const UI_TEXT = {
-        'EN': { 
-            avgPrice: "Avg Price", avgBuild: "Avg Building", unitPrice: "Unit Price", 
-            perSqm: "per sqm", perSqft: "per sqft", built: "Built", updated: "Updated",
-            locAll: "All Locations"
-        },
-        'JP': { 
-            avgPrice: "平均価格", avgBuild: "平均建物面積", unitPrice: "単価", 
-            perSqm: "平米単価", perSqft: "sqft単価", built: "築年", updated: "更新日",
-            locAll: "全地域"
-        }
+        'EN': { avgPrice: "Avg Price", avgBuild: "Avg Building", unitPrice: "Unit Price", perSqm: "per sqm", perSqft: "per sqft", built: "Built", updated: "Updated", locAll: "All Locations" },
+        'JP': { avgPrice: "平均価格", avgBuild: "平均建物面積", unitPrice: "単価", perSqm: "平米単価", perSqft: "sqft単価", built: "築年", updated: "更新日", locAll: "全地域" }
     };
 
     async function init() {
@@ -174,60 +156,30 @@
             const json = await res.json();
             DATA.listings = json.listings;
             DATA.rate = json.fxRate || 155.0;
-            
             populateLocations();
             applyFilters();
-        } catch (e) {
-            document.getElementById('listings-container').innerHTML = "<p class='no-listings'>Failed to load data.</p>";
-        }
+        } catch (e) { document.getElementById('listings-container').innerHTML = "<p class='no-listings'>Failed to load data.</p>"; }
     }
 
-    function setCurrency(c) {
-        STATE.currency = c;
-        document.querySelectorAll('#curr-jpy, #curr-usd').forEach(b => b.classList.remove('active'));
-        document.getElementById(c === 'JPY' ? 'curr-jpy' : 'curr-usd').classList.add('active');
-        applyFilters();
-    }
-
-    function setLanguage(l) {
-        STATE.language = l;
-        document.querySelectorAll('#lang-en, #lang-jp').forEach(b => b.classList.remove('active'));
-        document.getElementById(l === 'EN' ? 'lang-en' : 'lang-jp').classList.add('active');
-        
-        // Update static UI
-        const t = UI_TEXT[l];
-        document.getElementById('lbl-avg-price').textContent = t.avgPrice;
-        document.getElementById('lbl-avg-size').textContent = t.avgBuild;
-        document.getElementById('lbl-unit-price').textContent = t.unitPrice;
-        
-        // Re-populate dropdown to change language
-        populateLocations();
-        applyFilters();
-    }
+    function setCurrency(c) { STATE.currency = c; document.querySelectorAll('#curr-jpy, #curr-usd').forEach(b => b.classList.remove('active')); document.getElementById(c === 'JPY' ? 'curr-jpy' : 'curr-usd').classList.add('active'); applyFilters(); }
+    function setLanguage(l) { STATE.language = l; document.querySelectorAll('#lang-en, #lang-jp').forEach(b => b.classList.remove('active')); document.getElementById(l === 'EN' ? 'lang-en' : 'lang-jp').classList.add('active'); populateLocations(); applyFilters(); }
 
     function populateLocations() {
         const sel = document.getElementById('location-select');
         const currentVal = sel.value;
-        const t = UI_TEXT[STATE.language];
-        
-        // Get unique cities
         const cities = [...new Set(DATA.listings.map(l => l.city))].sort();
-        
+        const t = UI_TEXT[STATE.language];
         sel.innerHTML = `<option value="all">${t.locAll}</option>`;
         cities.forEach(city => {
             const label = STATE.language === 'EN' ? (LOC_MAP[city] || city) : city;
             sel.innerHTML += `<option value="${city}">${label}</option>`;
         });
-        sel.value = currentVal; // Restore selection
+        sel.value = currentVal;
     }
 
     function formatPrice(jpy) {
         if (!jpy) return "N/A";
-        if (STATE.currency === 'JPY') {
-            return "¥" + (jpy / 1000000).toFixed(1) + "M";
-        } else {
-            return "$" + Math.round(jpy / DATA.rate).toLocaleString();
-        }
+        return STATE.currency === 'JPY' ? "¥" + (jpy / 1000000).toFixed(1) + "M" : "$" + Math.round(jpy / DATA.rate).toLocaleString();
     }
 
     function renderStats(items) {
@@ -244,15 +196,19 @@
         const avgS = countS ? totalS / countS : 0;
         const pricePerSqm = (avgS > 0) ? avgP / avgS : 0;
         
-        document.getElementById('stat-price').textContent = formatPrice(avgP);
-        document.getElementById('stat-size').textContent = Math.round(avgS) + " m²";
+        document.getElementById('lbl-avg-price').innerText = t.avgPrice;
+        document.getElementById('lbl-avg-size').innerText = t.avgBuild;
+        document.getElementById('lbl-unit-price').innerText = t.unitPrice;
+
+        document.getElementById('stat-price').innerText = formatPrice(avgP);
+        document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
         
         if (STATE.currency === 'JPY') {
-            document.getElementById('stat-unit').textContent = "¥" + Math.round(pricePerSqm / 10000) + "万";
-            document.getElementById('stat-unit-sub').textContent = t.perSqm;
+            document.getElementById('stat-unit').innerText = "¥" + Math.round(pricePerSqm / 10000) + "万";
+            document.getElementById('stat-unit-sub').innerText = t.perSqm;
         } else {
             const pricePerSqftUSD = (pricePerSqm / 10.764) / DATA.rate;
-            document.getElementById('stat-unit').textContent = "$" + Math.round(pricePerSqftUSD);
+            document.getElementById('stat-unit').innerText = "$" + Math.round(pricePerSqftUSD);
             document.getElementById('stat-unit-sub').textContent = t.perSqft;
         }
     }
@@ -262,7 +218,6 @@
         const typeMode = document.getElementById('type-select').value;
         const locMode = document.getElementById('location-select').value;
         const viewMode = document.getElementById('seaview-select').value;
-        
         let items = [...DATA.listings];
 
         if (locMode !== 'all') items = items.filter(l => l.city === locMode);
@@ -271,16 +226,11 @@
         if (viewMode === '5') items = items.filter(l => l.seaViewScore === 5);
 
         items.sort((a, b) => {
-            const pA = a.priceJpy || 0; const pB = b.priceJpy || 0;
-            const sA = a.buildingSqm || 0; const sB = b.buildingSqm || 0;
-            const ageA = a.age || 999; const ageB = b.age || 999;
-
-            if (sortMode === 'price-desc') return pB - pA;
-            if (sortMode === 'price-asc') return pA - pB;
-            if (sortMode === 'size-desc') return sB - sA;
-            if (sortMode === 'age-desc') return ageA - ageB; 
+            if (sortMode === 'price-desc') return (b.priceJpy||0) - (a.priceJpy||0);
+            if (sortMode === 'price-asc') return (a.priceJpy||0) - (b.priceJpy||0);
+            if (sortMode === 'size-desc') return (b.buildingSqm||0) - (a.buildingSqm||0);
+            if (sortMode === 'age-desc') return (a.age||999) - (b.age||999);
         });
-
         renderListings(items);
         renderStats(items);
     }
@@ -288,7 +238,7 @@
     function renderListings(items) {
         const container = document.getElementById('listings-container');
         container.innerHTML = "";
-        document.getElementById('count-display').textContent = `${items.length} Listings`;
+        document.getElementById('count-display').innerText = `${items.length} Listings`;
         const t = UI_TEXT[STATE.language];
 
         if (items.length === 0) {
@@ -301,35 +251,32 @@
             const title = STATE.language === 'EN' ? (item.titleEn || item.title) : item.title;
             
             let metaHtml = "";
-            if (item.buildingSqm) metaHtml += `<div class="meta-item"><span class="meta-icon">🏠</span> <span>${item.buildingSqm} m²</span></div>`;
-            if (item.landSqm) metaHtml += `<div class="meta-item"><span class="meta-icon">🌳</span> <span>${item.landSqm} m²</span></div>`;
+            if (item.buildingSqm) metaHtml += `<div class="meta-item"><span>🏠</span> <span>${item.buildingSqm} m²</span></div>`;
+            if (item.landSqm) metaHtml += `<div class="meta-item"><span>🌳</span> <span>${item.landSqm} m²</span></div>`;
             
-            let details = "";
-            if (item.yearBuilt) details += `<div class="details-row"><span>${t.built}:</span> <strong>${item.yearBuilt}</strong></div>`;
-            if (item.lastUpdated) details += `<div class="details-row"><span>${t.updated}:</span> <strong>${item.lastUpdated}</strong></div>`;
+            let details = [];
+            if (item.yearBuilt) details.push(`<span>${t.built}: ${item.yearBuilt}</span>`);
+            if (item.lastUpdated) details.push(`<span>${t.updated}: ${item.lastUpdated}</span>`);
 
             const card = `
                 <div class="card">
                     <div class="card-img-wrap">
-                        <a href="${item.sourceUrl}" target="_blank">
-                            <img src="${imgUrl}" class="card-img" loading="lazy">
-                        </a>
+                        <a href="${item.sourceUrl}" target="_blank"><img src="${imgUrl}" class="card-img" loading="lazy"></a>
                         ${item.seaViewScore >=4 ? '<div class="card-tag sea-view">🌊 Sea View</div>' : ''}
                     </div>
                     <div class="card-body">
                         <div class="card-price">${formatPrice(item.priceJpy)}</div>
                         <a href="${item.sourceUrl}" target="_blank" class="card-title">${title}</a>
                         <div class="card-meta">${metaHtml}</div>
-                        ${details}
+                        <div class="card-footer">${details.join(' &bull; ')}</div>
                         <div class="card-tags">
                             ${item.highlightTags.map(tag => {
-                                if (tag !== 'Sea View') return `<span class="tag">${tag}</span>`;
-                                return '';
+                                if (tag === 'Sea View') return ''; 
+                                return `<span class="tag">${tag}</span>`;
                             }).join('')}
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
             container.insertAdjacentHTML('beforeend', card);
         });
     }
