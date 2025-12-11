@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Izu Coastal Radar</title>
+    <title>Izu Coastal Radar | Real Estate Listings</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,6 +13,7 @@
             --card-bg: #ffffff;
             --text: #2c3e50;
             --text-light: #7f8c8d;
+            --border: #e2e8f0;
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         
@@ -24,35 +25,57 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
         /* Stats Dashboard */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; }
-        .stat-val { font-size: 1.8em; font-weight: 700; color: var(--primary); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--border); }
+        .stat-val { font-size: 1.6em; font-weight: 700; color: var(--primary); }
         .stat-lbl { font-size: 0.85em; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
         .stat-sub { font-size: 0.85em; color: var(--accent); margin-top: 2px; font-weight: 600; }
 
-        /* Controls */
-        .controls { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 30px; }
-        select { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95em; min-width: 140px; }
-        .toggle-btn { background: #eee; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; color: #555; }
-        .toggle-btn.active { background: var(--primary); color: white; }
-        .flex-spacer { flex-grow: 1; }
-
-        /* Listings */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s; display: flex; flex-direction: column; }
-        .card:hover { transform: translateY(-5px); }
+        /* Controls Area */
+        .controls-wrapper { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid var(--border); }
         
-        .card-img-wrap { height: 220px; background: #eee; position: relative; overflow: hidden; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        /* Toggle Rows */
+        .toggles-row { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+        .toggle-group { display: flex; align-items: center; gap: 10px; }
+        .toggle-label { font-weight: 600; font-size: 0.9em; color: var(--text-light); text-transform: uppercase; }
+        .toggle-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; color: #64748b; transition: all 0.2s; }
+        .toggle-btn:hover { background: #e2e8f0; }
+        .toggle-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Filter Row */
+        .filters-row { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-label { font-size: 0.8em; font-weight: 600; color: var(--text-light); }
+        select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95em; min-width: 160px; background-color: #fff; color: var(--text); }
+        
+        .results-count { margin-left: auto; font-weight: 600; color: var(--text-light); align-self: flex-end; padding-bottom: 5px; }
+
+        /* Listings Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; }
+        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; border: 1px solid var(--border); }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+        
+        .card-img-wrap { height: 240px; background: #eee; position: relative; overflow: hidden; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .card:hover .card-img { transform: scale(1.05); }
         
         .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-price { font-size: 1.6em; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
-        .card-title { font-size: 1.1em; font-weight: 600; margin-bottom: 10px; line-height: 1.4; color: var(--text); text-decoration: none; }
-        .card-meta { display: flex; gap: 15px; font-size: 0.9em; color: var(--text-light); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        .card-tags { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; }
-        .tag { background: #e0f2f1; color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+        .card-price { font-size: 1.8em; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+        .card-title { font-size: 1.15em; font-weight: 600; margin-bottom: 12px; line-height: 1.4; color: var(--text); text-decoration: none; }
+        .card-title:hover { color: var(--accent); }
         
-        .info-row { font-size: 0.85em; color: #666; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        /* Property Meta Icons */
+        .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; color: var(--text); margin-bottom: 15px; padding: 15px 0; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+        .meta-item { display: flex; align-items: center; gap: 6px; }
+        .meta-icon { font-size: 1.2em; }
+        
+        /* Details & Tags */
+        .details-row { font-size: 0.85em; color: #64748b; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .card-tags { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; padding-top: 15px; }
+        .tag { background: #e0f2f1; color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag.sea-view { background: #e3f2fd; color: #0277bd; }
+        
+        .no-listings { grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-light); font-size: 1.2em; }
     </style>
 </head>
 <body>
@@ -66,39 +89,72 @@
     <div class="stats-grid" id="stats-panel" style="display:none;">
         <div class="stat-card">
             <div class="stat-val" id="stat-price">-</div>
-            <div class="stat-lbl">Avg Price</div>
+            <div class="stat-lbl" id="lbl-avg-price">Avg Price</div>
         </div>
         <div class="stat-card">
             <div class="stat-val" id="stat-size">-</div>
-            <div class="stat-lbl">Avg Building</div>
+            <div class="stat-lbl" id="lbl-avg-size">Avg Building</div>
         </div>
         <div class="stat-card">
             <div class="stat-val" id="stat-unit">-</div>
             <div class="stat-sub" id="stat-unit-sub">-</div>
-            <div class="stat-lbl">Price / Sqm</div>
+            <div class="stat-lbl" id="lbl-unit-price">Unit Price</div>
         </div>
     </div>
 
-    <div class="controls">
-        <button class="toggle-btn active" id="btn-jpy" onclick="setCurrency('JPY')">JPY</button>
-        <button class="toggle-btn" id="btn-usd" onclick="setCurrency('USD')">USD</button>
-        
-        <select id="sort-select" onchange="applyFilters()">
-            <option value="price-desc">Price: High to Low</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="size-desc">Size: Large to Small</option>
-            <option value="age-desc">Age: Newest First</option>
-        </select>
+    <div class="controls-wrapper">
+        <div class="toggles-row">
+            <div class="toggle-group">
+                <span class="toggle-label">Language</span>
+                <button class="toggle-btn active" id="lang-en" onclick="setLanguage('EN')">EN</button>
+                <button class="toggle-btn" id="lang-jp" onclick="setLanguage('JP')">JP</button>
+            </div>
+            <div class="toggle-group" style="margin-left: 20px;">
+                <span class="toggle-label">Currency</span>
+                <button class="toggle-btn active" id="curr-jpy" onclick="setCurrency('JPY')">JPY</button>
+                <button class="toggle-btn" id="curr-usd" onclick="setCurrency('USD')">USD</button>
+            </div>
+        </div>
 
-        <select id="type-select" onchange="applyFilters()">
-            <option value="all">All Types</option>
-            <option value="house">House</option>
-            <option value="mansion">Mansion</option>
-            <option value="land">Land</option>
-        </select>
-        
-        <div class="flex-spacer"></div>
-        <div id="count-display" style="color: #888; font-weight: 600;"></div>
+        <div class="filters-row">
+            <div class="filter-group">
+                <span class="filter-label">LOCATION</span>
+                <select id="location-select" onchange="applyFilters()">
+                    <option value="all">All Locations</option>
+                    </select>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label">PROPERTY TYPE</span>
+                <select id="type-select" onchange="applyFilters()">
+                    <option value="all">All Types</option>
+                    <option value="house">House</option>
+                    <option value="mansion">Mansion</option>
+                    <option value="land">Land</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label">SEA VIEW</span>
+                <select id="seaview-select" onchange="applyFilters()">
+                    <option value="all">Any View</option>
+                    <option value="4">Strong View (4+)</option>
+                    <option value="5">Ocean Front (5)</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label">SORT BY</span>
+                <select id="sort-select" onchange="applyFilters()">
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="size-desc">Building: Large to Small</option>
+                    <option value="age-desc">Age: Newest First</option>
+                </select>
+            </div>
+            
+            <div class="results-count" id="count-display"></div>
+        </div>
     </div>
 
     <div class="grid" id="listings-container"></div>
@@ -106,8 +162,22 @@
 
 <script>
     let DATA = { listings: [], rate: 155.0 };
-    let STATE = { currency: 'JPY' };
+    let STATE = { currency: 'JPY', language: 'EN' };
     const PROXY = "https://corsproxy.io/?";
+    
+    // Translation Map for UI elements
+    const UI_TEXT = {
+        'EN': { 
+            avgPrice: "Avg Price", avgBuild: "Avg Building", unitPrice: "Unit Price", 
+            perSqm: "per sqm", perSqft: "per sqft", built: "Built", updated: "Updated",
+            locAll: "All Locations", typeAll: "All Types", viewAny: "Any View"
+        },
+        'JP': { 
+            avgPrice: "平均価格", avgBuild: "平均建物面積", unitPrice: "単価", 
+            perSqm: "平米単価", perSqft: "sqft単価", built: "築年", updated: "更新日",
+            locAll: "全地域", typeAll: "全タイプ", viewAny: "海眺望 指定なし"
+        }
+    };
 
     async function init() {
         try {
@@ -116,18 +186,44 @@
             DATA.listings = json.listings;
             DATA.rate = json.fxRate || 155.0;
             
+            populateLocations();
             applyFilters();
         } catch (e) {
             console.error(e);
-            document.getElementById('listings-container').innerHTML = "<p style='text-align:center'>Failed to load data.</p>";
+            document.getElementById('listings-container').innerHTML = "<p class='no-listings'>Failed to load data. Please ensure listings.json is present.</p>";
         }
     }
 
     function setCurrency(c) {
         STATE.currency = c;
-        document.getElementById('btn-jpy').className = c === 'JPY' ? 'toggle-btn active' : 'toggle-btn';
-        document.getElementById('btn-usd').className = c === 'USD' ? 'toggle-btn active' : 'toggle-btn';
+        document.querySelectorAll('#curr-jpy, #curr-usd').forEach(b => b.classList.remove('active'));
+        document.getElementById(c === 'JPY' ? 'curr-jpy' : 'curr-usd').classList.add('active');
         applyFilters();
+    }
+
+    function setLanguage(l) {
+        STATE.language = l;
+        document.querySelectorAll('#lang-en, #lang-jp').forEach(b => b.classList.remove('active'));
+        document.getElementById(l === 'EN' ? 'lang-en' : 'lang-jp').classList.add('active');
+        
+        // Update static UI labels
+        const t = UI_TEXT[l];
+        document.getElementById('lbl-avg-price').textContent = t.avgPrice;
+        document.getElementById('lbl-avg-size').textContent = t.avgBuild;
+        document.getElementById('lbl-unit-price').textContent = t.unitPrice;
+        
+        applyFilters(); // Re-render listings with new language
+    }
+
+    function populateLocations() {
+        const cities = [...new Set(DATA.listings.map(l => l.city))].sort();
+        const sel = document.getElementById('location-select');
+        cities.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city;
+            opt.textContent = city; // Keeping original JP city name for consistency in dropdown
+            sel.appendChild(opt);
+        });
     }
 
     function formatPrice(jpy) {
@@ -140,7 +236,10 @@
     }
 
     function renderStats(items) {
-        if (items.length === 0) return;
+        if (items.length === 0) { document.getElementById('stats-panel').style.display = 'none'; return; }
+        document.getElementById('stats-panel').style.display = 'grid';
+        
+        const t = UI_TEXT[STATE.language];
         
         // Calcs
         const totalP = items.reduce((a, b) => a + (b.priceJpy || 0), 0);
@@ -151,35 +250,40 @@
         const avgP = countP ? totalP / countP : 0;
         const avgS = countS ? totalS / countS : 0;
         const pricePerSqm = (avgS > 0) ? avgP / avgS : 0;
-        const pricePerSqftUSD = (pricePerSqm / 10.764) / DATA.rate; // 1 sqm = 10.764 sqft
-
-        // Display
-        document.getElementById('stats-panel').style.display = 'grid';
+        
         document.getElementById('stat-price').textContent = formatPrice(avgP);
         document.getElementById('stat-size').textContent = Math.round(avgS) + " m²";
         
-        // Unit Logic
         if (STATE.currency === 'JPY') {
             document.getElementById('stat-unit').textContent = "¥" + Math.round(pricePerSqm / 10000) + "万";
-            document.getElementById('stat-unit-sub').textContent = "per sqm";
+            document.getElementById('stat-unit-sub').textContent = t.perSqm;
         } else {
+            // Convert to USD per Sqft
+            const pricePerSqftUSD = (pricePerSqm / 10.764) / DATA.rate;
             document.getElementById('stat-unit').textContent = "$" + Math.round(pricePerSqftUSD);
-            document.getElementById('stat-unit-sub').textContent = "per sqft";
+            document.getElementById('stat-unit-sub').textContent = t.perSqft;
         }
     }
 
     function applyFilters() {
         const sortMode = document.getElementById('sort-select').value;
         const typeMode = document.getElementById('type-select').value;
+        const locMode = document.getElementById('location-select').value;
+        const viewMode = document.getElementById('seaview-select').value;
         
         let items = [...DATA.listings];
 
-        // Filter
-        if (typeMode !== 'all') {
-            items = items.filter(l => l.propertyType === typeMode);
-        }
+        // 1. Filter Location
+        if (locMode !== 'all') items = items.filter(l => l.city === locMode);
 
-        // Sort
+        // 2. Filter Type
+        if (typeMode !== 'all') items = items.filter(l => l.propertyType === typeMode);
+
+        // 3. Filter Sea View
+        if (viewMode === '4') items = items.filter(l => l.seaViewScore >= 4);
+        if (viewMode === '5') items = items.filter(l => l.seaViewScore === 5);
+
+        // 4. Sort
         items.sort((a, b) => {
             const pA = a.priceJpy || 0;
             const pB = b.priceJpy || 0;
@@ -191,7 +295,7 @@
             if (sortMode === 'price-desc') return pB - pA;
             if (sortMode === 'price-asc') return pA - pB;
             if (sortMode === 'size-desc') return sB - sA;
-            if (sortMode === 'age-desc') return ageA - ageB; // Youngest first (smaller age num)
+            if (sortMode === 'age-desc') return ageA - ageB; 
         });
 
         renderListings(items);
@@ -202,20 +306,27 @@
         const container = document.getElementById('listings-container');
         container.innerHTML = "";
         document.getElementById('count-display').textContent = `${items.length} Listings`;
+        const t = UI_TEXT[STATE.language];
+
+        if (items.length === 0) {
+            container.innerHTML = `<p class="no-listings">No listings match your filters.</p>`;
+            return;
+        }
 
         items.forEach(item => {
-            // Safe Image with Proxy
             const imgUrl = item.imageUrl ? (PROXY + encodeURIComponent(item.imageUrl)) : "https://via.placeholder.com/300x200?text=No+Photo";
+            const title = STATE.language === 'EN' ? (item.titleEn || item.title) : item.title;
             
-            // Meta info construction
+            // Meta Icons
             let metaHtml = "";
-            if (item.buildingSqm) metaHtml += `<span>🏠 ${item.buildingSqm} m²</span>`;
-            if (item.landSqm) metaHtml += `<span>🌳 ${item.landSqm} m²</span>`;
+            if (item.buildingSqm) metaHtml += `<div class="meta-item"><span class="meta-icon">🏠</span> <span>${item.buildingSqm} m²</span></div>`;
+            if (item.landSqm) metaHtml += `<div class="meta-item"><span class="meta-icon">🌳</span> <span>${item.landSqm} m²</span></div>`;
+            // Add Sea View Icon if score is high
+            if (item.seaViewScore >= 4) metaHtml += `<div class="meta-item"><span class="meta-icon">🌊</span> <span>Sea View</span></div>`;
             
-            // Age & Update display
             let details = "";
-            if (item.yearBuilt) details += `<div class="info-row"><span>Built:</span> <strong>${item.yearBuilt}</strong></div>`;
-            if (item.lastUpdated) details += `<div class="info-row"><span>Updated:</span> <strong>${item.lastUpdated}</strong></div>`;
+            if (item.yearBuilt) details += `<div class="details-row"><span>${t.built}:</span> <strong>${item.yearBuilt}</strong></div>`;
+            if (item.lastUpdated) details += `<div class="details-row"><span>${t.updated}:</span> <strong>${item.lastUpdated}</strong></div>`;
 
             const card = `
                 <div class="card">
@@ -226,11 +337,14 @@
                     </div>
                     <div class="card-body">
                         <div class="card-price">${formatPrice(item.priceJpy)}</div>
-                        <a href="${item.sourceUrl}" target="_blank" class="card-title">${item.titleEn || item.title}</a>
+                        <a href="${item.sourceUrl}" target="_blank" class="card-title">${title}</a>
                         <div class="card-meta">${metaHtml}</div>
                         ${details}
                         <div class="card-tags">
-                            ${item.highlightTags.map(t => `<span class="tag">${t}</span>`).join('')}
+                            ${item.highlightTags.map(tag => {
+                                const isSea = tag === 'Sea View';
+                                return `<span class="tag ${isSea ? 'sea-view' : ''}">${tag}</span>`;
+                            }).join('')}
                         </div>
                     </div>
                 </div>
