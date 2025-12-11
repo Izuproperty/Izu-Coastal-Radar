@@ -1,269 +1,299 @@
 {
   "fxRate": 156.19,
-  "generatedAt": "2025-12-11T03:56:51.783520Z",
+  "generatedAt": "2025-12-11T13:21:34.775942",
   "listings": [
     {
-      "id": "izutaiyo-5861140895238660212",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
-      "title": "河津町 桜坂温泉別荘地の検索物件詳細",
-      "titleEn": "Kawazu 桜坂温泉別荘地の検索物件詳細",
+      "id": "izutaiyo-4868751571767963040",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
+      "title": "下田市 リゾート129 碁石が浜パートＩ",
+      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ",
       "propertyType": "house",
       "city": "下田市",
-      "priceJpy": 5800000.0,
-      "landSqm": 146.0,
-      "buildingSqm": 88.92,
+      "priceJpy": 15800000,
+      "landSqm": null,
+      "buildingSqm": 58.34,
       "yearBuilt": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235ha.jpg",
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
-        "House",
-        "Sea view"
+        "House"
       ]
     },
     {
-      "id": "izutaiyo--5509217551409180070",
+      "id": "izutaiyo--5272400392983066752",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
-      "title": "南伊豆町 子浦の検索物件詳細",
-      "titleEn": "Minami-Izu 子浦の検索物件詳細",
+      "title": "南伊豆町 子浦",
+      "titleEn": "Minami-Izu 子浦",
       "propertyType": "house",
       "city": "下田市",
-      "priceJpy": 8300000.0,
+      "priceJpy": 8300000,
       "landSqm": 382.85,
       "buildingSqm": 135.76,
       "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg",
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
         "House"
       ]
     },
     {
-      "id": "izutaiyo-3684343925292104151",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
-      "title": "南伊豆町 下賀茂の検索物件詳細",
-      "titleEn": "Minami-Izu 下賀茂の検索物件詳細",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 31800000.0,
-      "landSqm": 273.18,
-      "buildingSqm": 115.51,
-      "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib375ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-8716233382644119106",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
-      "title": "下田市 須崎の検索物件詳細",
-      "titleEn": "Shimoda 須崎の検索物件詳細",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 18800000.0,
-      "landSqm": 136.7,
-      "buildingSqm": 72.87,
-      "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2003ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-1308705316382795565",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2008H",
-      "title": "下田市 須崎の検索物件詳細",
-      "titleEn": "Shimoda 須崎の検索物件詳細",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 12800000.0,
-      "landSqm": 271.62,
-      "buildingSqm": 57.96,
-      "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2008ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--4622255469835181423",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
-      "title": "下田市 田牛の検索物件詳細",
-      "titleEn": "Shimoda 田牛の検索物件詳細",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 23000000.0,
-      "landSqm": 330.57,
-      "buildingSqm": 82.81,
-      "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--2326469173899730192",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
-      "title": "下田市 白浜の検索物件詳細",
-      "titleEn": "Shimoda 白浜の検索物件詳細",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 15000000.0,
-      "landSqm": 245.0,
-      "buildingSqm": 104.34,
-      "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-8941784529333040986",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2013M",
-      "title": "下田市 ロイヤルアーク下田の検索物件詳細",
-      "titleEn": "Shimoda ロイヤルアーク下田の検索物件詳細",
-      "propertyType": "mansion",
-      "city": "下田市",
-      "priceJpy": 4000000.0,
-      "landSqm": null,
-      "buildingSqm": 70.94,
-      "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2013ma.jpg",
-      "highlightTags": [
-        "Mansion"
-      ]
-    },
-    {
-      "id": "izutaiyo-2450674913325703364",
+      "id": "izutaiyo-6789617514960603426",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB342G",
-      "title": "下田市 西中の検索物件詳細",
-      "titleEn": "Shimoda 西中の検索物件詳細",
+      "title": "下田市 西中",
+      "titleEn": "Shimoda 西中",
       "propertyType": "land",
       "city": "下田市",
-      "priceJpy": 9000000.0,
+      "priceJpy": 9000000,
       "landSqm": 333.0,
       "buildingSqm": null,
       "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb342ga.jpg",
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
         "Land"
       ]
     },
     {
-      "id": "izutaiyo--719565425488066331",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
-      "title": "下田市 パレスサイドヴィラの検索物件詳細",
-      "titleEn": "Shimoda パレスサイドヴィラの検索物件詳細",
+      "id": "izutaiyo--8671140336573872439",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2008H",
+      "title": "下田市 須崎",
+      "titleEn": "Shimoda 須崎",
       "propertyType": "house",
       "city": "下田市",
-      "priceJpy": 6800000.0,
+      "priceJpy": 12800000,
+      "landSqm": 271.62,
+      "buildingSqm": 57.96,
+      "yearBuilt": "和2年 (2)",
+      "age": 2023,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo--6643896087642036374",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
+      "title": "下田市 パレスサイドヴィラ",
+      "titleEn": "Shimoda パレスサイドヴィラ",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 6800000,
       "landSqm": 132.0,
       "buildingSqm": 65.55,
       "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb391ha.jpg",
+      "imageUrl": null,
       "highlightTags": [
         "House",
-        "Sea view"
+        "Sea View"
       ]
     },
     {
-      "id": "izutaiyo--4397542042256185624",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB392H",
-      "title": "下田市 柿崎の検索物件詳細",
-      "titleEn": "Shimoda 柿崎の検索物件詳細",
+      "id": "izutaiyo--6639853067579867539",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
+      "title": "下田市 須崎",
+      "titleEn": "Shimoda 須崎",
       "propertyType": "house",
       "city": "下田市",
-      "priceJpy": 198000000.0,
-      "landSqm": 646.32,
-      "buildingSqm": 298.98,
+      "priceJpy": 18800000,
+      "landSqm": 136.7,
+      "buildingSqm": 72.87,
+      "yearBuilt": "和8年 (8)",
+      "age": 2017,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo-2864488763909888240",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
+      "title": "南伊豆町 下賀茂",
+      "titleEn": "Minami-Izu 下賀茂",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 31800000,
+      "landSqm": 273.18,
+      "buildingSqm": 115.51,
       "yearBuilt": null,
-      "seaViewScore": 5,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb392ha.jpg",
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
-        "House",
-        "Sea view"
+        "House"
       ]
     },
     {
-      "id": "izutaiyo--7029131371710734935",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB407M",
-      "title": "下田市 リゾート129 碁石が浜パートＩの検索物件詳細",
-      "titleEn": "Shimoda リゾート129 碁石が浜パートＩの検索物件詳細",
+      "id": "izutaiyo--649902792395581646",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
+      "title": "河津町 桜坂温泉別荘地",
+      "titleEn": "Kawazu 桜坂温泉別荘地",
       "propertyType": "house",
       "city": "下田市",
-      "priceJpy": 8800000.0,
+      "priceJpy": 5800000,
+      "landSqm": 146.0,
+      "buildingSqm": 88.92,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Sea View"
+      ]
+    },
+    {
+      "id": "izutaiyo--7993149636176443564",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
+      "title": "下田市 白浜",
+      "titleEn": "Shimoda 白浜",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 15000000,
+      "landSqm": 245.0,
+      "buildingSqm": 104.34,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo-1653710699654722487",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
+      "title": "下田市 田牛",
+      "titleEn": "Shimoda 田牛",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 23000000,
+      "landSqm": 330.57,
+      "buildingSqm": 82.81,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo-1826604867343922329",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB407M",
+      "title": "下田市 リゾート129 碁石が浜パートＩ",
+      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 8800000,
       "landSqm": null,
       "buildingSqm": 56.15,
       "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb407ma.jpg",
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
         "House"
       ]
     },
     {
-      "id": "izutaiyo-6871368580627798740",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
-      "title": "下田市 リゾート129 碁石が浜パートＩの検索物件詳細",
-      "titleEn": "Shimoda リゾート129 碁石が浜パートＩの検索物件詳細",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 15800000.0,
-      "landSqm": null,
-      "buildingSqm": 58.34,
-      "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408ma.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-8959640241950780166",
+      "id": "izutaiyo--298979513082267558",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
-      "title": "下田市 白浜の検索物件詳細",
-      "titleEn": "Shimoda 白浜の検索物件詳細",
+      "title": "下田市 白浜",
+      "titleEn": "Shimoda 白浜",
       "propertyType": "house",
       "city": "下田市",
-      "priceJpy": 12800000.0,
+      "priceJpy": 12800000,
       "landSqm": 219.79,
       "buildingSqm": 125.86,
       "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg",
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
         "House"
       ]
     },
     {
-      "id": "izutaiyo-3073544942836527043",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
-      "title": "下田市 武ガ浜の検索物件詳細",
-      "titleEn": "Shimoda 武ガ浜の検索物件詳細",
+      "id": "izutaiyo--7370104794824933029",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2013M",
+      "title": "下田市 ロイヤルアーク下田",
+      "titleEn": "Shimoda ロイヤルアーク下田",
       "propertyType": "house",
       "city": "下田市",
-      "priceJpy": 10800000.0,
+      "priceJpy": 4000000,
+      "landSqm": null,
+      "buildingSqm": 70.94,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo-2993113875999818300",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
+      "title": "下田市 武ガ浜",
+      "titleEn": "Shimoda 武ガ浜",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 10800000,
       "landSqm": 84.12,
       "buildingSqm": 71.22,
       "yearBuilt": null,
-      "seaViewScore": null,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg",
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
         "House"
+      ]
+    },
+    {
+      "id": "izutaiyo--1778511575016939490",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB392H",
+      "title": "下田市 柿崎",
+      "titleEn": "Shimoda 柿崎",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 198000000,
+      "landSqm": 646.32,
+      "buildingSqm": 298.98,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 5,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Sea View"
       ]
     }
   ],
   "stats": {
-    "avgPriceM": 25.433333333333334,
-    "avgBuildingSqm": 100.37214285714286,
-    "avgAge": 0
+    "avgPrice": 25433333.333333332,
+    "avgSize": 100.37214285714286,
+    "count": 15
   }
 }
