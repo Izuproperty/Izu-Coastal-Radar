@@ -6,29 +6,59 @@
     <title>Izu Coastal Radar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #006C70; --accent: #FF5A5F; --bg: #F4F6F7; --card-bg: #FFFFFF; --text-main: #2A2A33; --text-light: #585858; --border: #D1D1D5; }
+        :root {
+            --primary: #006C70; --accent: #FF5A5F; --bg: #F4F6F7; --card-bg: #FFFFFF;
+            --text-main: #2A2A33; --text-light: #585858; --border: #D1D1D5;
+        }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 50px; }
+        
+        /* HERO */
         header { background: #fff; border-bottom: 1px solid var(--border); }
-        .vintage-hero { display: flex; gap: 15px; padding: 30px; overflow-x: auto; background: #FDFBF7; justify-content: center; }
-        .poster-frame { height: 220px; flex-shrink: 0; border: 6px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer; }
+        .vintage-hero { 
+            display: flex; gap: 15px; padding: 30px; overflow-x: auto; 
+            background: #FDFBF7; justify-content: center;
+        }
+        .poster-frame { 
+            height: 200px; flex-shrink: 0; border: 6px solid #fff; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer;
+        }
         .poster-frame:hover { transform: scale(1.02); z-index: 10; }
         .poster-frame img { height: 100%; width: auto; display: block; }
+        
         .header-content { text-align: center; padding: 30px 20px; }
         h1 { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--primary); }
         .subtitle { color: var(--text-light); margin-top: 5px; font-weight: 400; }
+
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .stats-bar { display: flex; gap: 20px; flex-wrap: wrap; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; justify-content: space-around; }
+
+        /* STATS */
+        .stats-bar { 
+            display: flex; gap: 20px; flex-wrap: wrap; background: white; padding: 20px; 
+            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+            margin-bottom: 30px; justify-content: space-around;
+        }
         .stat-item { text-align: center; }
         .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
         .stat-label { font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-sub { font-size: 0.8rem; color: #888; }
-        .controls { background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* CONTROLS */
+        .controls { 
+            background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); 
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; 
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
         select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
         .toggle-btn { padding: 8px 16px; border: 1px solid var(--primary); background: white; color: var(--primary); border-radius: 4px; cursor: pointer; font-weight: 600; }
         .toggle-btn.active { background: var(--primary); color: white; }
         .results-count { margin-left: auto; font-weight: 600; color: var(--text-light); }
+
+        /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
-        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); transition: box-shadow 0.2s; display: flex; flex-direction: column; }
+        .card { 
+            background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
+            transition: box-shadow 0.2s; display: flex; flex-direction: column;
+        }
         .card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .card-img-wrap { height: 240px; background: #eee; position: relative; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
@@ -46,6 +76,7 @@
     </style>
 </head>
 <body>
+
 <header>
     <div class="vintage-hero">
         <div class="poster-frame"><img src="assets/images/17E88B82-01F3-4A60-9571-935741E304B9.jpeg"></div>
@@ -59,12 +90,14 @@
         <div class="subtitle">Market Intelligence for Shimoda & Minami-Izu</div>
     </div>
 </header>
+
 <div class="container">
     <div class="stats-bar" id="stats-panel" style="display:none">
         <div class="stat-item"><div class="stat-val" id="stat-price">-</div><div class="stat-label" id="lbl-price">Avg Price</div></div>
         <div class="stat-item"><div class="stat-val" id="stat-size">-</div><div class="stat-label" id="lbl-size">Avg Size</div></div>
         <div class="stat-item"><div class="stat-val" id="stat-unit">-</div><div class="stat-label" id="lbl-unit">Price/Unit</div><div class="stat-sub" id="stat-unit-sub">-</div></div>
     </div>
+
     <div class="controls">
         <div style="display:flex; gap:15px; margin-right:20px;">
             <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
@@ -73,20 +106,36 @@
             <button class="toggle-btn" id="btn-usd" onclick="setCurr('USD')">USD</button>
         </div>
         <select id="location-select" onchange="applyFilters()"><option value="all">All Locations</option></select>
-        <select id="type-select" onchange="applyFilters()"><option value="all">All Types</option><option value="house">House</option><option value="mansion">Mansion</option><option value="land">Land</option></select>
-        <select id="seaview-select" onchange="applyFilters()"><option value="all">Any View</option><option value="4">Strong View</option><option value="5">Ocean Front</option></select>
-        <select id="sort-select" onchange="applyFilters()"><option value="price-desc">Price: High-Low</option><option value="price-asc">Price: Low-High</option><option value="size-desc">Size: Large-Small</option><option value="age-desc">Age: Newest</option></select>
+        <select id="type-select" onchange="applyFilters()">
+            <option value="all">All Types</option>
+            <option value="house">House</option>
+            <option value="mansion">Mansion</option>
+            <option value="land">Land</option>
+        </select>
+        <select id="seaview-select" onchange="applyFilters()">
+            <option value="all">Any View</option>
+            <option value="4">Strong View</option>
+            <option value="5">Ocean Front</option>
+        </select>
+        <select id="sort-select" onchange="applyFilters()">
+            <option value="price-desc">Price: High-Low</option>
+            <option value="price-asc">Price: Low-High</option>
+            <option value="size-desc">Size: Large-Small</option>
+            <option value="age-desc">Age: Newest</option>
+        </select>
         <div class="results-count" id="count-display"></div>
     </div>
+
     <div class="grid" id="listings-container">Loading...</div>
 </div>
+
 <script>
     let DATA = { listings: [], rate: 155 };
     let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', sort: 'price-desc', type: 'all', view: 'all' };
     const PROXY = "https://corsproxy.io/?";
     const LOC_MAP = { "下田市": "Shimoda City", "伊東市": "Ito City", "東伊豆町": "Higashi-Izu Town", "河津町": "Kawazu Town", "南伊豆町": "Minami-Izu Town" };
     
-    // RENAMED BACK TO 'TXT' TO MATCH FUNCTION CALLS
+    // VARIABLE RENAMED TO MATCH REFERENCES
     const TXT = { 
         'EN': { avgP: "Avg Price", avgS: "Avg Size", unit: "Price/Unit", perSqm: "per sqm", perSqft: "per sqft", built: "Built", upd: "Updated", locAll: "All Locations" }, 
         'JP': { avgP: "平均価格", avgS: "平均面積", unit: "単価", perSqm: "平米単価", perSqft: "sqft単価", built: "築年", upd: "更新", locAll: "全地域" } 
@@ -106,17 +155,24 @@
         }
     }
 
-    function setLang(l) { STATE.lang = l; document.getElementById('btn-en').className = l==='EN'?'toggle-btn active':'toggle-btn'; document.getElementById('btn-jp').className = l==='JP'?'toggle-btn active':'toggle-btn'; populateLocations(); applyFilters(); }
-    function setCurr(c) { STATE.curr = c; document.getElementById('btn-jpy').className = c==='JPY'?'toggle-btn active':'toggle-btn'; document.getElementById('btn-usd').className = c==='USD'?'toggle-btn active':'toggle-btn'; applyFilters(); }
+    function setLang(l) { STATE.lang = l; updateToggles(); populateLocations(); applyFilters(); }
+    function setCurr(c) { STATE.curr = c; updateToggles(); applyFilters(); }
+
+    function updateToggles() {
+        document.getElementById('btn-en').className = STATE.lang==='EN'?'toggle-btn active':'toggle-btn';
+        document.getElementById('btn-jp').className = STATE.lang==='JP'?'toggle-btn active':'toggle-btn';
+        document.getElementById('btn-jpy').className = STATE.curr==='JPY'?'toggle-btn active':'toggle-btn';
+        document.getElementById('btn-usd').className = STATE.curr==='USD'?'toggle-btn active':'toggle-btn';
+    }
 
     function populateLocations() {
         const sel = document.getElementById('location-select');
         const currentVal = sel.value;
         const cities = [...new Set(DATA.listings.map(l => l.city))].sort();
-        const t = TXT[STATE.language];
+        const t = TXT[STATE.lang]; // Fixed reference
         sel.innerHTML = `<option value="all">${t.locAll}</option>`;
         cities.forEach(city => {
-            const label = STATE.language === 'EN' ? (LOC_MAP[city] || city) : city;
+            const label = STATE.lang === 'EN' ? (LOC_MAP[city] || city) : city;
             sel.innerHTML += `<option value="${city}">${label}</option>`;
         });
         sel.value = currentVal;
@@ -124,13 +180,13 @@
 
     function fmtPrice(v) {
         if (!v) return "N/A";
-        return STATE.currency === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
+        return STATE.curr === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
     }
 
     function renderStats(items) {
         if (items.length === 0) { document.getElementById('stats-panel').style.display = 'none'; return; }
         document.getElementById('stats-panel').style.display = 'flex';
-        const t = TXT[STATE.language];
+        const t = TXT[STATE.lang]; // Fixed reference
         const totalP = items.reduce((a, b) => a + (b.priceJpy || 0), 0);
         const totalS = items.reduce((a, b) => a + (b.buildingSqm || 0), 0);
         const countP = items.filter(i => i.priceJpy).length;
@@ -145,7 +201,7 @@
         document.getElementById('stat-price').innerText = fmtPrice(avgP);
         document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
         
-        if (STATE.currency === 'JPY') {
+        if (STATE.curr === 'JPY') {
             document.getElementById('stat-unit').innerText = "¥" + Math.round(pricePerSqm / 10000) + "万";
             document.getElementById('stat-unit-sub').innerText = t.perSqm;
         } else {
@@ -181,7 +237,7 @@
         const container = document.getElementById('listings-container');
         container.innerHTML = "";
         document.getElementById('count-display').innerText = `${items.length} Listings`;
-        const t = TXT[STATE.language];
+        const t = TXT[STATE.lang]; // Fixed reference
 
         if (items.length === 0) {
             container.innerHTML = `<p class="no-listings">No listings match your filters.</p>`;
@@ -190,7 +246,7 @@
 
         items.forEach(l => {
             const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400x300?text=No+Photo";
-            const title = STATE.language === 'EN' ? (l.titleEn || l.title) : l.title;
+            const title = STATE.lang === 'EN' ? (l.titleEn || l.title) : l.title;
             
             let metaHtml = "";
             if (l.buildingSqm) metaHtml += `<div class="meta-item"><span>🏠</span> <span>${l.buildingSqm} m²</span></div>`;
