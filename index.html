@@ -6,22 +6,12 @@
     <title>Izu Coastal Radar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #006C70; --accent: #FF5A5F; --bg: #F4F6F7; --card-bg: #FFFFFF;
-            --text-main: #2A2A33; --text-light: #585858; --border: #D1D1D5;
-            --tag-sea: #0077b6; /* Blue for Sea View */
-        }
+        :root { --primary: #006C70; --accent: #FF5A5F; --bg: #F4F6F7; --card-bg: #FFFFFF; --text-main: #2A2A33; --text-light: #585858; --border: #D1D1D5; --tag-sea: #0077b6; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 50px; }
         
         header { background: #fff; border-bottom: 1px solid var(--border); }
-        .vintage-hero { 
-            display: flex; gap: 15px; padding: 30px; overflow-x: auto; 
-            background: #FDFBF7; justify-content: center;
-        }
-        .poster-frame { 
-            height: 200px; flex-shrink: 0; border: 6px solid #fff; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer;
-        }
+        .vintage-hero { display: flex; gap: 15px; padding: 30px; overflow-x: auto; background: #FDFBF7; justify-content: center; }
+        .poster-frame { height: 200px; flex-shrink: 0; border: 6px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer; }
         .poster-frame:hover { transform: scale(1.02); z-index: 10; }
         .poster-frame img { height: 100%; width: auto; display: block; }
         
@@ -31,31 +21,20 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        .stats-bar { 
-            display: flex; gap: 20px; flex-wrap: wrap; background: white; padding: 20px; 
-            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            margin-bottom: 30px; justify-content: space-around;
-        }
+        .stats-bar { display: flex; gap: 20px; flex-wrap: wrap; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; justify-content: space-around; }
         .stat-item { text-align: center; }
         .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
         .stat-label { font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-sub { font-size: 0.8rem; color: #888; }
 
-        .controls { 
-            background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); 
-            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; 
-            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
+        .controls { background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
         .toggle-btn { padding: 8px 16px; border: 1px solid var(--primary); background: white; color: var(--primary); border-radius: 4px; cursor: pointer; font-weight: 600; }
         .toggle-btn.active { background: var(--primary); color: white; }
         .results-count { margin-left: auto; font-weight: 600; color: var(--text-light); }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
-        .card { 
-            background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
-            transition: box-shadow 0.2s; display: flex; flex-direction: column;
-        }
+        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); transition: box-shadow 0.2s; display: flex; flex-direction: column; }
         .card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .card-img-wrap { height: 240px; background: #eee; position: relative; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
@@ -68,10 +47,7 @@
         
         .card-tags { margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
         .tag { background: #e0f2f1; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        
-        /* The Blue Sea View Tag */
         .tag.sea-view { background: var(--tag-sea); color: white; }
-        
         .no-listings { grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-light); }
         .error-msg { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; text-align: center; }
     </style>
@@ -137,16 +113,15 @@
     const PROXY = "https://corsproxy.io/?";
     const LOC_MAP = { "下田市": "Shimoda City", "伊東市": "Ito City", "東伊豆町": "Higashi-Izu Town", "河津町": "Kawazu Town", "南伊豆町": "Minami-Izu Town" };
     
-    // UI TEXT (Handles translation logic for labels)
     const TXT = { 
         'EN': { 
             avgP: "Avg Price", avgS: "Avg Size", unit: "Price/Unit", perSqm: "per sqm", perSqft: "per sqft", 
-            built: "Built", upd: "Updated", locAll: "All Locations",
+            built: "Built", age: "yrs", upd: "Updated", locAll: "All Locations",
             types: { "house": "House", "mansion": "Condominium", "land": "Land" } 
         }, 
         'JP': { 
             avgP: "平均価格", avgS: "平均面積", unit: "単価", perSqm: "平米単価", perSqft: "sqft単価", 
-            built: "築年", upd: "更新", locAll: "全地域",
+            built: "築年", age: "築", upd: "更新", locAll: "全地域",
             types: { "house": "戸建", "mansion": "マンション", "land": "土地" } 
         } 
     };
@@ -204,7 +179,7 @@
 
     function fmtPrice(v) {
         if (!v) return "N/A";
-        return STATE.currency === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
+        return STATE.curr === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
     }
 
     function renderStats(items) {
@@ -280,20 +255,25 @@
             if (l.landSqm) metaHtml += `<div class="meta-item"><span>🌳</span> <span>${l.landSqm} m²</span></div>`;
             
             let details = [];
-            // Added Age display here
             if (l.yearBuilt) {
-                let ageText = l.age > 0 ? ` (${l.age} yrs)` : '';
-                details.push(`<span>${t.built}: ${l.yearBuilt}${ageText}</span>`);
+                let ageInfo = l.age > 0 ? ` (${l.age} ${t.age})` : '';
+                details.push(`<span>${t.built}: ${l.yearBuilt}${ageInfo}</span>`);
             }
             if (l.lastUpdated) details.push(`<span>${t.upd}: ${l.lastUpdated}</span>`);
 
-            // Translate Tag Label (House -> 戸建)
+            // Use mapped labels for tags (House -> 戸建)
             const typeLabel = t.types[l.propertyType] || l.propertyType;
 
             const card = `
                 <div class="card">
                     <div class="card-img-wrap">
                         <a href="${l.sourceUrl}" target="_blank"><img src="${imgUrl}" class="card-img" loading="lazy"></a>
+                        <div class="card-tag-overlay">
+                            ${l.highlightTags.map(tag => {
+                                if (tag === 'Sea View') return `<span class="tag sea-view">Sea View</span>`;
+                                return '';
+                            }).join('')}
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="card-price">${fmtPrice(l.priceJpy)}</div>
@@ -302,7 +282,6 @@
                         <div class="card-footer">${details.join(' &bull; ')}</div>
                         <div class="card-tags">
                             <span class="tag">${typeLabel}</span>
-                            ${l.seaViewScore >=4 ? '<span class="tag sea-view">Sea View</span>' : ''}
                         </div>
                     </div>
                 </div>`;
