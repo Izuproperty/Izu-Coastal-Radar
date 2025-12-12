@@ -6,12 +6,23 @@
     <title>Izu Coastal Radar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #006C70; --accent: #FF5A5F; --bg: #F4F6F7; --card-bg: #FFFFFF; --text-main: #2A2A33; --text-light: #585858; --border: #D1D1D5; --tag-sea: #0077b6; }
+        :root {
+            --primary: #006C70; --accent: #FF5A5F; --bg: #F4F6F7; --card-bg: #FFFFFF;
+            --text-main: #2A2A33; --text-light: #585858; --border: #D1D1D5;
+            --tag-bg: #e0f2f1; --tag-text: #006C70;
+            --tag-sea-bg: #0077b6; --tag-sea-text: #ffffff;
+        }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 50px; }
         
         header { background: #fff; border-bottom: 1px solid var(--border); }
-        .vintage-hero { display: flex; gap: 15px; padding: 30px; overflow-x: auto; background: #FDFBF7; justify-content: center; }
-        .poster-frame { height: 200px; flex-shrink: 0; border: 6px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer; }
+        .vintage-hero { 
+            display: flex; gap: 15px; padding: 30px; overflow-x: auto; 
+            background: #FDFBF7; justify-content: center;
+        }
+        .poster-frame { 
+            height: 200px; flex-shrink: 0; border: 6px solid #fff; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer;
+        }
         .poster-frame:hover { transform: scale(1.02); z-index: 10; }
         .poster-frame img { height: 100%; width: auto; display: block; }
         
@@ -21,20 +32,31 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        .stats-bar { display: flex; gap: 20px; flex-wrap: wrap; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; justify-content: space-around; }
+        .stats-bar { 
+            display: flex; gap: 20px; flex-wrap: wrap; background: white; padding: 20px; 
+            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+            margin-bottom: 30px; justify-content: space-around;
+        }
         .stat-item { text-align: center; }
         .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
         .stat-label { font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-sub { font-size: 0.8rem; color: #888; }
 
-        .controls { background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .controls { 
+            background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); 
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; 
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
         select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
         .toggle-btn { padding: 8px 16px; border: 1px solid var(--primary); background: white; color: var(--primary); border-radius: 4px; cursor: pointer; font-weight: 600; }
         .toggle-btn.active { background: var(--primary); color: white; }
         .results-count { margin-left: auto; font-weight: 600; color: var(--text-light); }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
-        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); transition: box-shadow 0.2s; display: flex; flex-direction: column; }
+        .card { 
+            background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
+            transition: box-shadow 0.2s; display: flex; flex-direction: column;
+        }
         .card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .card-img-wrap { height: 240px; background: #eee; position: relative; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
@@ -45,9 +67,17 @@
         .meta-item { display: flex; align-items: center; gap: 6px; }
         .card-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.85rem; color: var(--text-light); }
         
-        .card-tags { margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
-        .tag { background: #e0f2f1; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        .tag.sea-view { background: var(--tag-sea); color: white; }
+        /* TAG STYLES */
+        .card-tags { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .tag { 
+            background: var(--tag-bg); color: var(--tag-text); 
+            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .tag.sea-view { 
+            background: var(--tag-sea-bg); color: var(--tag-sea-text); 
+        }
+        
         .no-listings { grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-light); }
         .error-msg { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; text-align: center; }
     </style>
@@ -144,18 +174,8 @@
         }
     }
 
-    function setLang(l) { 
-        STATE.lang = l; 
-        updateToggles();
-        populateLocations(); 
-        applyFilters(); 
-    }
-    
-    function setCurr(c) { 
-        STATE.curr = c; 
-        updateToggles(); 
-        applyFilters(); 
-    }
+    function setLang(l) { STATE.lang = l; updateToggles(); populateLocations(); applyFilters(); }
+    function setCurr(c) { STATE.curr = c; updateToggles(); applyFilters(); }
 
     function updateToggles() {
         document.getElementById('btn-en').className = STATE.lang==='EN'?'toggle-btn active':'toggle-btn';
@@ -255,25 +275,20 @@
             if (l.landSqm) metaHtml += `<div class="meta-item"><span>🌳</span> <span>${l.landSqm} m²</span></div>`;
             
             let details = [];
-            if (l.yearBuilt) {
-                let ageInfo = l.age > 0 ? ` (${l.age} ${t.age})` : '';
-                details.push(`<span>${t.built}: ${l.yearBuilt}${ageInfo}</span>`);
+            if (l.yearBuilt || l.age) {
+                let text = l.yearBuilt ? l.yearBuilt : '';
+                if (l.age > 0) text += ` (${l.age} ${t.age})`;
+                details.push(`<span>${t.built}: ${text}</span>`);
             }
             if (l.lastUpdated) details.push(`<span>${t.upd}: ${l.lastUpdated}</span>`);
 
-            // Use mapped labels for tags (House -> 戸建)
+            // Translate Tag Label (House -> 戸建)
             const typeLabel = t.types[l.propertyType] || l.propertyType;
 
             const card = `
                 <div class="card">
                     <div class="card-img-wrap">
                         <a href="${l.sourceUrl}" target="_blank"><img src="${imgUrl}" class="card-img" loading="lazy"></a>
-                        <div class="card-tag-overlay">
-                            ${l.highlightTags.map(tag => {
-                                if (tag === 'Sea View') return `<span class="tag sea-view">Sea View</span>`;
-                                return '';
-                            }).join('')}
-                        </div>
                     </div>
                     <div class="card-body">
                         <div class="card-price">${fmtPrice(l.priceJpy)}</div>
@@ -282,6 +297,7 @@
                         <div class="card-footer">${details.join(' &bull; ')}</div>
                         <div class="card-tags">
                             <span class="tag">${typeLabel}</span>
+                            ${l.seaViewScore >=4 ? '<span class="tag sea-view">Sea View</span>' : ''}
                         </div>
                     </div>
                 </div>`;
