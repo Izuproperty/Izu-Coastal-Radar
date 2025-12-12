@@ -1,85 +1,9 @@
 {
   "fxRate": 155.53,
-  "generatedAt": "2025-12-12T10:59:37.599924",
+  "generatedAt": "2025-12-12T12:03:48.957169",
   "listings": [
     {
-      "id": "izutaiyo--302024855608560768",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KN5247H",
-      "title": "函南町 パサディナタウン（函南町）",
-      "titleEn": "函南町 パサディナタウン（函南町）",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 7500000,
-      "landSqm": 339.0,
-      "buildingSqm": 121.75,
-      "yearBuilt": "1990",
-      "age": 35.0,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/kn/kn5247ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-344593320064144131",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=IT7220M",
-      "title": "伊東市 スカイリゾート伊豆高原",
-      "titleEn": "Ito スカイリゾート伊豆高原",
-      "propertyType": "mansion",
-      "city": "伊東市",
-      "priceJpy": 9990000,
-      "landSqm": null,
-      "buildingSqm": 67.87,
-      "yearBuilt": "1991",
-      "age": 33.7,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/it/it7220ma.jpg",
-      "highlightTags": [
-        "Mansion"
-      ]
-    },
-    {
-      "id": "izutaiyo-550160200646388358",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=AT3001R",
-      "title": "熱海市 来の宮旭マンション",
-      "titleEn": "熱海市 来の宮旭Condominium",
-      "propertyType": "mansion",
-      "city": "下田市",
-      "priceJpy": 180000,
-      "landSqm": 115.85,
-      "buildingSqm": 115.85,
-      "yearBuilt": "1979",
-      "age": 45.9,
-      "lastUpdated": null,
-      "seaViewScore": 2,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/at3001ra.jpg",
-      "highlightTags": [
-        "Mansion"
-      ]
-    },
-    {
-      "id": "izutaiyo-1267593754490785287",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=IZA023H",
-      "title": "伊豆市 冷川",
-      "titleEn": "伊豆市 冷川",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 16800000,
-      "landSqm": null,
-      "buildingSqm": 114.22,
-      "yearBuilt": "1995",
-      "age": 29.3,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/iz/iza023ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--8207140370174342775",
+      "id": "izutaiyo-6308737845928805517",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP593H",
       "title": "東伊豆町 熱川台",
       "titleEn": "Higashi-Izu 熱川台",
@@ -99,47 +23,45 @@
       ]
     },
     {
-      "id": "izutaiyo-8922514656315919754",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC603M",
-      "title": "熱海市 紅葉ガ丘ガーデンハイツ",
-      "titleEn": "熱海市 紅葉ガ丘ガーデンハイツ",
-      "propertyType": "house",
+      "id": "izutaiyo-1027309344492703003",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB342G",
+      "title": "下田市 西中",
+      "titleEn": "Shimoda 西中",
+      "propertyType": "land",
       "city": "下田市",
       "priceJpy": 9000000,
-      "landSqm": null,
-      "buildingSqm": 97.48,
-      "yearBuilt": "1974",
-      "age": 50.8,
+      "landSqm": 333.0,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
       "lastUpdated": null,
-      "seaViewScore": 5,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc603ma.jpg",
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb342ga.jpg",
       "highlightTags": [
-        "House",
-        "Sea View"
+        "Land"
       ]
     },
     {
-      "id": "izutaiyo-7228667772124116364",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATV032M",
-      "title": "熱海市 熱海ビラ",
-      "titleEn": "熱海市 熱海ビラ",
-      "propertyType": "house",
+      "id": "izutaiyo-8812535221322531137",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB407M",
+      "title": "下田市 リゾート129 碁石が浜パートＩ",
+      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ",
+      "propertyType": "mansion",
       "city": "下田市",
-      "priceJpy": 12800000,
+      "priceJpy": 8800000,
       "landSqm": null,
-      "buildingSqm": 33.31,
-      "yearBuilt": "1973",
-      "age": 51.3,
+      "buildingSqm": 56.15,
+      "yearBuilt": "1987",
+      "age": 37.7,
       "lastUpdated": null,
-      "seaViewScore": 5,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atv032ma.jpg",
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb407ma.jpg",
       "highlightTags": [
-        "House",
-        "Sea View"
+        "Mansion"
       ]
     },
     {
-      "id": "izutaiyo-617473141013026576",
+      "id": "izutaiyo--8223206095326700978",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
       "title": "下田市 パレスサイドヴィラ",
       "titleEn": "Shimoda パレスサイドヴィラ",
@@ -159,66 +81,7 @@
       ]
     },
     {
-      "id": "izutaiyo--7002101782165077728",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=AT3020M",
-      "title": "熱海市 熱海野中山マンション2号館",
-      "titleEn": "熱海市 熱海野中山Condominium2号館",
-      "propertyType": "mansion",
-      "city": "下田市",
-      "priceJpy": 4800000,
-      "landSqm": null,
-      "buildingSqm": 18.71,
-      "yearBuilt": "1963",
-      "age": 62.0,
-      "lastUpdated": null,
-      "seaViewScore": 2,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/at3020ma.jpg",
-      "highlightTags": [
-        "Mansion"
-      ]
-    },
-    {
-      "id": "izutaiyo-3138115911348768293",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
-      "title": "河津町 桜坂温泉別荘地",
-      "titleEn": "Kawazu 桜坂温泉別荘地",
-      "propertyType": "house",
-      "city": "河津町",
-      "priceJpy": 5800000,
-      "landSqm": 146.0,
-      "buildingSqm": 88.92,
-      "yearBuilt": "1966",
-      "age": 58.1,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235ha.jpg",
-      "highlightTags": [
-        "House",
-        "Sea View"
-      ]
-    },
-    {
-      "id": "izutaiyo--30215707826355672",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC212M",
-      "title": "熱海市 中銀ライフケア熱海第3伊豆山23号館",
-      "titleEn": "熱海市 中銀ライフケア熱海第3伊豆山23号館",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 11800000,
-      "landSqm": null,
-      "buildingSqm": 70.56,
-      "yearBuilt": "1991",
-      "age": 33.8,
-      "lastUpdated": null,
-      "seaViewScore": 5,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc212ma.jpg",
-      "highlightTags": [
-        "House",
-        "Sea View"
-      ]
-    },
-    {
-      "id": "izutaiyo--1197731063063840454",
+      "id": "izutaiyo--6319098505773431691",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
       "title": "下田市 白浜",
       "titleEn": "Shimoda 白浜",
@@ -237,161 +100,28 @@
       ]
     },
     {
-      "id": "izutaiyo-4144281464415570627",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC995M",
-      "title": "熱海市 ドメーヌ熱海伊豆山",
-      "titleEn": "熱海市 ドメーヌ熱海伊豆山",
+      "id": "izutaiyo-3939415916390251769",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
+      "title": "南伊豆町 子浦",
+      "titleEn": "Minami-Izu 子浦",
       "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 28800000,
-      "landSqm": null,
-      "buildingSqm": 96.82,
-      "yearBuilt": "1992",
-      "age": 32.7,
+      "city": "南伊豆町",
+      "priceJpy": 8300000,
+      "landSqm": 382.85,
+      "buildingSqm": 135.76,
+      "yearBuilt": "1987",
+      "age": 37.3,
       "lastUpdated": null,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc995ma.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-4020712065498433607",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KN5231H",
-      "title": "函南町 南箱根ダイヤランド",
-      "titleEn": "函南町 南箱根ダイヤランド",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 32800000,
-      "landSqm": 1715.83,
-      "buildingSqm": 182.58,
-      "yearBuilt": "1997",
-      "age": 28.0,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/kn/kn5231ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--8775257614299183668",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
-      "title": "下田市 白浜",
-      "titleEn": "Shimoda 白浜",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 12800000,
-      "landSqm": 219.79,
-      "buildingSqm": 125.86,
-      "yearBuilt": "1991",
-      "age": 33.2,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--2040545493489761062",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC659M",
-      "title": "熱海市 ラ・ヴィ熱海",
-      "titleEn": "熱海市 ラ・ヴィ熱海",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 24800000,
-      "landSqm": null,
-      "buildingSqm": 100.8,
-      "yearBuilt": "1989",
-      "age": 35.2,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc659ma.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--2854290732704992421",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=AT7311H",
-      "title": "熱海市 桜町",
-      "titleEn": "熱海市 桜町",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 16900000,
-      "landSqm": 143.63,
-      "buildingSqm": 124.34,
-      "yearBuilt": "1988",
-      "age": 36.9,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/at7311ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-3785506812496984680",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2008H",
-      "title": "下田市 須崎",
-      "titleEn": "Shimoda 須崎",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 12800000,
-      "landSqm": 271.62,
-      "buildingSqm": 57.96,
-      "yearBuilt": "1994",
-      "age": 30.5,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2008ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--5049606582359846411",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC140M",
-      "title": "熱海市 ヴィンテージ熱海桃山",
-      "titleEn": "熱海市 ヴィンテージ熱海桃山",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 43000000,
-      "landSqm": null,
-      "buildingSqm": 104.34,
-      "yearBuilt": "1990",
-      "age": 34.6,
-      "lastUpdated": null,
-      "seaViewScore": 2,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc140ma.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-3294551412155636478",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC500M",
-      "title": "熱海市 紅葉ガ丘ガーデンハイツ",
-      "titleEn": "熱海市 紅葉ガ丘ガーデンハイツ",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 4100000,
-      "landSqm": null,
-      "buildingSqm": 27.46,
-      "yearBuilt": "1974",
-      "age": 50.8,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc500ma.jpg",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg",
       "highlightTags": [
         "House"
       ]
     }
   ],
   "stats": {
-    "avgPrice": 14613500.0,
-    "avgSize": 94.30600000000001,
-    "count": 20
+    "avgPrice": 10616666.666666666,
+    "avgSize": 105.84,
+    "count": 6
   }
 }
