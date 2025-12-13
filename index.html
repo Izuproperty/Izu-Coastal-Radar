@@ -4,259 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Izu Coastal Radar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Apple/Tech Dark Theme Palette */
             --bg-body: #000000;
             --bg-card: #1c1c1e;
-            --bg-header: #000000;
             --text-primary: #f5f5f7;
             --text-secondary: #86868b;
-            --accent: #0a84ff; /* System Blue */
-            --sea-view: #30d158; /* System Green */
-            --sea-front: #32d74b; /* Brighter Green */
+            --accent: #0a84ff;
+            --tag-sea: #0a84ff;
+            --tag-onsen: #ff453a;
             --border: #333;
         }
-
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            background-color: var(--bg-body); 
-            color: var(--text-primary); 
-            margin: 0; 
-            padding-bottom: 80px; 
-            -webkit-font-smoothing: antialiased;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 80px; }
+        header { background: #000; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
         
-        /* HEADER */
-        header { 
-            background: var(--bg-header); 
-            border-bottom: 1px solid var(--border); 
-            padding-bottom: 20px;
-        }
-
         .vintage-hero { 
-            display: flex; 
-            gap: 20px; 
-            padding: 40px 20px; 
-            overflow-x: auto; 
-            background: linear-gradient(to bottom, #111, #000);
-            justify-content: center;
-            scrollbar-width: none;
+            display: flex; gap: 20px; padding: 40px 20px; overflow-x: auto; 
+            background: linear-gradient(to bottom, #111, #000); justify-content: center;
         }
-        .vintage-hero::-webkit-scrollbar { display: none; }
+        .poster-frame { height: 180px; flex-shrink: 0; border: 1px solid #333; transition: transform 0.2s; opacity: 0.8; }
+        .poster-frame:hover { transform: scale(1.05); opacity: 1; border-color: #fff; }
+        .poster-frame img { height: 100%; width: auto; }
 
-        .poster-frame { 
-            height: 180px; 
-            flex-shrink: 0; 
-            border: 1px solid #333; 
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            opacity: 0.8;
-        }
-        .poster-frame:hover { transform: scale(1.05); opacity: 1; z-index: 10; border-color: var(--text-primary); }
-        .poster-frame img { height: 100%; width: auto; display: block; }
-        
-        .header-content { text-align: center; padding: 20px 20px 0; }
-        h1 { 
-            margin: 0; 
-            font-size: 3rem; 
-            font-weight: 800; 
-            letter-spacing: -0.05em; 
-            background: linear-gradient(90deg, #fff, #888); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle { 
-            color: var(--text-secondary); 
-            margin-top: 8px; 
-            font-weight: 400; 
-            font-size: 1.1rem; 
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
+        .header-content { text-align: center; padding: 20px; }
+        h1 { margin: 0; font-size: 3rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { color: var(--text-secondary); margin-top: 8px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
 
-        /* DASHBOARD STATS */
+        /* DARK MODE STATS BAR */
         .stats-bar { 
-            display: flex; 
-            gap: 1px;
-            background: #333;
-            border: 1px solid #333;
-            border-radius: 12px; 
-            overflow: hidden;
-            margin-bottom: 40px; 
+            display: flex; gap: 1px; background: #333; border: 1px solid #333; 
+            border-radius: 12px; overflow: hidden; margin-bottom: 40px; 
         }
-        .stat-item { 
-            flex: 1; 
-            text-align: center; 
-            padding: 20px; 
-            background: var(--bg-card); 
-        }
-        .stat-val { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); letter-spacing: -1px; }
+        .stat-item { flex: 1; text-align: center; padding: 20px; background: var(--bg-card); }
+        .stat-val { font-size: 1.6rem; font-weight: 700; color: #fff; }
         .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
-        .stat-sub { font-size: 0.85rem; color: var(--accent); margin-top: 2px; font-weight: 600; }
+        .stat-sub { font-size: 0.8rem; color: var(--accent); margin-top: 4px; }
 
         /* CONTROLS */
         .controls { 
-            background: rgba(28, 28, 30, 0.9);
-            padding: 15px; 
-            border-radius: 12px; 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 15px; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            position: sticky; 
-            top: 20px; 
-            z-index: 100; 
-            border: 1px solid #333;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(28,28,30,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 30px; 
+            position: sticky; top: 20px; z-index: 100; backdrop-filter: blur(10px);
         }
         
-        select { 
-            padding: 10px 16px; 
-            background: #000; 
-            color: #fff; 
-            border: 1px solid #444; 
-            border-radius: 8px; 
-            font-size: 0.9rem; 
-            font-weight: 500;
-            outline: none;
-        }
-        select:focus { border-color: var(--accent); }
-
-        .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; }
-        .toggle-btn { 
-            padding: 8px 16px; 
-            border: none; 
-            background: transparent; 
-            color: var(--text-secondary); 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
+        select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; outline: none; }
+        .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; margin-right: 20px; }
+        .toggle-btn { padding: 8px 16px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
         .toggle-btn.active { background: #333; color: #fff; }
-        
-        .results-count { margin-left: auto; font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; }
+        .results-count { margin-left: auto; color: var(--text-secondary); font-weight: 600; }
 
         /* GRID */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 30px; 
-        }
-        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
         .card { 
-            background: var(--bg-card); 
-            border-radius: 16px; 
-            overflow: hidden; 
-            transition: transform 0.2s, box-shadow 0.2s; 
-            display: flex; 
-            flex-direction: column;
-            border: 1px solid #2c2c2e;
+            background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid #2c2c2e; 
+            display: flex; flex-direction: column; transition: transform 0.2s;
         }
-        .card:hover { 
-            transform: translateY(-4px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
-            border-color: #444;
-        }
-
-        .card-img-wrap { 
-            height: 220px; 
-            position: relative; 
-            overflow: hidden;
-        }
-        .card-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transition: transform 0.5s ease; 
-        }
-        .card:hover .card-img { transform: scale(1.05); }
-
-        .overlay-tags {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            display: flex;
-            gap: 6px;
-        }
-        .ov-tag {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(8px);
-        }
-        .ov-sea { background: rgba(10, 132, 255, 0.85); color: white; } /* Blue for Sea View */
-        .ov-type { background: rgba(255, 255, 255, 0.9); color: black; }
-
-        .card-body { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card:hover { transform: translateY(-4px); border-color: #555; }
         
-        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .card-price { 
-            font-size: 1.6rem; 
-            font-weight: 700; 
-            color: var(--text-primary); 
-            letter-spacing: -0.5px;
-        }
-        .card-age {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            background: #2c2c2e;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
+        .card-img-wrap { height: 220px; position: relative; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .overlay-tags { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; }
+        .ov-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(8px); color: #fff; }
+        .ov-type { background: rgba(0,0,0,0.6); }
+        .ov-sea { background: var(--tag-sea); }
+        .ov-onsen { background: var(--tag-onsen); }
 
-        .card-title { 
-            font-size: 1.1rem; 
-            font-weight: 600; 
-            margin-bottom: 16px; 
-            line-height: 1.4; 
-            color: #ddd; 
-            text-decoration: none; 
-            display: block;
-        }
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .card-price { font-size: 1.5rem; font-weight: 700; color: #fff; }
+        .card-age { background: #333; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: #ccc; }
+        
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: #ddd; text-decoration: none; line-height: 1.4; }
         .card-title:hover { color: var(--accent); }
-
-        .card-metrics { 
-            display: flex; 
-            gap: 15px; 
-            font-size: 0.95rem; 
-            color: var(--text-secondary); 
-            margin-bottom: 20px; 
-            font-weight: 500;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #333;
-        }
-        .metric span { color: var(--text-primary); font-weight: 600; }
-
-        .card-footer { 
-            margin-top: auto; 
-            font-size: 0.8rem; 
-            color: #555; 
-            display: flex; 
-            justify-content: space-between;
-            align-items: center;
-        }
-        .view-btn {
-            color: var(--accent);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-decoration: none;
-        }
-
-        .no-listings { grid-column: 1 / -1; text-align: center; padding: 100px; color: var(--text-secondary); font-size: 1.2rem; }
-        .error-msg { background: rgba(255, 59, 48, 0.1); color: #ff453a; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255, 59, 48, 0.3); }
+        
+        .card-metrics { display: flex; gap: 15px; color: var(--text-secondary); font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #333; margin-bottom: 15px; }
+        .metric span { color: #fff; font-weight: 600; }
+        
+        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #555; }
+        .view-btn { color: var(--accent); text-transform: uppercase; font-weight: 700; text-decoration: none; }
+        
+        .no-listings { grid-column: 1/-1; text-align: center; padding: 100px; color: #555; }
     </style>
 </head>
 <body>
@@ -277,23 +108,33 @@
 
 <div class="container">
     <div class="stats-bar" id="stats-panel" style="display:none">
-        <div class="stat-item"><div class="stat-val" id="stat-price">-</div><div class="stat-label" id="lbl-avg-price">Avg Price</div></div>
-        <div class="stat-item"><div class="stat-val" id="stat-size">-</div><div class="stat-label" id="lbl-avg-size">Avg Size</div></div>
-        <div class="stat-item"><div class="stat-val" id="stat-unit">-</div><div class="stat-label" id="lbl-unit-price">Unit Price</div><div class="stat-sub" id="stat-unit-sub">-</div></div>
+        <div class="stat-item">
+            <div class="stat-val" id="stat-price">-</div>
+            <div class="stat-label">Avg Price</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-val" id="stat-size">-</div>
+            <div class="stat-label">Avg Size</div>
+            <div class="stat-sub" id="stat-size-sub">-</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-val" id="stat-unit">-</div>
+            <div class="stat-label">Price / Unit</div>
+            <div class="stat-sub" id="stat-unit-sub">-</div>
+        </div>
     </div>
 
     <div class="controls">
-        <div class="toggle-group" style="margin-right:20px;">
+        <div class="toggle-group">
             <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
             <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
         </div>
-        
-        <div class="toggle-group" style="margin-right:20px;">
+        <div class="toggle-group">
             <button class="toggle-btn active" id="btn-jpy" onclick="setCurr('JPY')">¥</button>
             <button class="toggle-btn" id="btn-usd" onclick="setCurr('USD')">$</button>
         </div>
 
-        <select id="location-select" onchange="applyFilters()"><option value="all">All Locations</option></select>
+        <select id="location-select" onchange="applyFilters()"></select>
         <select id="type-select" onchange="applyFilters()">
             <option value="all">All Types</option>
             <option value="house">House</option>
@@ -303,18 +144,17 @@
         <select id="seaview-select" onchange="applyFilters()">
             <option value="all">Any View</option>
             <option value="4">Sea View</option>
-            <option value="5">Seafront View</option>
         </select>
         <select id="sort-select" onchange="applyFilters()">
-            <option value="price-desc">Price: High to Low</option>
-            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High-Low</option>
+            <option value="price-asc">Price: Low-High</option>
             <option value="size-desc">Size: Largest</option>
             <option value="age-desc">Age: Newest</option>
         </select>
         <div class="results-count" id="count-display"></div>
     </div>
 
-    <div class="grid" id="listings-container">Scanning...</div>
+    <div class="grid" id="listings-container">Loading...</div>
 </div>
 
 <script>
@@ -322,47 +162,21 @@
     let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', sort: 'price-desc', type: 'all', view: 'all' };
     const PROXY = "https://corsproxy.io/?";
     
-    // Updated LOC_MAP to handle full city names like "下田市"
-    const LOC_MAP = { 
-        "下田": "Shimoda", "下田市": "Shimoda", 
-        "伊東": "Ito", "伊東市": "Ito", 
-        "東伊豆": "Higashi-Izu", "東伊豆町": "Higashi-Izu",
-        "河津": "Kawazu", "河津町": "Kawazu", 
-        "南伊豆": "Minami-Izu", "南伊豆町": "Minami-Izu"
-    };
-    
-    const TXT = { 
-        'EN': { 
-            avgP: "AVG PRICE", avgS: "AVG SIZE", unit: "UNIT PRICE", perSqm: "per m²", perSqft: "per ft²", 
-            built: "Built", age: "yrs", upd: "Updated", locAll: "All Locations",
-            types: { "house": "House", "mansion": "Condo", "land": "Land" } 
-        }, 
-        'JP': { 
-            avgP: "平均価格", avgS: "平均面積", unit: "坪単価", perSqm: "平米", perSqft: "sqft", 
-            built: "築", age: "築", upd: "更新", locAll: "全地域",
-            types: { "house": "戸建", "mansion": "マンション", "land": "土地" } 
-        } 
-    };
-
     async function init() {
         try {
             const res = await fetch('listings.json?v=' + Date.now());
             if (!res.ok) throw new Error("JSON not found");
             const json = await res.json();
-            
-            if (!json || !Array.isArray(json.listings)) throw new Error("Invalid JSON structure.");
-            
             DATA.listings = json.listings;
             DATA.rate = json.fxRate || 155;
-            
             populateLocations();
             applyFilters();
-        } catch (e) { 
-            document.getElementById('listings-container').innerHTML = `<div class='error-msg'><strong>System Malfunction</strong><br>${e.message}</div>`; 
+        } catch (e) {
+            document.getElementById('listings-container').innerHTML = `<div class='error-msg'>${e.message}</div>`;
         }
     }
 
-    function setLang(l) { STATE.lang = l; updateToggles(); populateLocations(); applyFilters(); }
+    function setLang(l) { STATE.lang = l; updateToggles(); applyFilters(); }
     function setCurr(c) { STATE.curr = c; updateToggles(); applyFilters(); }
 
     function updateToggles() {
@@ -374,50 +188,46 @@
 
     function populateLocations() {
         const sel = document.getElementById('location-select');
-        const currentVal = sel.value;
         const cities = [...new Set(DATA.listings.map(l => l.city))].sort();
-        const t = TXT[STATE.lang];
-        sel.innerHTML = `<option value="all">${t.locAll}</option>`;
-        cities.forEach(city => {
-            const label = STATE.lang === 'EN' ? (LOC_MAP[city] || city) : city;
-            sel.innerHTML += `<option value="${city}">${label}</option>`;
-        });
-        sel.value = currentVal;
+        sel.innerHTML = `<option value="all">All Locations</option>`;
+        cities.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
     }
 
     function fmtPrice(v) {
-        if (!v) return "N/A";
-        return STATE.curr === 'JPY' ? "¥" + (v/1000000).toFixed(1) + "M" : "$" + Math.round(v / DATA.rate).toLocaleString();
+        if (!v) return "-";
+        return STATE.curr === 'JPY' 
+            ? "¥" + (v/1000000).toFixed(1) + "M"
+            : "$" + Math.round(v / DATA.rate).toLocaleString();
     }
 
     function renderStats(items) {
-        if (!items || items.length === 0) { document.getElementById('stats-panel').style.display = 'none'; return; }
+        if (!items.length) { document.getElementById('stats-panel').style.display = 'none'; return; }
         document.getElementById('stats-panel').style.display = 'flex';
-        const t = TXT[STATE.lang];
         
-        const totalP = items.reduce((a, b) => a + (b.priceJpy || 0), 0);
-        const totalS = items.reduce((a, b) => a + (b.buildingSqm || 0), 0);
-        const countP = items.filter(i => i.priceJpy).length;
-        const countS = items.filter(i => i.buildingSqm).length;
+        const totalP = items.reduce((a,b)=>a+(b.priceJpy||0),0);
+        const totalS = items.reduce((a,b)=>a+(b.buildingSqm||0),0);
+        const count = items.length;
         
-        const avgP = countP ? totalP / countP : 0;
-        const avgS = countS ? totalS / countS : 0;
-        const pricePerSqm = (avgS > 0) ? avgP / avgS : 0;
+        const avgP = totalP/count;
+        const avgS = totalS/count;
         
-        document.getElementById('lbl-avg-price').innerText = t.avgP;
-        document.getElementById('lbl-avg-size').innerText = t.avgS;
-        document.getElementById('lbl-unit-price').innerText = t.unit;
-
         document.getElementById('stat-price').innerText = fmtPrice(avgP);
-        document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
         
+        // Show BOTH Sqm and Sqft if USD
         if (STATE.curr === 'JPY') {
-            document.getElementById('stat-unit').innerText = "¥" + Math.round(pricePerSqm / 10000) + "万";
-            document.getElementById('stat-unit-sub').innerText = t.perSqm;
+            document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
+            document.getElementById('stat-size-sub').innerText = "";
+            document.getElementById('stat-unit').innerText = "¥" + Math.round((avgP/avgS)/10000) + "万 /m²";
+            document.getElementById('stat-unit-sub').innerText = "";
         } else {
-            const pricePerSqftUSD = (pricePerSqm / 10.764) / DATA.rate;
-            document.getElementById('stat-unit').innerText = "$" + Math.round(pricePerSqftUSD);
-            document.getElementById('stat-unit-sub').textContent = t.perSqft;
+            const sqft = avgS * 10.764;
+            document.getElementById('stat-size').innerText = Math.round(sqft) + " ft²";
+            document.getElementById('stat-size-sub').innerText = `(${Math.round(avgS)} m²)`;
+            
+            const ppSqft = (avgP / DATA.rate) / sqft;
+            document.getElementById('stat-unit').innerText = "$" + Math.round(ppSqft) + " /ft²";
+            const ppSqm = (avgP / DATA.rate) / avgS;
+            document.getElementById('stat-unit-sub').innerText = `($${Math.round(ppSqm)} /m²)`;
         }
     }
 
@@ -426,12 +236,13 @@
         STATE.type = document.getElementById('type-select').value;
         STATE.view = document.getElementById('seaview-select').value;
         STATE.sort = document.getElementById('sort-select').value;
-        
-        let items = [...DATA.listings];
-        if (STATE.loc !== 'all') items = items.filter(l => l.city === STATE.loc);
-        if (STATE.type !== 'all') items = items.filter(l => l.propertyType === STATE.type);
-        if (STATE.view === '4') items = items.filter(l => l.seaViewScore >= 4);
-        if (STATE.view === '5') items = items.filter(l => l.seaViewScore === 5);
+
+        let items = DATA.listings.filter(l => {
+            if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
+            if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
+            if (STATE.view === '4' && l.seaViewScore < 4) return false;
+            return true;
+        });
 
         items.sort((a,b) => {
             if (STATE.sort === 'price-desc') return (b.priceJpy||0) - (a.priceJpy||0);
@@ -439,6 +250,7 @@
             if (STATE.sort === 'size-desc') return (b.buildingSqm||0) - (a.buildingSqm||0);
             if (STATE.sort === 'age-desc') return (a.age||999) - (b.age||999);
         });
+
         renderListings(items);
         renderStats(items);
     }
@@ -447,39 +259,35 @@
         const container = document.getElementById('listings-container');
         container.innerHTML = "";
         document.getElementById('count-display').innerText = `${items.length} Listings`;
-        const t = TXT[STATE.lang];
 
-        if (items.length === 0) {
-            container.innerHTML = `<p class="no-listings">NO SIGNAL DETECTED.</p>`;
+        if (!items.length) {
+            container.innerHTML = `<div class="no-listings">NO SIGNAL DETECTED.</div>`;
             return;
         }
 
         items.forEach(l => {
-            const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400x300?text=No+Photo";
+            const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400?text=No+Img";
             const title = STATE.lang === 'EN' ? (l.titleEn || l.title) : l.title;
+            const typeLabel = (l.propertyType === 'mansion') ? 'Condo' : l.propertyType;
             
-            // Age Tag
-            let ageInfo = "";
-            if (l.age > 0) {
-                ageInfo = `<div class="card-age">${Math.floor(l.age)} ${t.age}</div>`;
-            }
+            // Age
+            let ageInfo = l.age > 0 ? `<div class="card-age">${Math.floor(l.age)} yrs</div>` : '';
+
+            // Tags
+            let tagsHtml = `<span class="ov-tag ov-type">${typeLabel}</span>`;
+            if (l.seaViewScore >= 4) tagsHtml += `<span class="ov-tag ov-sea">SEA VIEW</span>`;
+            if (l.highlightTags.includes("Onsen")) tagsHtml += `<span class="ov-tag ov-onsen">ONSEN</span>`;
 
             // Metrics
             let metrics = [];
             if (l.buildingSqm) metrics.push(`<span>${l.buildingSqm}</span> m²`);
             if (l.landSqm) metrics.push(`Land <span>${l.landSqm}</span> m²`);
 
-            // Type Label
-            const typeLabel = t.types[l.propertyType] || l.propertyType;
-
             const card = `
                 <div class="card">
                     <div class="card-img-wrap">
                         <a href="${l.sourceUrl}" target="_blank"><img src="${imgUrl}" class="card-img" loading="lazy"></a>
-                        <div class="overlay-tags">
-                            <span class="ov-tag ov-type">${typeLabel}</span>
-                            ${l.seaViewScore >=4 ? '<span class="ov-tag ov-sea">SEA VIEW</span>' : ''}
-                        </div>
+                        <div class="overlay-tags">${tagsHtml}</div>
                     </div>
                     <div class="card-body">
                         <div class="card-header-row">
@@ -487,14 +295,12 @@
                             ${ageInfo}
                         </div>
                         <a href="${l.sourceUrl}" target="_blank" class="card-title">${title}</a>
-                        
                         <div class="card-metrics">
                             ${metrics.map(m => `<div class="metric">${m}</div>`).join('<div style="color:#333">|</div>')}
                         </div>
-
                         <div class="card-footer">
-                            <div style="opacity:0.6">ID: ${l.id.split('-')[1].substring(0,6)}...</div>
-                            <a href="${l.sourceUrl}" target="_blank" class="view-btn">Analyze &rarr;</a>
+                            <div style="opacity:0.5">ID: ${l.id.substring(9,15)}</div>
+                            <a href="${l.sourceUrl}" target="_blank" class="view-btn">ANALYZE &rarr;</a>
                         </div>
                     </div>
                 </div>`;
