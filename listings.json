@@ -1,239 +1,9 @@
 {
   "fxRate": 155.83,
-  "generatedAt": "2025-12-13T22:30:36.554141",
+  "generatedAt": "2025-12-13T23:26:30.629988",
   "listings": [
     {
-      "id": "izutaiyo--3440465414470308830",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
-      "title": "下田市 武ガ浜",
-      "titleEn": "Shimoda 武ガ浜",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 10800000,
-      "landSqm": 84.12,
-      "buildingSqm": 71.22,
-      "yearBuilt": "1974",
-      "age": 51.0,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-7681736756438107945",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
-      "title": "南伊豆町 下賀茂",
-      "titleEn": "Minami-Izu 下賀茂",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 31800000,
-      "landSqm": 273.18,
-      "buildingSqm": 115.51,
-      "yearBuilt": "2016",
-      "age": 8.2,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib375ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--7647166336041226295",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
-      "title": "下田市 須崎",
-      "titleEn": "Shimoda 須崎",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 18800000,
-      "landSqm": 136.7,
-      "buildingSqm": 72.87,
-      "yearBuilt": "2012",
-      "age": 12.3,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2003ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--9119772798582670550",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
-      "title": "南伊豆町 子浦",
-      "titleEn": "Minami-Izu 子浦",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 8300000,
-      "landSqm": 382.85,
-      "buildingSqm": 135.76,
-      "yearBuilt": "1987",
-      "age": 37.3,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--6419964673250450676",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2013M",
-      "title": "下田市 ロイヤルアーク下田",
-      "titleEn": "Shimoda ロイヤルアークShimoda",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 4000000,
-      "landSqm": null,
-      "buildingSqm": 70.94,
-      "yearBuilt": "1989",
-      "age": 35.6,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2013ma.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-2316760609785844877",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
-      "title": "河津町 桜坂温泉別荘地",
-      "titleEn": "Kawazu 桜坂温泉別荘地",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 5800000,
-      "landSqm": 146.0,
-      "buildingSqm": 88.92,
-      "yearBuilt": "1966",
-      "age": 58.2,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235ha.jpg",
-      "highlightTags": [
-        "House",
-        "Sea View"
-      ]
-    },
-    {
-      "id": "izutaiyo-7900466993053458063",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
-      "title": "下田市 パレスサイドヴィラ",
-      "titleEn": "Shimoda パレスサイドヴィラ",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 6800000,
-      "landSqm": 132.0,
-      "buildingSqm": 65.55,
-      "yearBuilt": "1992",
-      "age": 32.9,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb391ha.jpg",
-      "highlightTags": [
-        "House",
-        "Sea View"
-      ]
-    },
-    {
-      "id": "izutaiyo-3406029417252099762",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
-      "title": "下田市 リゾート129 碁石が浜パートＩ",
-      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ",
-      "propertyType": "mansion",
-      "city": "Shimoda",
-      "priceJpy": 15800000,
-      "landSqm": null,
-      "buildingSqm": 58.34,
-      "yearBuilt": "1987",
-      "age": 37.7,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408ma.jpg",
-      "highlightTags": [
-        "Mansion"
-      ]
-    },
-    {
-      "id": "izutaiyo--5487313375670942317",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB342G",
-      "title": "下田市 西中",
-      "titleEn": "Shimoda 西中",
-      "propertyType": "land",
-      "city": "Shimoda",
-      "priceJpy": 9000000,
-      "landSqm": 333.0,
-      "buildingSqm": null,
-      "yearBuilt": null,
-      "age": 0,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb342ga.jpg",
-      "highlightTags": [
-        "Land"
-      ]
-    },
-    {
-      "id": "izutaiyo--8369406604771693869",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
-      "title": "下田市 白浜",
-      "titleEn": "Shimoda 白浜",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 15000000,
-      "landSqm": 245.0,
-      "buildingSqm": 104.34,
-      "yearBuilt": "1997",
-      "age": 28.0,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--5993482965662312615",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
-      "title": "下田市 白浜",
-      "titleEn": "Shimoda 白浜",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 12800000,
-      "landSqm": 219.79,
-      "buildingSqm": 125.86,
-      "yearBuilt": "1991",
-      "age": 33.2,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--3736073015530318822",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
-      "title": "下田市 田牛",
-      "titleEn": "Shimoda 田牛",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 23000000,
-      "landSqm": 330.57,
-      "buildingSqm": 82.81,
-      "yearBuilt": "1966",
-      "age": 58.4,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--7867710796176877701",
+      "id": "izutaiyo--5206134490545736446",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2008H",
       "title": "下田市 須崎",
       "titleEn": "Shimoda 須崎",
@@ -242,9 +12,7 @@
       "priceJpy": 12800000,
       "landSqm": 271.62,
       "buildingSqm": 57.96,
-      "yearBuilt": "1994",
       "age": 30.5,
-      "lastUpdated": null,
       "seaViewScore": 0,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2008ha.jpg",
       "highlightTags": [
@@ -252,26 +20,133 @@
       ]
     },
     {
-      "id": "izutaiyo-138931415775009084",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB407M",
-      "title": "下田市 リゾート129 碁石が浜パートＩ",
-      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ",
-      "propertyType": "mansion",
+      "id": "izutaiyo-6739367343031938053",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC659M",
+      "title": "熱海市 ラ・ヴィ熱海",
+      "titleEn": "熱海市 ラ・ヴィ熱海",
+      "propertyType": "house",
       "city": "Shimoda",
-      "priceJpy": 8800000,
+      "priceJpy": 24800000,
       "landSqm": null,
-      "buildingSqm": 56.15,
-      "yearBuilt": "1987",
-      "age": 37.7,
-      "lastUpdated": null,
+      "buildingSqm": 100.8,
+      "age": 35.2,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb407ma.jpg",
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc659ma.jpg",
       "highlightTags": [
-        "Mansion"
+        "House",
+        "Onsen"
       ]
     },
     {
-      "id": "izutaiyo-9144083508432309725",
+      "id": "izutaiyo--8015863012538115053",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
+      "title": "南伊豆町 子浦",
+      "titleEn": "Minami-Izu 子浦",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 8300000,
+      "landSqm": 382.85,
+      "buildingSqm": 135.76,
+      "age": 37.3,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg",
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo-8270458105822512022",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=IT7220M",
+      "title": "伊東市 スカイリゾート伊豆高原",
+      "titleEn": "伊東市 スカイリゾート伊豆高原",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 9990000,
+      "landSqm": null,
+      "buildingSqm": 67.87,
+      "age": 33.7,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/it/it7220ma.jpg",
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo--7724200875282149",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KN5231H",
+      "title": "函南町 南箱根ダイヤランド",
+      "titleEn": "函南町 南箱根ダイヤランド",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 32800000,
+      "landSqm": 1715.83,
+      "buildingSqm": 182.58,
+      "age": 28.0,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/kn/kn5231ha.jpg",
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo--71760144955425253",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATV032M",
+      "title": "熱海市 熱海ビラ",
+      "titleEn": "熱海市 熱海ビラ",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 12800000,
+      "landSqm": null,
+      "buildingSqm": 33.31,
+      "age": 51.3,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atv032ma.jpg",
+      "highlightTags": [
+        "House",
+        "Sea View",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-1990790845206949661",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=YG5117H",
+      "title": "湯河原町 吉浜",
+      "titleEn": "湯河原町 吉浜",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 52800000,
+      "landSqm": 232.17,
+      "buildingSqm": 109.3,
+      "age": 0.5,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/yg/yg5117ha.jpg",
+      "highlightTags": [
+        "House",
+        "Sea View"
+      ]
+    },
+    {
+      "id": "izutaiyo--2021383208667396573",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ITE046H",
+      "title": "伊東市 宇佐美",
+      "titleEn": "伊東市 宇佐美",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 50000000,
+      "landSqm": 338.42,
+      "buildingSqm": 325.61,
+      "age": 37.6,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/it/ite046ha.jpg",
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-9077420304287931684",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB392H",
       "title": "下田市 柿崎",
       "titleEn": "Shimoda 柿崎",
@@ -280,20 +155,213 @@
       "priceJpy": 198000000,
       "landSqm": 646.32,
       "buildingSqm": 298.98,
-      "yearBuilt": "2008",
       "age": 16.8,
-      "lastUpdated": null,
-      "seaViewScore": 5,
+      "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb392ha.jpg",
       "highlightTags": [
         "House",
         "Sea View"
       ]
+    },
+    {
+      "id": "izutaiyo--4698958481542399056",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=AT7311H",
+      "title": "熱海市 桜町",
+      "titleEn": "熱海市 桜町",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 16900000,
+      "landSqm": 143.63,
+      "buildingSqm": 124.34,
+      "age": 36.9,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/at7311ha.jpg",
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo--2188630714643929420",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC500M",
+      "title": "熱海市 紅葉ガ丘ガーデンハイツ",
+      "titleEn": "熱海市 紅葉ガ丘ガーデンハイツ",
+      "propertyType": "mansion",
+      "city": "Shimoda",
+      "priceJpy": 4100000,
+      "landSqm": null,
+      "buildingSqm": 27.46,
+      "age": 50.8,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc500ma.jpg",
+      "highlightTags": [
+        "Mansion",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-8010557638583199294",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
+      "title": "下田市 武ガ浜",
+      "titleEn": "Shimoda 武ガ浜",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 10800000,
+      "landSqm": 84.12,
+      "buildingSqm": 71.22,
+      "age": 51.0,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg",
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo-3078019532820294598",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC603M",
+      "title": "熱海市 紅葉ガ丘ガーデンハイツ",
+      "titleEn": "熱海市 紅葉ガ丘ガーデンハイツ",
+      "propertyType": "mansion",
+      "city": "Shimoda",
+      "priceJpy": 9000000,
+      "landSqm": null,
+      "buildingSqm": 97.48,
+      "age": 50.8,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc603ma.jpg",
+      "highlightTags": [
+        "Mansion",
+        "Sea View",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo--1016530993945976887",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=AT3023M",
+      "title": "熱海市 ライオンズマンション熱海梅園第2",
+      "titleEn": "熱海市 ライオンズマンション熱海梅園第2",
+      "propertyType": "mansion",
+      "city": "Shimoda",
+      "priceJpy": 10900000,
+      "landSqm": null,
+      "buildingSqm": 64.85,
+      "age": 34.4,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/at3023ma.jpg",
+      "highlightTags": [
+        "Mansion",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo--5370067180961702451",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KN5260H",
+      "title": "函南町 仁田",
+      "titleEn": "函南町 仁田",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 43800000,
+      "landSqm": 171.93,
+      "buildingSqm": 105.28,
+      "age": 0.2,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/kn/kn5260ha.jpg",
+      "highlightTags": [
+        "House"
+      ]
+    },
+    {
+      "id": "izutaiyo-4070869234285243738",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB342G",
+      "title": "下田市 西中",
+      "titleEn": "Shimoda 西中",
+      "propertyType": "land",
+      "city": "Shimoda",
+      "priceJpy": 9000000,
+      "landSqm": 333.0,
+      "buildingSqm": null,
+      "age": 0,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb342ga.jpg",
+      "highlightTags": [
+        "Land"
+      ]
+    },
+    {
+      "id": "izutaiyo-4380379680491411675",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=IKM028H",
+      "title": "伊豆の国市 富士見ニュータウン",
+      "titleEn": "伊豆の国市 富士見ニュータウン",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 13000000,
+      "landSqm": 721.0,
+      "buildingSqm": 155.3,
+      "age": 36.7,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/ik/ikm028ha.jpg",
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo--3058687477312351398",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KN5253H",
+      "title": "函南町 南箱根ダイヤランド",
+      "titleEn": "函南町 南箱根ダイヤランド",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 23000000,
+      "landSqm": 295.82,
+      "buildingSqm": 134.96,
+      "age": 37.3,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/kn/kn5253ha.jpg",
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo--4862655168858137636",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC230M",
+      "title": "熱海市 熱海パサニアクラブ",
+      "titleEn": "熱海市 熱海パサニアクラブ",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 46800000,
+      "landSqm": null,
+      "buildingSqm": 93.36,
+      "age": 36.1,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc230ma.jpg",
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo--8535340622874412300",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=ATC408M",
+      "title": "熱海市 熱海シティヴィラ咲見町",
+      "titleEn": "熱海市 熱海シティヴィラ咲見町",
+      "propertyType": "mansion",
+      "city": "Shimoda",
+      "priceJpy": 29800000,
+      "landSqm": null,
+      "buildingSqm": 56.45,
+      "age": 29.3,
+      "seaViewScore": 0,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/at/atc408ma.jpg",
+      "highlightTags": [
+        "Mansion",
+        "Onsen"
+      ]
     }
   ],
   "stats": {
-    "avgPrice": 25433333.333333332,
-    "avgSize": 100.37214285714286,
-    "count": 15
+    "avgPrice": 30969500.0,
+    "avgSize": 118.04578947368421,
+    "count": 20
   }
 }
