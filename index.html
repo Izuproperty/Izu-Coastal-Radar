@@ -4,82 +4,265 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Izu Coastal Radar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #006C70; --accent: #FF5A5F; --bg: #F4F6F7; --card-bg: #FFFFFF;
-            --text-main: #2A2A33; --text-light: #585858; --border: #D1D1D5;
-            --tag-bg: #e0f2f1; --tag-text: #006C70;
-            --tag-sea-bg: #0077b6; --tag-sea-text: #ffffff;
+            /* Apple-esque Dark Theme Palette */
+            --bg-body: #000000;
+            --bg-card: #1c1c1e; /* Apple's secondary system background */
+            --bg-header: #000000;
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #0a84ff; /* System Blue */
+            --accent-glow: rgba(10, 132, 255, 0.3);
+            --sea-view: #30d158; /* System Green - distinct for 'Sea View' */
+            --border: #333;
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 50px; }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-primary); 
+            margin: 0; 
+            padding-bottom: 80px; 
+            -webkit-font-smoothing: antialiased;
+        }
         
-        header { background: #fff; border-bottom: 1px solid var(--border); }
+        /* HEADER */
+        header { 
+            background: var(--bg-header); 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 20px;
+        }
+
         .vintage-hero { 
-            display: flex; gap: 15px; padding: 30px; overflow-x: auto; 
-            background: #FDFBF7; justify-content: center;
+            display: flex; 
+            gap: 20px; 
+            padding: 40px 20px; 
+            overflow-x: auto; 
+            background: linear-gradient(to bottom, #111, #000); /* Subtle fade */
+            justify-content: center;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
         }
+        .vintage-hero::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome */
+
         .poster-frame { 
-            height: 200px; flex-shrink: 0; border: 6px solid #fff; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer;
+            height: 180px; 
+            flex-shrink: 0; 
+            border: 1px solid #333; 
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            opacity: 0.8;
         }
-        .poster-frame:hover { transform: scale(1.02); z-index: 10; }
+        .poster-frame:hover { transform: scale(1.05); opacity: 1; z-index: 10; border-color: var(--text-primary); }
         .poster-frame img { height: 100%; width: auto; display: block; }
         
-        .header-content { text-align: center; padding: 30px 20px; }
-        h1 { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--primary); }
-        .subtitle { color: var(--text-light); margin-top: 5px; font-weight: 400; }
+        .header-content { text-align: center; padding: 20px 20px 0; }
+        h1 { 
+            margin: 0; 
+            font-size: 3rem; 
+            font-weight: 800; 
+            letter-spacing: -0.05em; 
+            background: linear-gradient(90deg, #fff, #888); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { 
+            color: var(--text-secondary); 
+            margin-top: 8px; 
+            font-weight: 400; 
+            font-size: 1.1rem; 
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
 
+        /* DASHBOARD STATS (The "Ticker") */
         .stats-bar { 
-            display: flex; gap: 20px; flex-wrap: wrap; background: white; padding: 20px; 
-            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            margin-bottom: 30px; justify-content: space-around;
+            display: flex; 
+            gap: 1px; /* Gap for borders */
+            background: #333; /* Border color */
+            border: 1px solid #333;
+            border-radius: 12px; 
+            overflow: hidden;
+            margin-bottom: 40px; 
         }
-        .stat-item { text-align: center; }
-        .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-        .stat-label { font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-sub { font-size: 0.8rem; color: #888; }
+        .stat-item { 
+            flex: 1; 
+            text-align: center; 
+            padding: 20px; 
+            background: var(--bg-card); 
+        }
+        .stat-val { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); letter-spacing: -1px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+        .stat-sub { font-size: 0.85rem; color: var(--accent); margin-top: 2px; font-weight: 600; }
 
+        /* CONTROLS - Sleek Toolbar */
         .controls { 
-            background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); 
-            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; 
-            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: var(--bg-card); 
+            padding: 15px; 
+            border-radius: 12px; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            position: sticky; 
+            top: 20px; 
+            z-index: 100; 
+            border: 1px solid #333;
+            backdrop-filter: blur(10px); /* Glass effect */
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(28, 28, 30, 0.9);
         }
-        select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
-        .toggle-btn { padding: 8px 16px; border: 1px solid var(--primary); background: white; color: var(--primary); border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .toggle-btn.active { background: var(--primary); color: white; }
-        .results-count { margin-left: auto; font-weight: 600; color: var(--text-light); }
+        
+        /* Custom Selects */
+        select { 
+            padding: 10px 16px; 
+            background: #000; 
+            color: #fff; 
+            border: 1px solid #444; 
+            border-radius: 8px; 
+            font-size: 0.9rem; 
+            font-weight: 500;
+            outline: none;
+        }
+        select:focus { border-color: var(--accent); }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
+        /* Toggle Buttons */
+        .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; }
+        .toggle-btn { 
+            padding: 8px 16px; 
+            border: none; 
+            background: transparent; 
+            color: var(--text-secondary); 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .toggle-btn.active { background: #333; color: #fff; }
+        
+        .results-count { margin-left: auto; font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* GRID - Magazine Layout */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 30px; 
+        }
+        
         .card { 
-            background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
-            transition: box-shadow 0.2s; display: flex; flex-direction: column;
+            background: var(--bg-card); 
+            border-radius: 16px; 
+            overflow: hidden; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            display: flex; 
+            flex-direction: column;
+            border: 1px solid #2c2c2e;
         }
-        .card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .card-img-wrap { height: 240px; background: #eee; position: relative; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
-        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-price { font-size: 1.75rem; font-weight: 700; color: var(--text-main); }
-        .card-title { font-size: 1.15em; font-weight: 600; margin-bottom: 12px; line-height: 1.4; color: var(--text); text-decoration: none; }
-        .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; margin-bottom: 15px; padding: 15px 0; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
-        .meta-item { display: flex; align-items: center; gap: 6px; }
-        .card-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.85rem; color: var(--text-light); }
+        .card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+            border-color: #444;
+        }
+
+        .card-img-wrap { 
+            height: 220px; 
+            position: relative; 
+            overflow: hidden;
+        }
+        .card-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: transform 0.5s ease; 
+        }
+        .card:hover .card-img { transform: scale(1.05); }
+
+        /* Overlay Tags */
+        .overlay-tags {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            gap: 6px;
+        }
+        .ov-tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+        }
+        .ov-sea { background: rgba(0, 200, 0, 0.85); color: black; }
+        .ov-type { background: rgba(255, 255, 255, 0.9); color: black; }
+
+        .card-body { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
         
-        /* TAG STYLES */
-        .card-tags { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
-        .tag { 
-            background: var(--tag-bg); color: var(--tag-text); 
-            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; 
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        /* Typography Hierarchy */
+        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .card-price { 
+            font-size: 1.6rem; 
+            font-weight: 700; 
+            color: var(--text-primary); 
+            letter-spacing: -0.5px;
         }
-        .tag.sea-view { 
-            background: var(--tag-sea-bg); color: var(--tag-sea-text); 
+        .card-age {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            background: #2c2c2e;
+            padding: 4px 8px;
+            border-radius: 6px;
         }
-        
-        .no-listings { grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-light); }
-        .error-msg { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; text-align: center; }
+
+        .card-title { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            margin-bottom: 16px; 
+            line-height: 1.4; 
+            color: #ddd; 
+            text-decoration: none; 
+            display: block;
+        }
+        .card-title:hover { color: var(--accent); }
+
+        /* The Metrics Line (No Emojis) */
+        .card-metrics { 
+            display: flex; 
+            gap: 15px; 
+            font-size: 0.95rem; 
+            color: var(--text-secondary); 
+            margin-bottom: 20px; 
+            font-weight: 500;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .metric span { color: var(--text-primary); font-weight: 600; }
+
+        .card-footer { 
+            margin-top: auto; 
+            font-size: 0.8rem; 
+            color: #555; 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+        }
+        .view-btn {
+            color: var(--accent);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .no-listings { grid-column: 1 / -1; text-align: center; padding: 100px; color: var(--text-secondary); font-size: 1.2rem; }
+        .error-msg { background: rgba(255, 59, 48, 0.1); color: #ff453a; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255, 59, 48, 0.3); }
     </style>
 </head>
 <body>
@@ -93,8 +276,8 @@
         <div class="poster-frame"><img src="assets/images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg"></div>
     </div>
     <div class="header-content">
-        <h1>Izu Coastal Radar</h1>
-        <div class="subtitle">Market Intelligence for Shimoda & Minami-Izu</div>
+        <h1>COASTAL RADAR</h1>
+        <div class="subtitle">Market Intelligence: Shimoda & South Izu</div>
     </div>
 </header>
 
@@ -102,56 +285,59 @@
     <div class="stats-bar" id="stats-panel" style="display:none">
         <div class="stat-item"><div class="stat-val" id="stat-price">-</div><div class="stat-label" id="lbl-avg-price">Avg Price</div></div>
         <div class="stat-item"><div class="stat-val" id="stat-size">-</div><div class="stat-label" id="lbl-avg-size">Avg Size</div></div>
-        <div class="stat-item"><div class="stat-val" id="stat-unit">-</div><div class="stat-label" id="lbl-unit-price">Price/Unit</div><div class="stat-sub" id="stat-unit-sub">-</div></div>
+        <div class="stat-item"><div class="stat-val" id="stat-unit">-</div><div class="stat-label" id="lbl-unit-price">Unit Price</div><div class="stat-sub" id="stat-unit-sub">-</div></div>
     </div>
 
     <div class="controls">
-        <div style="display:flex; gap:15px; margin-right:20px;">
+        <div class="toggle-group" style="margin-right:20px;">
             <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
             <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
-            <div style="width:1px; background:#ddd; margin:0 5px;"></div>
+        </div>
+        
+        <div class="toggle-group" style="margin-right:20px;">
             <button class="toggle-btn active" id="btn-jpy" onclick="setCurr('JPY')">¥</button>
             <button class="toggle-btn" id="btn-usd" onclick="setCurr('USD')">$</button>
         </div>
+
         <select id="location-select" onchange="applyFilters()"><option value="all">All Locations</option></select>
         <select id="type-select" onchange="applyFilters()">
             <option value="all">All Types</option>
             <option value="house">House</option>
-            <option value="mansion">Condominium</option>
+            <option value="mansion">Condo</option>
             <option value="land">Land</option>
         </select>
         <select id="seaview-select" onchange="applyFilters()">
             <option value="all">Any View</option>
-            <option value="4">Strong View</option>
+            <option value="4">Ocean View</option>
             <option value="5">Ocean Front</option>
         </select>
         <select id="sort-select" onchange="applyFilters()">
-            <option value="price-desc">Price: High-Low</option>
-            <option value="price-asc">Price: Low-High</option>
-            <option value="size-desc">Size: Large-Small</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="size-desc">Size: Largest</option>
             <option value="age-desc">Age: Newest</option>
         </select>
         <div class="results-count" id="count-display"></div>
     </div>
 
-    <div class="grid" id="listings-container">Loading...</div>
+    <div class="grid" id="listings-container">Scanning...</div>
 </div>
 
 <script>
     let DATA = { listings: [], rate: 155 };
     let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', sort: 'price-desc', type: 'all', view: 'all' };
     const PROXY = "https://corsproxy.io/?";
-    const LOC_MAP = { "下田市": "Shimoda City", "伊東市": "Ito City", "東伊豆町": "Higashi-Izu Town", "河津町": "Kawazu Town", "南伊豆町": "Minami-Izu Town" };
+    const LOC_MAP = { "下田": "Shimoda", "伊東": "Ito", "東伊豆": "Higashi-Izu", "河津": "Kawazu", "南伊豆": "Minami-Izu" };
     
     const TXT = { 
         'EN': { 
-            avgP: "Avg Price", avgS: "Avg Size", unit: "Price/Unit", perSqm: "per sqm", perSqft: "per sqft", 
+            avgP: "AVG PRICE", avgS: "AVG SIZE", unit: "UNIT PRICE", perSqm: "per m²", perSqft: "per ft²", 
             built: "Built", age: "yrs", upd: "Updated", locAll: "All Locations",
-            types: { "house": "House", "mansion": "Condominium", "land": "Land" } 
+            types: { "house": "House", "mansion": "Condo", "land": "Land" } 
         }, 
         'JP': { 
-            avgP: "平均価格", avgS: "平均面積", unit: "単価", perSqm: "平米単価", perSqft: "sqft単価", 
-            built: "築年", age: "築", upd: "更新", locAll: "全地域",
+            avgP: "平均価格", avgS: "平均面積", unit: "坪単価", perSqm: "平米", perSqft: "sqft", 
+            built: "築", age: "築", upd: "更新", locAll: "全地域",
             types: { "house": "戸建", "mansion": "マンション", "land": "土地" } 
         } 
     };
@@ -170,7 +356,7 @@
             populateLocations();
             applyFilters();
         } catch (e) { 
-            document.getElementById('listings-container').innerHTML = `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`; 
+            document.getElementById('listings-container').innerHTML = `<div class='error-msg'><strong>System Malfunction</strong><br>${e.message}</div>`; 
         }
     }
 
@@ -262,7 +448,7 @@
         const t = TXT[STATE.lang];
 
         if (items.length === 0) {
-            container.innerHTML = `<p class="no-listings">No listings match your filters.</p>`;
+            container.innerHTML = `<p class="no-listings">NO SIGNAL DETECTED.</p>`;
             return;
         }
 
@@ -270,34 +456,43 @@
             const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400x300?text=No+Photo";
             const title = STATE.lang === 'EN' ? (l.titleEn || l.title) : l.title;
             
-            let metaHtml = "";
-            if (l.buildingSqm) metaHtml += `<div class="meta-item"><span>🏠</span> <span>${l.buildingSqm} m²</span></div>`;
-            if (l.landSqm) metaHtml += `<div class="meta-item"><span>🌳</span> <span>${l.landSqm} m²</span></div>`;
-            
-            let details = [];
-            if (l.yearBuilt || l.age) {
-                let text = l.yearBuilt ? l.yearBuilt : '';
-                if (l.age > 0) text += ` (${l.age} ${t.age})`;
-                details.push(`<span>${t.built}: ${text}</span>`);
+            // Clean logic for Age/Year
+            let ageInfo = "";
+            if (l.age > 0) {
+                ageInfo = `<div class="card-age">${Math.floor(l.age)} ${t.age}</div>`;
             }
-            if (l.lastUpdated) details.push(`<span>${t.upd}: ${l.lastUpdated}</span>`);
 
-            // Translate Tag Label (House -> 戸建)
+            // Metrics (No Emojis)
+            let metrics = [];
+            if (l.buildingSqm) metrics.push(`<span>${l.buildingSqm}</span> m²`);
+            if (l.landSqm) metrics.push(`Land <span>${l.landSqm}</span> m²`);
+
+            // Type Label
             const typeLabel = t.types[l.propertyType] || l.propertyType;
 
             const card = `
                 <div class="card">
                     <div class="card-img-wrap">
                         <a href="${l.sourceUrl}" target="_blank"><img src="${imgUrl}" class="card-img" loading="lazy"></a>
+                        <div class="overlay-tags">
+                            <span class="ov-tag ov-type">${typeLabel}</span>
+                            ${l.seaViewScore >=4 ? '<span class="ov-tag ov-sea">SEA VIEW</span>' : ''}
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-price">${fmtPrice(l.priceJpy)}</div>
+                        <div class="card-header-row">
+                            <div class="card-price">${fmtPrice(l.priceJpy)}</div>
+                            ${ageInfo}
+                        </div>
                         <a href="${l.sourceUrl}" target="_blank" class="card-title">${title}</a>
-                        <div class="card-meta">${metaHtml}</div>
-                        <div class="card-footer">${details.join(' &bull; ')}</div>
-                        <div class="card-tags">
-                            <span class="tag">${typeLabel}</span>
-                            ${l.seaViewScore >=4 ? '<span class="tag sea-view">Sea View</span>' : ''}
+                        
+                        <div class="card-metrics">
+                            ${metrics.map(m => `<div class="metric">${m}</div>`).join('<div style="color:#333">|</div>')}
+                        </div>
+
+                        <div class="card-footer">
+                            <div style="opacity:0.6">ID: ${l.id.split('-')[1].substring(0,6)}...</div>
+                            <a href="${l.sourceUrl}" target="_blank" class="view-btn">Analyze &rarr;</a>
                         </div>
                     </div>
                 </div>`;
