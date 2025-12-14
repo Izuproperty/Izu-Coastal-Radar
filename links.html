@@ -150,7 +150,9 @@
       back: "← Back to Radar",
       note: "Add links over time — this page is designed to scale.",
       watch: "WATCH →",
-      pill: "VIDEO"
+      read: "READ →",
+      open: "OPEN →",
+      pillVideo: "VIDEO"
     },
     JP: {
       title: "役立つ伊豆リンク",
@@ -158,7 +160,9 @@
       back: "← レーダーへ戻る",
       note: "リンクは随時追加していく想定です。",
       watch: "視聴 →",
-      pill: "動画"
+      read: "読む →",
+      open: "開く →",
+      pillVideo: "動画"
     },
     CN: {
       title: "伊豆实用链接",
@@ -166,33 +170,35 @@
       back: "← 返回雷达",
       note: "后续将持续补充更多链接。",
       watch: "观看 →",
-      pill: "视频"
+      read: "阅读 →",
+      open: "打开 →",
+      pillVideo: "视频"
     }
   };
 
   // Add links here over time:
- const LINKS = [
-  {
-    type: "video",
-    url: "https://www.youtube.com/watch?v=4Vozq-pkGac",
-    titleJP: "移住はパラダイス？",
-    titleEN: "Living in Izu Paradise?",
-    titleCN: "在伊豆生活是天堂吗？",
-    noteEN: "A great perspective on relocating and life in Izu.",
-    noteJP: "伊豆での移住・暮らしの雰囲気がよく分かる動画。",
-    noteCN: "关于移居与伊豆生活的很棒视角。"
-  },
-  {
-    type: "pdf",
-    url: "https://www.town.higashiizu.lg.jp/material/files/group/10/kik_panf.pdf",
-    titleJP: "東伊豆町 住民ガイド（日本語のみ）",
-    titleEN: "Higashi Izu Town Resident Guide (Japanese Only)",
-    titleCN: "东伊豆町居民指南（日文）",
-    noteEN: "Official resident guide PDF from Higashi-Izu Town.",
-    noteJP: "東伊豆町の公式住民向けガイド（PDF）。",
-    noteCN: "东伊豆町官方居民指南（PDF）。"
-  }
-];
+  const LINKS = [
+    {
+      type: "video",
+      url: "https://www.youtube.com/watch?v=4Vozq-pkGac",
+      titleJP: "移住はパラダイス？",
+      titleEN: "Living in Izu Paradise?",
+      titleCN: "在伊豆生活是天堂吗？",
+      noteEN: "A great perspective on relocating and life in Izu.",
+      noteJP: "伊豆での移住・暮らしの雰囲気がよく分かる動画。",
+      noteCN: "关于移居与伊豆生活的很棒视角。"
+    },
+    {
+      type: "pdf",
+      url: "https://www.town.higashiizu.lg.jp/material/files/group/10/kik_panf.pdf",
+      titleJP: "東伊豆町 住民ガイド（日本語のみ）",
+      titleEN: "Higashi Izu Town Resident Guide (Japanese Only)",
+      titleCN: "东伊豆町居民指南（日文）",
+      noteEN: "Official resident guide PDF from Higashi-Izu Town.",
+      noteJP: "東伊豆町の公式住民向けガイド（PDF）。",
+      noteCN: "东伊豆町官方居民指南（PDF）。"
+    }
+  ];
 
   function setLang(l) {
     STATE.lang = l;
@@ -215,6 +221,13 @@
     document.getElementById("footer-note").innerText = t.note;
   }
 
+  function getCta(itemType) {
+    const t = TXT[STATE.lang];
+    if (itemType === "video") return t.watch;
+    if (itemType === "pdf") return t.read;
+    return t.open;
+  }
+
   function renderLinks() {
     const grid = document.getElementById("links-grid");
     const t = TXT[STATE.lang];
@@ -231,7 +244,8 @@
         (STATE.lang === "CN") ? (item.noteCN || item.noteEN || "") :
         (item.noteJP || "");
 
-      const pill = (item.type === "video") ? t.pill : item.type.toUpperCase();
+      const pill = (item.type === "video") ? t.pillVideo : item.type.toUpperCase();
+      const cta = getCta(item.type);
 
       const card = `
         <div class="link-card">
@@ -242,7 +256,7 @@
           <div class="link-title">${title}</div>
           ${note ? `<div style="color:#b8b8bd; font-size:0.95rem; line-height:1.5">${note}</div>` : ""}
           <div class="link-actions">
-            <a href="${item.url}" target="_blank" rel="noopener">${t.watch}</a>
+            <a href="${item.url}" target="_blank" rel="noopener">${cta}</a>
           </div>
         </div>
       `;
