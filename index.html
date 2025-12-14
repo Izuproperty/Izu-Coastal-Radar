@@ -1,314 +1,442 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Izu Coastal Radar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-body: #000000;
-            --bg-card: #1c1c1e;
-            --text-primary: #f5f5f7;
-            --text-secondary: #86868b;
-            --accent: #0a84ff;
-            --tag-sea: #0a84ff;
-            --tag-onsen: #ff453a;
-            --border: #333;
-        }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 80px; }
-        header { background: #000; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-        
-        .vintage-hero { 
-            display: flex; gap: 20px; padding: 40px 20px; overflow-x: auto; 
-            background: linear-gradient(to bottom, #111, #000); justify-content: center;
-        }
-        .poster-frame { height: 180px; flex-shrink: 0; border: 1px solid #333; transition: transform 0.2s; opacity: 0.8; }
-        .poster-frame:hover { transform: scale(1.05); opacity: 1; border-color: #fff; }
-        .poster-frame img { height: 100%; width: auto; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Izu Coastal Radar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-body: #000000;
+      --bg-card: #1c1c1e;
+      --text-primary: #f5f5f7;
+      --text-secondary: #86868b;
+      --accent: #0a84ff;
+      --tag-sea: #0a84ff;
+      --tag-onsen: #ff453a;
+      --border: #333;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 80px; }
+    header { background: #000; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
 
-        .header-content { text-align: center; padding: 20px; }
-        h1 { margin: 0; font-size: 3rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { color: var(--text-secondary); margin-top: 8px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+    .vintage-hero {
+      display: flex; gap: 20px; padding: 40px 20px; overflow-x: auto;
+      background: linear-gradient(to bottom, #111, #000); justify-content: center;
+    }
+    .poster-frame { height: 180px; flex-shrink: 0; border: 1px solid #333; transition: transform 0.2s; opacity: 0.8; }
+    .poster-frame:hover { transform: scale(1.05); opacity: 1; border-color: #fff; }
+    .poster-frame img { height: 100%; width: auto; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+    .header-content { text-align: center; padding: 20px; }
+    h1 { margin: 0; font-size: 3rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: var(--text-secondary); margin-top: 8px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* DARK MODE STATS BAR */
-        .stats-bar { 
-            display: flex; gap: 1px; background: #333; border: 1px solid #333; 
-            border-radius: 12px; overflow: hidden; margin-bottom: 40px; 
-        }
-        .stat-item { flex: 1; text-align: center; padding: 20px; background: var(--bg-card); }
-        .stat-val { font-size: 1.6rem; font-weight: 700; color: #fff; }
-        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
-        .stat-sub { font-size: 0.8rem; color: var(--accent); margin-top: 4px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
 
-        /* CONTROLS */
-        .controls { 
-            background: rgba(28,28,30,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
-            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 30px; 
-            position: sticky; top: 20px; z-index: 100; backdrop-filter: blur(10px);
-        }
-        
-        select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; outline: none; }
-        .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; margin-right: 20px; }
-        .toggle-btn { padding: 8px 16px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
-        .toggle-btn.active { background: #333; color: #fff; }
-        .results-count { margin-left: auto; color: var(--text-secondary); font-weight: 600; }
+    /* DARK MODE STATS BAR */
+    .stats-bar {
+      display: flex; gap: 1px; background: #333; border: 1px solid #333;
+      border-radius: 12px; overflow: hidden; margin-bottom: 40px;
+    }
+    .stat-item { flex: 1; text-align: center; padding: 20px; background: var(--bg-card); }
+    .stat-val { font-size: 1.6rem; font-weight: 700; color: #fff; }
+    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+    .stat-sub { font-size: 0.8rem; color: var(--accent); margin-top: 4px; }
 
-        /* GRID */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
-        .card { 
-            background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid #2c2c2e; 
-            display: flex; flex-direction: column; transition: transform 0.2s;
-        }
-        .card:hover { transform: translateY(-4px); border-color: #555; }
-        
-        .card-img-wrap { height: 220px; position: relative; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .overlay-tags { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; }
-        .ov-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(8px); color: #fff; }
-        .ov-type { background: rgba(0,0,0,0.6); }
-        .ov-sea { background: var(--tag-sea); }
-        .ov-onsen { background: var(--tag-onsen); }
+    /* CONTROLS */
+    .controls {
+      background: rgba(28,28,30,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
+      display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 30px;
+      position: sticky; top: 20px; z-index: 100; backdrop-filter: blur(10px);
+    }
 
-        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        .card-price { font-size: 1.5rem; font-weight: 700; color: #fff; }
-        .card-age { background: #333; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: #ccc; }
-        
-        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: #ddd; text-decoration: none; line-height: 1.4; }
-        .card-title:hover { color: var(--accent); }
-        
-        .card-metrics { display: flex; gap: 15px; color: var(--text-secondary); font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #333; margin-bottom: 15px; }
-        .metric span { color: #fff; font-weight: 600; }
-        
-        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #555; }
-        .view-btn { color: var(--accent); text-transform: uppercase; font-weight: 700; text-decoration: none; }
-        
-        .no-listings { grid-column: 1/-1; text-align: center; padding: 100px; color: #555; }
-    </style>
+    select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; outline: none; }
+    .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; margin-right: 20px; }
+    .toggle-btn { padding: 8px 16px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
+    .toggle-btn.active { background: #333; color: #fff; }
+    .results-count { margin-left: auto; color: var(--text-secondary); font-weight: 600; }
+
+    /* GRID */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+    .card {
+      background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid #2c2c2e;
+      display: flex; flex-direction: column; transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-4px); border-color: #555; }
+
+    .card-img-wrap { height: 220px; position: relative; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; }
+
+    .overlay-tags { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .ov-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(8px); color: #fff; }
+    .ov-type { background: rgba(0,0,0,0.6); }
+    .ov-sea { background: var(--tag-sea); }
+    .ov-onsen { background: var(--tag-onsen); }
+
+    .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 10px; }
+    .card-price { font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .card-age { background: #333; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: #ccc; white-space: nowrap; }
+
+    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: #ddd; text-decoration: none; line-height: 1.4; }
+    .card-title:hover { color: var(--accent); }
+
+    .card-metrics { display: flex; gap: 15px; color: var(--text-secondary); font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #333; margin-bottom: 15px; flex-wrap: wrap; }
+    .metric span { color: #fff; font-weight: 600; }
+
+    .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #555; }
+    .view-btn { color: var(--accent); text-transform: uppercase; font-weight: 700; text-decoration: none; }
+
+    .no-listings { grid-column: 1/-1; text-align: center; padding: 100px; color: #555; }
+    .error-msg { grid-column: 1/-1; background: #220; border: 1px solid #533; padding: 16px; border-radius: 12px; color: #f5f5f7; }
+  </style>
 </head>
 <body>
 
 <header>
-    <div class="vintage-hero">
-        <div class="poster-frame"><img src="assets/images/17E88B82-01F3-4A60-9571-935741E304B9.jpeg"></div>
-        <div class="poster-frame"><img src="assets/images/42DD5202-2825-48D4-BC01-1AF67FD8BFBE.jpeg"></div>
-        <div class="poster-frame"><img src="assets/images/57D6E8AA-D359-417A-AB92-037676775478.jpeg"></div>
-        <div class="poster-frame"><img src="assets/images/715105E4-F9EB-405D-A0E4-3D0C8C82EDE6.jpeg"></div>
-        <div class="poster-frame"><img src="assets/images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg"></div>
-    </div>
-    <div class="header-content">
-        <h1>COASTAL RADAR</h1>
-        <div class="subtitle">Market Intelligence: Shimoda & South Izu</div>
-    </div>
+  <div class="vintage-hero">
+    <div class="poster-frame"><img src="assets/images/17E88B82-01F3-4A60-9571-935741E304B9.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/42DD5202-2825-48D4-BC01-1AF67FD8BFBE.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/57D6E8AA-D359-417A-AB92-037676775478.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/715105E4-F9EB-405D-A0E4-3D0C8C82EDE6.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg"></div>
+  </div>
+  <div class="header-content">
+    <h1>COASTAL RADAR</h1>
+    <div class="subtitle">Market Intelligence: Shimoda & South Izu</div>
+  </div>
 </header>
 
 <div class="container">
-    <div class="stats-bar" id="stats-panel" style="display:none">
-        <div class="stat-item">
-            <div class="stat-val" id="stat-price">-</div>
-            <div class="stat-label">Avg Price</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-val" id="stat-size">-</div>
-            <div class="stat-label">Avg Size</div>
-            <div class="stat-sub" id="stat-size-sub">-</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-val" id="stat-unit">-</div>
-            <div class="stat-label">Price / Unit</div>
-            <div class="stat-sub" id="stat-unit-sub">-</div>
-        </div>
+  <div class="stats-bar" id="stats-panel" style="display:none">
+    <div class="stat-item">
+      <div class="stat-val" id="stat-price">-</div>
+      <div class="stat-label" id="lbl-avg-price">Avg Price</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-size">-</div>
+      <div class="stat-label" id="lbl-avg-size">Avg Size</div>
+      <div class="stat-sub" id="stat-size-sub">-</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-unit">-</div>
+      <div class="stat-label" id="lbl-unit">Price / Unit</div>
+      <div class="stat-sub" id="stat-unit-sub">-</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
+      <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
+    </div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btn-jpy" onclick="setCurr('JPY')">¥</button>
+      <button class="toggle-btn" id="btn-usd" onclick="setCurr('USD')">$</button>
     </div>
 
-    <div class="controls">
-        <div class="toggle-group">
-            <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
-            <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
-        </div>
-        <div class="toggle-group">
-            <button class="toggle-btn active" id="btn-jpy" onclick="setCurr('JPY')">¥</button>
-            <button class="toggle-btn" id="btn-usd" onclick="setCurr('USD')">$</button>
-        </div>
+    <select id="location-select" onchange="applyFilters()"></select>
+    <select id="type-select" onchange="applyFilters()">
+      <option value="all">All Types</option>
+      <option value="house">House</option>
+      <option value="mansion">Condo</option>
+      <option value="land">Land</option>
+    </select>
+    <select id="seaview-select" onchange="applyFilters()">
+      <option value="all">Any View</option>
+      <option value="4">Sea View</option>
+    </select>
+    <select id="sort-select" onchange="applyFilters()">
+      <option value="price-desc">Price: High-Low</option>
+      <option value="price-asc">Price: Low-High</option>
+      <option value="size-desc">Size: Largest</option>
+      <option value="age-desc">Age: Newest</option>
+    </select>
+    <div class="results-count" id="count-display"></div>
+  </div>
 
-        <select id="location-select" onchange="applyFilters()"></select>
-        <select id="type-select" onchange="applyFilters()">
-            <option value="all">All Types</option>
-            <option value="house">House</option>
-            <option value="mansion">Condo</option>
-            <option value="land">Land</option>
-        </select>
-        <select id="seaview-select" onchange="applyFilters()">
-            <option value="all">Any View</option>
-            <option value="4">Sea View</option>
-        </select>
-        <select id="sort-select" onchange="applyFilters()">
-            <option value="price-desc">Price: High-Low</option>
-            <option value="price-asc">Price: Low-High</option>
-            <option value="size-desc">Size: Largest</option>
-            <option value="age-desc">Age: Newest</option>
-        </select>
-        <div class="results-count" id="count-display"></div>
-    </div>
-
-    <div class="grid" id="listings-container">Loading...</div>
+  <div class="grid" id="listings-container">Loading...</div>
 </div>
 
 <script>
-    let DATA = { listings: [], rate: 155 };
-    let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', sort: 'price-desc', type: 'all', view: 'all' };
-    const PROXY = "https://corsproxy.io/?";
-    
-    async function init() {
-        try {
-            const res = await fetch('listings.json?v=' + Date.now());
-            if (!res.ok) throw new Error("JSON not found");
-            const json = await res.json();
-            DATA.listings = json.listings;
-            DATA.rate = json.fxRate || 155;
-            populateLocations();
-            applyFilters();
-        } catch (e) {
-            document.getElementById('listings-container').innerHTML = `<div class='error-msg'>${e.message}</div>`;
-        }
+  let DATA = { listings: [], rate: 155 };
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', sort: 'price-desc', type: 'all', view: 'all' };
+  const PROXY = "https://corsproxy.io/?";
+
+  const LOC_MAP = {
+    "下田市": "Shimoda City",
+    "河津町": "Kawazu Town",
+    "東伊豆町": "Higashi-Izu Town",
+    "南伊豆町": "Minami-Izu Town",
+    "伊東市": "Ito City",
+  };
+
+  const TXT = {
+    EN: {
+      allLoc: "All Locations",
+      allTypes: "All Types",
+      house: "House",
+      mansion: "Condo",
+      land: "Land",
+      anyView: "Any View",
+      seaView: "Sea View",
+      listings: "Listings",
+      noSignal: "NO SIGNAL DETECTED.",
+      analyze: "ANALYZE →",
+      avgPrice: "Avg Price",
+      avgSize: "Avg Size",
+      unit: "Price / Unit",
+      seaTag: "SEA VIEW",
+      onsenTag: "ONSEN"
+    },
+    JP: {
+      allLoc: "全地域",
+      allTypes: "全種別",
+      house: "戸建",
+      mansion: "マンション",
+      land: "土地",
+      anyView: "眺望指定なし",
+      seaView: "海眺望",
+      listings: "件",
+      noSignal: "該当なし",
+      analyze: "詳細 →",
+      avgPrice: "平均価格",
+      avgSize: "平均面積",
+      unit: "単価",
+      seaTag: "海眺望",
+      onsenTag: "温泉"
+    }
+  };
+
+  const TYPE_LABELS = {
+    EN: { house: "House", mansion: "Condo", land: "Land" },
+    JP: { house: "戸建", mansion: "マンション", land: "土地" }
+  };
+
+  async function init() {
+    try {
+      const res = await fetch('listings.json?v=' + Date.now());
+      if (!res.ok) throw new Error("JSON not found");
+      const json = await res.json();
+      if (!json || !Array.isArray(json.listings)) throw new Error("Invalid JSON structure");
+      DATA.listings = json.listings;
+      DATA.rate = json.fxRate || 155;
+
+      updateLabels();
+      populateLocations();
+      applyFilters();
+    } catch (e) {
+      document.getElementById('listings-container').innerHTML = `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`;
+    }
+  }
+
+  function setLang(l) { STATE.lang = l; updateToggles(); updateLabels(); populateLocations(); applyFilters(); }
+  function setCurr(c) { STATE.curr = c; updateToggles(); applyFilters(); }
+
+  function updateToggles() {
+    document.getElementById('btn-en').className = STATE.lang==='EN'?'toggle-btn active':'toggle-btn';
+    document.getElementById('btn-jp').className = STATE.lang==='JP'?'toggle-btn active':'toggle-btn';
+    document.getElementById('btn-jpy').className = STATE.curr==='JPY'?'toggle-btn active':'toggle-btn';
+    document.getElementById('btn-usd').className = STATE.curr==='USD'?'toggle-btn active':'toggle-btn';
+  }
+
+  function updateLabels() {
+    const t = TXT[STATE.lang];
+    document.getElementById('lbl-avg-price').innerText = t.avgPrice;
+    document.getElementById('lbl-avg-size').innerText = t.avgSize;
+    document.getElementById('lbl-unit').innerText = t.unit;
+
+    // Update select option labels (static ones)
+    const typeSel = document.getElementById('type-select');
+    typeSel.options[0].text = t.allTypes;
+    typeSel.options[1].text = t.house;
+    typeSel.options[2].text = t.mansion;
+    typeSel.options[3].text = t.land;
+
+    const viewSel = document.getElementById('seaview-select');
+    viewSel.options[0].text = t.anyView;
+    viewSel.options[1].text = t.seaView;
+  }
+
+  function populateLocations() {
+    const sel = document.getElementById('location-select');
+    const currentVal = sel.value || "all";
+    const cities = [...new Set(DATA.listings.map(l => l.city).filter(Boolean))].sort();
+    const t = TXT[STATE.lang];
+
+    sel.innerHTML = `<option value="all">${t.allLoc}</option>`;
+    cities.forEach(c => {
+      const label = (STATE.lang === 'EN') ? (LOC_MAP[c] || c) : c;
+      sel.innerHTML += `<option value="${c}">${label}</option>`;
+    });
+
+    sel.value = currentVal;
+  }
+
+  function fmtPrice(v) {
+    if (!v) return "-";
+    return STATE.curr === 'JPY'
+      ? "¥" + (v/1000000).toFixed(1) + "M"
+      : "$" + Math.round(v / DATA.rate).toLocaleString();
+  }
+
+  function pickSizeForStats(item) {
+    // For land, landSqm is the most meaningful "size"; otherwise use buildingSqm.
+    if (!item) return 0;
+    if (item.propertyType === "land") return item.landSqm || 0;
+    return item.buildingSqm || 0;
+  }
+
+  function renderStats(items) {
+    if (!items.length) {
+      document.getElementById('stats-panel').style.display = 'none';
+      return;
+    }
+    document.getElementById('stats-panel').style.display = 'flex';
+
+    const prices = items.map(i => i.priceJpy || 0).filter(v => v > 0);
+    const sizes = items.map(i => pickSizeForStats(i)).filter(v => v > 0);
+
+    const avgP = prices.length ? (prices.reduce((a,b)=>a+b,0) / prices.length) : 0;
+    const avgS = sizes.length ? (sizes.reduce((a,b)=>a+b,0) / sizes.length) : 0;
+
+    document.getElementById('stat-price').innerText = avgP ? fmtPrice(avgP) : "-";
+
+    if (!avgS || !avgP) {
+      document.getElementById('stat-size').innerText = avgS ? (Math.round(avgS) + " m²") : "-";
+      document.getElementById('stat-size-sub').innerText = "";
+      document.getElementById('stat-unit').innerText = "-";
+      document.getElementById('stat-unit-sub').innerText = "";
+      return;
     }
 
-    function setLang(l) { STATE.lang = l; updateToggles(); applyFilters(); }
-    function setCurr(c) { STATE.curr = c; updateToggles(); applyFilters(); }
+    if (STATE.curr === 'JPY') {
+      document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
+      document.getElementById('stat-size-sub').innerText = "";
 
-    function updateToggles() {
-        document.getElementById('btn-en').className = STATE.lang==='EN'?'toggle-btn active':'toggle-btn';
-        document.getElementById('btn-jp').className = STATE.lang==='JP'?'toggle-btn active':'toggle-btn';
-        document.getElementById('btn-jpy').className = STATE.curr==='JPY'?'toggle-btn active':'toggle-btn';
-        document.getElementById('btn-usd').className = STATE.curr==='USD'?'toggle-btn active':'toggle-btn';
+      const ppSqm = avgP / avgS; // JPY per m2
+      document.getElementById('stat-unit').innerText = "¥" + Math.round(ppSqm / 10000) + "万 /m²";
+      document.getElementById('stat-unit-sub').innerText = "";
+    } else {
+      const sqft = avgS * 10.764;
+      document.getElementById('stat-size').innerText = Math.round(sqft) + " ft²";
+      document.getElementById('stat-size-sub').innerText = `(${Math.round(avgS)} m²)`;
+
+      const ppSqft = (avgP / DATA.rate) / sqft;
+      document.getElementById('stat-unit').innerText = "$" + Math.round(ppSqft) + " /ft²";
+
+      const ppSqm = (avgP / DATA.rate) / avgS;
+      document.getElementById('stat-unit-sub').innerText = `($${Math.round(ppSqm)} /m²)`;
+    }
+  }
+
+  function applyFilters() {
+    STATE.loc = document.getElementById('location-select').value;
+    STATE.type = document.getElementById('type-select').value;
+    STATE.view = document.getElementById('seaview-select').value;
+    STATE.sort = document.getElementById('sort-select').value;
+
+    let items = DATA.listings.filter(l => {
+      if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
+      if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
+      if (STATE.view === '4' && (l.seaViewScore || 0) < 4) return false;
+      return true;
+    });
+
+    items.sort((a,b) => {
+      if (STATE.sort === 'price-desc') return (b.priceJpy||0) - (a.priceJpy||0);
+      if (STATE.sort === 'price-asc') return (a.priceJpy||0) - (b.priceJpy||0);
+      if (STATE.sort === 'size-desc') {
+        const as = pickSizeForStats(a);
+        const bs = pickSizeForStats(b);
+        return (bs||0) - (as||0);
+      }
+      if (STATE.sort === 'age-desc') return (a.age||999) - (b.age||999);
+      return 0;
+    });
+
+    renderListings(items);
+    renderStats(items);
+  }
+
+  function formatAgeBadge(l) {
+    const age = (l.age || 0);
+    const yb = l.yearBuilt;
+
+    if (yb && age > 0) {
+      if (STATE.lang === "EN") return `${yb} · ${Math.floor(age)} yrs`;
+      return `${yb} · 築${Math.floor(age)}年`;
+    }
+    if (age > 0) {
+      if (STATE.lang === "EN") return `${Math.floor(age)} yrs`;
+      return `築${Math.floor(age)}年`;
+    }
+    if (yb) return String(yb);
+    return "";
+  }
+
+  function renderListings(items) {
+    const container = document.getElementById('listings-container');
+    const t = TXT[STATE.lang];
+
+    container.innerHTML = "";
+    document.getElementById('count-display').innerText = `${items.length} ${t.listings}`;
+
+    if (!items.length) {
+      container.innerHTML = `<div class="no-listings">${t.noSignal}</div>`;
+      return;
     }
 
-    function populateLocations() {
-        const sel = document.getElementById('location-select');
-        const cities = [...new Set(DATA.listings.map(l => l.city))].sort();
-        sel.innerHTML = `<option value="all">All Locations</option>`;
-        cities.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-    }
+    items.forEach(l => {
+      const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400?text=No+Img";
+      const title = (STATE.lang === 'EN') ? (l.titleEn || l.title) : l.title;
 
-    function fmtPrice(v) {
-        if (!v) return "-";
-        return STATE.curr === 'JPY' 
-            ? "¥" + (v/1000000).toFixed(1) + "M"
-            : "$" + Math.round(v / DATA.rate).toLocaleString();
-    }
+      const typeLabel = (TYPE_LABELS[STATE.lang][l.propertyType] || l.propertyType);
 
-    function renderStats(items) {
-        if (!items.length) { document.getElementById('stats-panel').style.display = 'none'; return; }
-        document.getElementById('stats-panel').style.display = 'flex';
-        
-        const totalP = items.reduce((a,b)=>a+(b.priceJpy||0),0);
-        const totalS = items.reduce((a,b)=>a+(b.buildingSqm||0),0);
-        const count = items.length;
-        
-        const avgP = totalP/count;
-        const avgS = totalS/count;
-        
-        document.getElementById('stat-price').innerText = fmtPrice(avgP);
-        
-        // Show BOTH Sqm and Sqft if USD
-        if (STATE.curr === 'JPY') {
-            document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
-            document.getElementById('stat-size-sub').innerText = "";
-            document.getElementById('stat-unit').innerText = "¥" + Math.round((avgP/avgS)/10000) + "万 /m²";
-            document.getElementById('stat-unit-sub').innerText = "";
-        } else {
-            const sqft = avgS * 10.764;
-            document.getElementById('stat-size').innerText = Math.round(sqft) + " ft²";
-            document.getElementById('stat-size-sub').innerText = `(${Math.round(avgS)} m²)`;
-            
-            const ppSqft = (avgP / DATA.rate) / sqft;
-            document.getElementById('stat-unit').innerText = "$" + Math.round(ppSqft) + " /ft²";
-            const ppSqm = (avgP / DATA.rate) / avgS;
-            document.getElementById('stat-unit-sub').innerText = `($${Math.round(ppSqm)} /m²)`;
-        }
-    }
+      // Age badge (year + years)
+      const ageBadge = formatAgeBadge(l);
+      const ageInfo = ageBadge ? `<div class="card-age">${ageBadge}</div>` : '';
 
-    function applyFilters() {
-        STATE.loc = document.getElementById('location-select').value;
-        STATE.type = document.getElementById('type-select').value;
-        STATE.view = document.getElementById('seaview-select').value;
-        STATE.sort = document.getElementById('sort-select').value;
+      // Overlay tags
+      let tagsHtml = `<span class="ov-tag ov-type">${typeLabel}</span>`;
+      if ((l.seaViewScore || 0) >= 4) tagsHtml += `<span class="ov-tag ov-sea">${t.seaTag}</span>`;
+      if ((l.highlightTags || []).includes("Onsen")) tagsHtml += `<span class="ov-tag ov-onsen">${t.onsenTag}</span>`;
 
-        let items = DATA.listings.filter(l => {
-            if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
-            if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
-            if (STATE.view === '4' && l.seaViewScore < 4) return false;
-            return true;
-        });
+      // Metrics
+      let metrics = [];
+      if (l.propertyType !== "land" && l.buildingSqm) metrics.push(`<span>${Math.round(l.buildingSqm)}</span> m²`);
+      if (l.landSqm) metrics.push(`${STATE.lang === 'EN' ? 'Land' : '土地'} <span>${Math.round(l.landSqm)}</span> m²`);
 
-        items.sort((a,b) => {
-            if (STATE.sort === 'price-desc') return (b.priceJpy||0) - (a.priceJpy||0);
-            if (STATE.sort === 'price-asc') return (a.priceJpy||0) - (b.priceJpy||0);
-            if (STATE.sort === 'size-desc') return (b.buildingSqm||0) - (a.buildingSqm||0);
-            if (STATE.sort === 'age-desc') return (a.age||999) - (b.age||999);
-        });
+      const viewLabel = t.analyze;
 
-        renderListings(items);
-        renderStats(items);
-    }
+      const card = `
+        <div class="card">
+          <div class="card-img-wrap">
+            <a href="${l.sourceUrl}" target="_blank" rel="noopener">
+              <img src="${imgUrl}" class="card-img" loading="lazy">
+            </a>
+            <div class="overlay-tags">${tagsHtml}</div>
+          </div>
+          <div class="card-body">
+            <div class="card-header-row">
+              <div class="card-price">${fmtPrice(l.priceJpy)}</div>
+              ${ageInfo}
+            </div>
+            <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="card-title">${title}</a>
+            <div class="card-metrics">
+              ${metrics.map(m => `<div class="metric">${m}</div>`).join('<div style="color:#333">|</div>')}
+            </div>
+            <div class="card-footer">
+              <div style="opacity:0.5">ID: ${(l.id || "").substring(9,15)}</div>
+              <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="view-btn">${viewLabel}</a>
+            </div>
+          </div>
+        </div>`;
+      container.insertAdjacentHTML('beforeend', card);
+    });
+  }
 
-    function renderListings(items) {
-        const container = document.getElementById('listings-container');
-        container.innerHTML = "";
-        document.getElementById('count-display').innerText = `${items.length} Listings`;
-
-        if (!items.length) {
-            container.innerHTML = `<div class="no-listings">NO SIGNAL DETECTED.</div>`;
-            return;
-        }
-
-        items.forEach(l => {
-            const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400?text=No+Img";
-            const title = STATE.lang === 'EN' ? (l.titleEn || l.title) : l.title;
-            const typeLabel = (l.propertyType === 'mansion') ? 'Condo' : l.propertyType;
-            
-            // Age
-            let ageInfo = l.age > 0 ? `<div class="card-age">${Math.floor(l.age)} yrs</div>` : '';
-
-            // Tags
-            let tagsHtml = `<span class="ov-tag ov-type">${typeLabel}</span>`;
-            if (l.seaViewScore >= 4) tagsHtml += `<span class="ov-tag ov-sea">SEA VIEW</span>`;
-            if (l.highlightTags.includes("Onsen")) tagsHtml += `<span class="ov-tag ov-onsen">ONSEN</span>`;
-
-            // Metrics
-            let metrics = [];
-            if (l.buildingSqm) metrics.push(`<span>${l.buildingSqm}</span> m²`);
-            if (l.landSqm) metrics.push(`Land <span>${l.landSqm}</span> m²`);
-
-            const card = `
-                <div class="card">
-                    <div class="card-img-wrap">
-                        <a href="${l.sourceUrl}" target="_blank"><img src="${imgUrl}" class="card-img" loading="lazy"></a>
-                        <div class="overlay-tags">${tagsHtml}</div>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-header-row">
-                            <div class="card-price">${fmtPrice(l.priceJpy)}</div>
-                            ${ageInfo}
-                        </div>
-                        <a href="${l.sourceUrl}" target="_blank" class="card-title">${title}</a>
-                        <div class="card-metrics">
-                            ${metrics.map(m => `<div class="metric">${m}</div>`).join('<div style="color:#333">|</div>')}
-                        </div>
-                        <div class="card-footer">
-                            <div style="opacity:0.5">ID: ${l.id.substring(9,15)}</div>
-                            <a href="${l.sourceUrl}" target="_blank" class="view-btn">ANALYZE &rarr;</a>
-                        </div>
-                    </div>
-                </div>`;
-            container.insertAdjacentHTML('beforeend', card);
-        });
-    }
-
-    init();
+  init();
 </script>
 </body>
 </html>
