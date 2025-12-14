@@ -1,6 +1,6 @@
 {
   "fxRate": 155.81,
-  "generatedAt": "2025-12-14T14:34:09.829498",
+  "generatedAt": "2025-12-14T16:17:37.190330",
   "listings": [
     {
       "id": "izutaiyo-HIP593H",
@@ -688,26 +688,6 @@
       ]
     },
     {
-      "id": "izutaiyo-SMB384Z",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB384Z",
-      "title": "下田市 吉佐美（5700万円）のその他情報はこちら！2025.11.28下田店 大上 が担当させて頂いてます。",
-      "titleEn": "Shimoda 吉佐美（5700万円）のその他情報はこちら！2025.11.28下田店 大上 が担当させて頂いてます。",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 57000000,
-      "landSqm": null,
-      "buildingSqm": 1078.8,
-      "yearBuilt": "1980",
-      "age": 44.7,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": null,
-      "highlightTags": [
-        "House",
-        "Onsen"
-      ]
-    },
-    {
       "id": "izutaiyo-SMB391H",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
       "title": "下田市 パレスサイドヴィラ（680万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
@@ -853,10 +833,10 @@
     }
   ],
   "stats": {
-    "avgPrice": 14764146.341463415,
-    "avgSize": 150.0717391304348,
-    "count": 42,
-    "rawHpnoCount": 42,
+    "avgPrice": 13708250.0,
+    "avgSize": 107.85681818181818,
+    "count": 41,
+    "rawHpnoCount": 41,
     "failures": 0
   },
   "sources": {
