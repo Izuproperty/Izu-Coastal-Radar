@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Useful Izu Links</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-body: #000000;
+      --bg-card: #1c1c1e;
+      --text-primary: #f5f5f7;
+      --text-secondary: #86868b;
+      --accent: #0a84ff;
+      --border: #333;
+      --footer-bg: #0b0b0c;
+      --footer-border: #1f1f21;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 0; }
+    header { background: #000; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+
+    .vintage-hero {
+      display: flex; gap: 20px; padding: 40px 20px; overflow-x: auto;
+      background: linear-gradient(to bottom, #111, #000); justify-content: center;
+    }
+    .poster-frame { height: 180px; flex-shrink: 0; border: 1px solid #333; transition: transform 0.2s; opacity: 0.8; }
+    .poster-frame:hover { transform: scale(1.05); opacity: 1; border-color: #fff; }
+    .poster-frame img { height: 100%; width: auto; }
+
+    .header-content { text-align: center; padding: 20px; }
+    h1 { margin: 0; font-size: 3rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: var(--text-secondary); margin-top: 8px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px 50px; }
+
+    .controls {
+      background: rgba(28,28,30,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
+      display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 24px;
+      position: sticky; top: 20px; z-index: 100; backdrop-filter: blur(10px);
+    }
+
+    .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; }
+    .toggle-btn { padding: 8px 14px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
+    .toggle-btn.active { background: #333; color: #fff; }
+
+    .nav-links { margin-left: auto; display: flex; gap: 12px; flex-wrap: wrap; }
+    .nav-links a { color: #cfcfd2; text-decoration: none; font-weight: 700; }
+    .nav-links a:hover { color: #fff; }
+
+    .links-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .link-card {
+      background: var(--bg-card);
+      border: 1px solid #2c2c2e;
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .link-title { font-size: 1.15rem; font-weight: 700; color: #fff; }
+    .link-meta { font-size: 0.9rem; color: var(--text-secondary); display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill {
+      display: inline-block;
+      border: 1px solid #333;
+      background: #0c0c0d;
+      color: #d7d7db;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .link-actions a {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .link-actions a:hover { color: #fff; }
+
+    footer {
+      border-top: 1px solid var(--footer-border);
+      background: var(--footer-bg);
+      padding: 28px 20px 40px;
+    }
+    .footer-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .footer-inner a { color: #cfcfd2; text-decoration: none; font-weight: 700; }
+    .footer-inner a:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="vintage-hero">
+    <div class="poster-frame"><img src="assets/images/17E88B82-01F3-4A60-9571-935741E304B9.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/42DD5202-2825-48D4-BC01-1AF67FD8BFBE.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/57D6E8AA-D359-417A-AB92-037676775478.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/715105E4-F9EB-405D-A0E4-3D0C8C82EDE6.jpeg"></div>
+    <div class="poster-frame"><img src="assets/images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg"></div>
+  </div>
+  <div class="header-content">
+    <h1 id="page-title">USEFUL IZU LINKS</h1>
+    <div class="subtitle" id="subtitle">Curated references for living, moving, and exploring</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="controls">
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
+      <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
+      <button class="toggle-btn" id="btn-cn" onclick="setLang('CN')">CN</button>
+    </div>
+
+    <div class="nav-links">
+      <a href="index.html" id="back-home">← Back to Radar</a>
+    </div>
+  </div>
+
+  <div class="links-grid" id="links-grid"></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div id="footer-note">Add links over time — this page is designed to scale.</div>
+    <div><a href="index.html">Home</a></div>
+  </div>
+</footer>
+
+<script>
+  let STATE = { lang: "EN" };
+
+  const TXT = {
+    EN: {
+      title: "USEFUL IZU LINKS",
+      subtitle: "Curated references for living, moving, and exploring",
+      back: "← Back to Radar",
+      note: "Add links over time — this page is designed to scale.",
+      watch: "WATCH →",
+      pill: "VIDEO"
+    },
+    JP: {
+      title: "役立つ伊豆リンク",
+      subtitle: "移住・暮らし・旅の参考リンク集",
+      back: "← レーダーへ戻る",
+      note: "リンクは随時追加していく想定です。",
+      watch: "視聴 →",
+      pill: "動画"
+    },
+    CN: {
+      title: "伊豆实用链接",
+      subtitle: "移居、生活与旅行的精选参考",
+      back: "← 返回雷达",
+      note: "后续将持续补充更多链接。",
+      watch: "观看 →",
+      pill: "视频"
+    }
+  };
+
+  // Add links here over time:
+  const LINKS = [
+    {
+      type: "video",
+      url: "https://www.youtube.com/watch?v=4Vozq-pkGac",
+      titleJP: "移住はパラダイス？",
+      titleEN: "Living in Izu Paradise?",
+      titleCN: "在伊豆生活是天堂吗？",
+      noteEN: "A great perspective on relocating and life in Izu.",
+      noteJP: "伊豆での移住・暮らしの雰囲気がよく分かる動画。",
+      noteCN: "关于移居与伊豆生活的很棒视角。"
+    }
+  ];
+
+  function setLang(l) {
+    STATE.lang = l;
+    updateToggles();
+    renderPageText();
+    renderLinks();
+  }
+
+  function updateToggles() {
+    document.getElementById('btn-en').className = STATE.lang==='EN'?'toggle-btn active':'toggle-btn';
+    document.getElementById('btn-jp').className = STATE.lang==='JP'?'toggle-btn active':'toggle-btn';
+    document.getElementById('btn-cn').className = STATE.lang==='CN'?'toggle-btn active':'toggle-btn';
+  }
+
+  function renderPageText() {
+    const t = TXT[STATE.lang];
+    document.getElementById("page-title").innerText = t.title;
+    document.getElementById("subtitle").innerText = t.subtitle;
+    document.getElementById("back-home").innerText = t.back;
+    document.getElementById("footer-note").innerText = t.note;
+  }
+
+  function renderLinks() {
+    const grid = document.getElementById("links-grid");
+    const t = TXT[STATE.lang];
+    grid.innerHTML = "";
+
+    LINKS.forEach(item => {
+      const title =
+        (STATE.lang === "EN") ? item.titleEN :
+        (STATE.lang === "CN") ? (item.titleCN || item.titleEN || item.titleJP) :
+        item.titleJP;
+
+      const note =
+        (STATE.lang === "EN") ? (item.noteEN || "") :
+        (STATE.lang === "CN") ? (item.noteCN || item.noteEN || "") :
+        (item.noteJP || "");
+
+      const pill = (item.type === "video") ? t.pill : item.type.toUpperCase();
+
+      const card = `
+        <div class="link-card">
+          <div class="link-meta">
+            <span class="pill">${pill}</span>
+            <span style="opacity:0.9">${item.url}</span>
+          </div>
+          <div class="link-title">${title}</div>
+          ${note ? `<div style="color:#b8b8bd; font-size:0.95rem; line-height:1.5">${note}</div>` : ""}
+          <div class="link-actions">
+            <a href="${item.url}" target="_blank" rel="noopener">${t.watch}</a>
+          </div>
+        </div>
+      `;
+      grid.insertAdjacentHTML("beforeend", card);
+    });
+  }
+
+  // init
+  renderPageText();
+  renderLinks();
+</script>
+</body>
+</html>
