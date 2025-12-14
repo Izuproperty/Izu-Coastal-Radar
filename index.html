@@ -15,8 +15,10 @@
       --tag-sea: #0a84ff;
       --tag-onsen: #ff453a;
       --border: #333;
+      --footer-bg: #0b0b0c;
+      --footer-border: #1f1f21;
     }
-    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 80px; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 0; }
     header { background: #000; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
 
     .vintage-hero {
@@ -31,7 +33,7 @@
     h1 { margin: 0; font-size: 3rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { color: var(--text-secondary); margin-top: 8px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
 
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px 50px; }
 
     /* DARK MODE STATS BAR */
     .stats-bar {
@@ -51,8 +53,8 @@
     }
 
     select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; outline: none; }
-    .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; margin-right: 20px; }
-    .toggle-btn { padding: 8px 16px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
+    .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; }
+    .toggle-btn { padding: 8px 14px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
     .toggle-btn.active { background: #333; color: #fff; }
     .results-count { margin-left: auto; color: var(--text-secondary); font-weight: 600; }
 
@@ -67,7 +69,7 @@
     .card-img-wrap { height: 220px; position: relative; }
     .card-img { width: 100%; height: 100%; object-fit: cover; }
 
-    .overlay-tags { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .overlay-tags { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100% - 24px); }
     .ov-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(8px); color: #fff; }
     .ov-type { background: rgba(0,0,0,0.6); }
     .ov-sea { background: var(--tag-sea); }
@@ -89,6 +91,41 @@
 
     .no-listings { grid-column: 1/-1; text-align: center; padding: 100px; color: #555; }
     .error-msg { grid-column: 1/-1; background: #220; border: 1px solid #533; padding: 16px; border-radius: 12px; color: #f5f5f7; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--footer-border);
+      background: var(--footer-bg);
+      padding: 28px 20px 40px;
+    }
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .footer-links { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .footer-links a {
+      color: #cfcfd2;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid transparent;
+    }
+    .footer-links a:hover { color: #fff; border-bottom-color: #555; }
+    .fx-meta { opacity: 0.9; }
+    .fx-meta code {
+      background: #111;
+      border: 1px solid #222;
+      padding: 2px 6px;
+      border-radius: 8px;
+      color: #d7d7db;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -102,8 +139,8 @@
     <div class="poster-frame"><img src="assets/images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg"></div>
   </div>
   <div class="header-content">
-    <h1>COASTAL RADAR</h1>
-    <div class="subtitle">Market Intelligence: Shimoda & South Izu</div>
+    <h1>IZU COASTAL RADAR</h1>
+    <div class="subtitle" id="subtitle">Market Intelligence: Shimoda & South Izu</div>
   </div>
 </header>
 
@@ -116,12 +153,12 @@
     <div class="stat-item">
       <div class="stat-val" id="stat-size">-</div>
       <div class="stat-label" id="lbl-avg-size">Avg Size</div>
-      <div class="stat-sub" id="stat-size-sub">-</div>
+      <div class="stat-sub" id="stat-size-sub"></div>
     </div>
     <div class="stat-item">
       <div class="stat-val" id="stat-unit">-</div>
       <div class="stat-label" id="lbl-unit">Price / Unit</div>
-      <div class="stat-sub" id="stat-unit-sub">-</div>
+      <div class="stat-sub" id="stat-unit-sub"></div>
     </div>
   </div>
 
@@ -129,41 +166,75 @@
     <div class="toggle-group">
       <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
       <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
+      <button class="toggle-btn" id="btn-cn" onclick="setLang('CN')">CN</button>
     </div>
+
     <div class="toggle-group">
       <button class="toggle-btn active" id="btn-jpy" onclick="setCurr('JPY')">¥</button>
       <button class="toggle-btn" id="btn-usd" onclick="setCurr('USD')">$</button>
+      <button class="toggle-btn" id="btn-cny" onclick="setCurr('CNY')">CNY</button>
     </div>
 
     <select id="location-select" onchange="applyFilters()"></select>
+
+    <select id="source-select" onchange="applyFilters()"></select>
+
     <select id="type-select" onchange="applyFilters()">
       <option value="all">All Types</option>
       <option value="house">House</option>
       <option value="mansion">Condo</option>
       <option value="land">Land</option>
     </select>
+
     <select id="seaview-select" onchange="applyFilters()">
       <option value="all">Any View</option>
       <option value="4">Sea View</option>
     </select>
+
     <select id="sort-select" onchange="applyFilters()">
       <option value="price-desc">Price: High-Low</option>
       <option value="price-asc">Price: Low-High</option>
       <option value="size-desc">Size: Largest</option>
       <option value="age-desc">Age: Newest</option>
     </select>
+
     <div class="results-count" id="count-display"></div>
   </div>
 
   <div class="grid" id="listings-container">Loading...</div>
 </div>
 
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links" id="footer-links">
+      <a href="links.html" id="useful-links">Useful Izu Links</a>
+    </div>
+    <div class="fx-meta" id="fx-meta"></div>
+  </div>
+</footer>
+
 <script>
-  let DATA = { listings: [], rate: 155 };
-  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', sort: 'price-desc', type: 'all', view: 'all' };
+  let DATA = {
+    listings: [],
+    fxUsdJpy: 155,
+    fxCnyJpy: 20,
+    fxSource: "Manual",
+    generatedAt: null
+  };
+
+  let STATE = {
+    lang: 'EN',
+    curr: 'JPY',
+    loc: 'all',
+    source: 'all',
+    sort: 'price-desc',
+    type: 'all',
+    view: 'all'
+  };
+
   const PROXY = "https://corsproxy.io/?";
 
-  const LOC_MAP = {
+  const LOC_MAP_EN = {
     "下田市": "Shimoda City",
     "河津町": "Kawazu Town",
     "東伊豆町": "Higashi-Izu Town",
@@ -171,13 +242,20 @@
     "伊東市": "Ito City",
   };
 
+  const LOC_MAP_CN = {
+    "下田市": "下田市",
+    "河津町": "河津町",
+    "東伊豆町": "东伊豆町",
+    "南伊豆町": "南伊豆町",
+    "伊東市": "伊东市",
+  };
+
   const TXT = {
     EN: {
+      subtitle: "Market Intelligence: Shimoda & South Izu",
       allLoc: "All Locations",
+      allSources: "All Sources",
       allTypes: "All Types",
-      house: "House",
-      mansion: "Condo",
-      land: "Land",
       anyView: "Any View",
       seaView: "Sea View",
       listings: "Listings",
@@ -187,14 +265,16 @@
       avgSize: "Avg Size",
       unit: "Price / Unit",
       seaTag: "SEA VIEW",
-      onsenTag: "ONSEN"
+      onsenTag: "ONSEN",
+      landLabel: "Land",
+      usefulLinks: "Useful Izu Links",
+      fxLabel: "FX"
     },
     JP: {
+      subtitle: "市場インテリジェンス：下田・南伊豆",
       allLoc: "全地域",
+      allSources: "全ソース",
       allTypes: "全種別",
-      house: "戸建",
-      mansion: "マンション",
-      land: "土地",
       anyView: "眺望指定なし",
       seaView: "海眺望",
       listings: "件",
@@ -204,13 +284,36 @@
       avgSize: "平均面積",
       unit: "単価",
       seaTag: "海眺望",
-      onsenTag: "温泉"
+      onsenTag: "温泉",
+      landLabel: "土地",
+      usefulLinks: "役立つ伊豆リンク",
+      fxLabel: "為替"
+    },
+    CN: {
+      subtitle: "市场情报：下田与南伊豆",
+      allLoc: "全部地区",
+      allSources: "全部来源",
+      allTypes: "全部类型",
+      anyView: "不限景观",
+      seaView: "海景",
+      listings: "套",
+      noSignal: "未找到匹配房源。",
+      analyze: "查看 →",
+      avgPrice: "平均价格",
+      avgSize: "平均面积",
+      unit: "单价",
+      seaTag: "海景",
+      onsenTag: "温泉",
+      landLabel: "土地",
+      usefulLinks: "伊豆实用链接",
+      fxLabel: "汇率"
     }
   };
 
   const TYPE_LABELS = {
     EN: { house: "House", mansion: "Condo", land: "Land" },
-    JP: { house: "戸建", mansion: "マンション", land: "土地" }
+    JP: { house: "戸建", mansion: "マンション", land: "土地" },
+    CN: { house: "独栋", mansion: "公寓", land: "土地" }
   };
 
   async function init() {
@@ -219,39 +322,72 @@
       if (!res.ok) throw new Error("JSON not found");
       const json = await res.json();
       if (!json || !Array.isArray(json.listings)) throw new Error("Invalid JSON structure");
-      DATA.listings = json.listings;
-      DATA.rate = json.fxRate || 155;
 
+      DATA.listings = json.listings;
+
+      // Backward-compatible FX fields:
+      // - fxRateUsd OR fxRate (legacy) treated as USD/JPY (JPY per USD)
+      // - fxRateCny treated as CNY/JPY (JPY per CNY)
+      DATA.fxUsdJpy = json.fxRateUsd || json.fxRate || 155;
+      DATA.fxCnyJpy = json.fxRateCny || 20;
+      DATA.fxSource = json.fxSource || "Manual";
+      DATA.generatedAt = json.generatedAt || null;
+
+      updateToggles();
       updateLabels();
       populateLocations();
+      populateSources();
       applyFilters();
+      renderFxFooter();
     } catch (e) {
-      document.getElementById('listings-container').innerHTML = `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`;
+      document.getElementById('listings-container').innerHTML =
+        `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`;
     }
   }
 
-  function setLang(l) { STATE.lang = l; updateToggles(); updateLabels(); populateLocations(); applyFilters(); }
-  function setCurr(c) { STATE.curr = c; updateToggles(); applyFilters(); }
+  function setLang(l) {
+    STATE.lang = l;
+    updateToggles();
+    updateLabels();
+    populateLocations();
+    populateSources();
+    applyFilters();
+    renderFxFooter();
+  }
+
+  function setCurr(c) {
+    STATE.curr = c;
+    updateToggles();
+    applyFilters();
+    renderFxFooter();
+  }
 
   function updateToggles() {
     document.getElementById('btn-en').className = STATE.lang==='EN'?'toggle-btn active':'toggle-btn';
     document.getElementById('btn-jp').className = STATE.lang==='JP'?'toggle-btn active':'toggle-btn';
+    document.getElementById('btn-cn').className = STATE.lang==='CN'?'toggle-btn active':'toggle-btn';
+
     document.getElementById('btn-jpy').className = STATE.curr==='JPY'?'toggle-btn active':'toggle-btn';
     document.getElementById('btn-usd').className = STATE.curr==='USD'?'toggle-btn active':'toggle-btn';
+    document.getElementById('btn-cny').className = STATE.curr==='CNY'?'toggle-btn active':'toggle-btn';
   }
 
   function updateLabels() {
     const t = TXT[STATE.lang];
+    document.getElementById('subtitle').innerText = t.subtitle;
+
     document.getElementById('lbl-avg-price').innerText = t.avgPrice;
     document.getElementById('lbl-avg-size').innerText = t.avgSize;
     document.getElementById('lbl-unit').innerText = t.unit;
 
-    // Update select option labels (static ones)
+    document.getElementById('useful-links').innerText = t.usefulLinks;
+
+    // Update select static option labels
     const typeSel = document.getElementById('type-select');
     typeSel.options[0].text = t.allTypes;
-    typeSel.options[1].text = t.house;
-    typeSel.options[2].text = t.mansion;
-    typeSel.options[3].text = t.land;
+    typeSel.options[1].text = TYPE_LABELS[STATE.lang].house;
+    typeSel.options[2].text = TYPE_LABELS[STATE.lang].mansion;
+    typeSel.options[3].text = TYPE_LABELS[STATE.lang].land;
 
     const viewSel = document.getElementById('seaview-select');
     viewSel.options[0].text = t.anyView;
@@ -266,22 +402,48 @@
 
     sel.innerHTML = `<option value="all">${t.allLoc}</option>`;
     cities.forEach(c => {
-      const label = (STATE.lang === 'EN') ? (LOC_MAP[c] || c) : c;
+      let label = c;
+      if (STATE.lang === 'EN') label = LOC_MAP_EN[c] || c;
+      if (STATE.lang === 'CN') label = LOC_MAP_CN[c] || c;
       sel.innerHTML += `<option value="${c}">${label}</option>`;
     });
 
     sel.value = currentVal;
   }
 
+  function normalizeSource(l) {
+    return (l && l.source) ? String(l.source) : "Izu Taiyo";
+  }
+
+  function populateSources() {
+    const sel = document.getElementById('source-select');
+    const currentVal = sel.value || "all";
+    const t = TXT[STATE.lang];
+
+    const sources = [...new Set(DATA.listings.map(l => normalizeSource(l)))].sort();
+
+    sel.innerHTML = `<option value="all">${t.allSources}</option>`;
+    sources.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
+    sel.value = currentVal;
+  }
+
+  function fmtPriceJPY(v) {
+    return "¥" + (v/1000000).toFixed(1) + "M";
+  }
+
   function fmtPrice(v) {
     if (!v) return "-";
-    return STATE.curr === 'JPY'
-      ? "¥" + (v/1000000).toFixed(1) + "M"
-      : "$" + Math.round(v / DATA.rate).toLocaleString();
+    if (STATE.curr === 'JPY') return fmtPriceJPY(v);
+
+    if (STATE.curr === 'USD') {
+      return "$" + Math.round(v / DATA.fxUsdJpy).toLocaleString();
+    }
+
+    // CNY (label as CNY, not ¥)
+    return "CNY " + Math.round(v / DATA.fxCnyJpy).toLocaleString();
   }
 
   function pickSizeForStats(item) {
-    // For land, landSqm is the most meaningful "size"; otherwise use buildingSqm.
     if (!item) return 0;
     if (item.propertyType === "land") return item.landSqm || 0;
     return item.buildingSqm || 0;
@@ -310,34 +472,51 @@
       return;
     }
 
-    if (STATE.curr === 'JPY') {
-      document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
-      document.getElementById('stat-size-sub').innerText = "";
+    const sqft = avgS * 10.764;
 
-      const ppSqm = avgP / avgS; // JPY per m2
-      document.getElementById('stat-unit').innerText = "¥" + Math.round(ppSqm / 10000) + "万 /m²";
-      document.getElementById('stat-unit-sub').innerText = "";
-    } else {
-      const sqft = avgS * 10.764;
+    if (STATE.curr === 'USD') {
       document.getElementById('stat-size').innerText = Math.round(sqft) + " ft²";
       document.getElementById('stat-size-sub').innerText = `(${Math.round(avgS)} m²)`;
 
-      const ppSqft = (avgP / DATA.rate) / sqft;
+      const ppSqft = (avgP / DATA.fxUsdJpy) / sqft;
       document.getElementById('stat-unit').innerText = "$" + Math.round(ppSqft) + " /ft²";
 
-      const ppSqm = (avgP / DATA.rate) / avgS;
+      const ppSqm = (avgP / DATA.fxUsdJpy) / avgS;
       document.getElementById('stat-unit-sub').innerText = `($${Math.round(ppSqm)} /m²)`;
+      return;
     }
+
+    if (STATE.curr === 'CNY') {
+      document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
+      document.getElementById('stat-size-sub').innerText = `(${Math.round(sqft)} ft²)`;
+
+      const ppSqm = (avgP / DATA.fxCnyJpy) / avgS;
+      document.getElementById('stat-unit').innerText = "CNY " + Math.round(ppSqm) + " /m²";
+
+      const ppSqft = (avgP / DATA.fxCnyJpy) / sqft;
+      document.getElementById('stat-unit-sub').innerText = `(CNY ${Math.round(ppSqft)} /ft²)`;
+      return;
+    }
+
+    // JPY
+    document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
+    document.getElementById('stat-size-sub').innerText = "";
+
+    const ppSqmJPY = avgP / avgS; // JPY per m2
+    document.getElementById('stat-unit').innerText = "¥" + Math.round(ppSqmJPY / 10000) + "万 /m²";
+    document.getElementById('stat-unit-sub').innerText = "";
   }
 
   function applyFilters() {
     STATE.loc = document.getElementById('location-select').value;
+    STATE.source = document.getElementById('source-select').value;
     STATE.type = document.getElementById('type-select').value;
     STATE.view = document.getElementById('seaview-select').value;
     STATE.sort = document.getElementById('sort-select').value;
 
     let items = DATA.listings.filter(l => {
       if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
+      if (STATE.source !== 'all' && normalizeSource(l) !== STATE.source) return false;
       if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
       if (STATE.view === '4' && (l.seaViewScore || 0) < 4) return false;
       return true;
@@ -346,11 +525,7 @@
     items.sort((a,b) => {
       if (STATE.sort === 'price-desc') return (b.priceJpy||0) - (a.priceJpy||0);
       if (STATE.sort === 'price-asc') return (a.priceJpy||0) - (b.priceJpy||0);
-      if (STATE.sort === 'size-desc') {
-        const as = pickSizeForStats(a);
-        const bs = pickSizeForStats(b);
-        return (bs||0) - (as||0);
-      }
+      if (STATE.sort === 'size-desc') return (pickSizeForStats(b)||0) - (pickSizeForStats(a)||0);
       if (STATE.sort === 'age-desc') return (a.age||999) - (b.age||999);
       return 0;
     });
@@ -365,10 +540,12 @@
 
     if (yb && age > 0) {
       if (STATE.lang === "EN") return `${yb} · ${Math.floor(age)} yrs`;
+      if (STATE.lang === "CN") return `${yb} · ${Math.floor(age)} 年`;
       return `${yb} · 築${Math.floor(age)}年`;
     }
     if (age > 0) {
       if (STATE.lang === "EN") return `${Math.floor(age)} yrs`;
+      if (STATE.lang === "CN") return `${Math.floor(age)} 年`;
       return `築${Math.floor(age)}年`;
     }
     if (yb) return String(yb);
@@ -389,25 +566,22 @@
 
     items.forEach(l => {
       const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400?text=No+Img";
-      const title = (STATE.lang === 'EN') ? (l.titleEn || l.title) : l.title;
+      const title = (STATE.lang === 'EN') ? (l.titleEn || l.title) :
+                    (STATE.lang === 'CN') ? (l.titleCn || l.titleEn || l.title) :
+                    l.title;
 
       const typeLabel = (TYPE_LABELS[STATE.lang][l.propertyType] || l.propertyType);
 
-      // Age badge (year + years)
       const ageBadge = formatAgeBadge(l);
       const ageInfo = ageBadge ? `<div class="card-age">${ageBadge}</div>` : '';
 
-      // Overlay tags
       let tagsHtml = `<span class="ov-tag ov-type">${typeLabel}</span>`;
       if ((l.seaViewScore || 0) >= 4) tagsHtml += `<span class="ov-tag ov-sea">${t.seaTag}</span>`;
       if ((l.highlightTags || []).includes("Onsen")) tagsHtml += `<span class="ov-tag ov-onsen">${t.onsenTag}</span>`;
 
-      // Metrics
       let metrics = [];
       if (l.propertyType !== "land" && l.buildingSqm) metrics.push(`<span>${Math.round(l.buildingSqm)}</span> m²`);
-      if (l.landSqm) metrics.push(`${STATE.lang === 'EN' ? 'Land' : '土地'} <span>${Math.round(l.landSqm)}</span> m²`);
-
-      const viewLabel = t.analyze;
+      if (l.landSqm) metrics.push(`${t.landLabel} <span>${Math.round(l.landSqm)}</span> m²`);
 
       const card = `
         <div class="card">
@@ -427,13 +601,32 @@
               ${metrics.map(m => `<div class="metric">${m}</div>`).join('<div style="color:#333">|</div>')}
             </div>
             <div class="card-footer">
-              <div style="opacity:0.5">ID: ${(l.id || "").substring(9,15)}</div>
-              <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="view-btn">${viewLabel}</a>
+              <div style="opacity:0.5">Source: ${normalizeSource(l)}</div>
+              <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="view-btn">${t.analyze}</a>
             </div>
           </div>
         </div>`;
       container.insertAdjacentHTML('beforeend', card);
     });
+  }
+
+  function renderFxFooter() {
+    const t = TXT[STATE.lang];
+    const el = document.getElementById('fx-meta');
+
+    const gen = DATA.generatedAt ? new Date(DATA.generatedAt) : null;
+    const genStr = gen ? gen.toLocaleString() : "-";
+
+    // Display as: USD/JPY and CNY/JPY (JPY per unit)
+    const usd = Number(DATA.fxUsdJpy || 0);
+    const cny = Number(DATA.fxCnyJpy || 0);
+
+    el.innerHTML = `
+      <span>${t.fxLabel}:</span>
+      <code>USD/JPY ${usd ? usd.toFixed(2) : "-"}</code>
+      <code>CNY/JPY ${cny ? cny.toFixed(2) : "-"}</code>
+      <span style="opacity:0.8">· source: ${DATA.fxSource || "Manual"} · generated: ${genStr}</span>
+    `;
   }
 
   init();
