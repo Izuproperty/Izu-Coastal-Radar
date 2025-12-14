@@ -1,272 +1,875 @@
 {
-  "fxRate": 155.83,
-  "generatedAt": "2025-12-13T23:57:08.110658",
+  "fxRate": 155.81,
+  "generatedAt": "2025-12-14T14:34:09.829498",
   "listings": [
     {
-      "id": "izutaiyo-8256322131549925600",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
-      "title": "河津町 桜坂温泉別荘地",
-      "titleEn": "Kawazu 桜坂温泉別荘地",
+      "id": "izutaiyo-HIP593H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP593H",
+      "title": "東伊豆町 熱川台（1580万円）の家情報はこちら！2025.11.29熱海店 山口 が担当させて頂いてます。",
+      "titleEn": "Higashi-Izu 熱川台（1580万円）の家情報はこちら！2025.11.29熱海店 山口 が担当させて頂いてます。",
       "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 5800000,
-      "landSqm": 146.0,
-      "buildingSqm": 88.92,
-      "age": 58.2,
+      "city": "Higashi-Izu",
+      "priceJpy": 15800000,
+      "landSqm": null,
+      "buildingSqm": 167.4,
+      "yearBuilt": "1989",
+      "age": 35.6,
+      "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235ha.jpg",
+      "imageUrl": null,
       "highlightTags": [
         "House",
-        "Sea View"
+        "Sea View",
+        "Onsen"
       ]
     },
     {
-      "id": "izutaiyo--3142334189708109437",
+      "id": "izutaiyo-HIP608H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP608H",
+      "title": "東伊豆町 熱川台（820万円）の家情報はこちら！2025.12.4熱海店 山口 が担当させて頂いてます。",
+      "titleEn": "Higashi-Izu 熱川台（820万円）の家情報はこちら！2025.12.4熱海店 山口 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Higashi-Izu",
+      "priceJpy": 8200000,
+      "landSqm": null,
+      "buildingSqm": 78.8,
+      "yearBuilt": "1979",
+      "age": 45.9,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Sea View",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-HIP609G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP609G",
+      "title": "東伊豆町 稲取（380万円）の土地情報はこちら！2025.12.2熱海店 山口 が担当させて頂いてます。",
+      "titleEn": "Higashi-Izu 稲取（380万円）の土地情報はこちら！2025.12.2熱海店 山口 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Higashi-Izu",
+      "priceJpy": 3800000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-HIP613G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP613G",
+      "title": "東伊豆町 稲取（600万円）の土地情報はこちら！2025.12.5熱海店 山口 が担当させて頂いてます。",
+      "titleEn": "Higashi-Izu 稲取（600万円）の土地情報はこちら！2025.12.5熱海店 山口 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Higashi-Izu",
+      "priceJpy": 6000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": "1975",
+      "age": 49.3,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-KWB235H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
+      "title": "河津町 桜坂温泉別荘地（580万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Kawazu 桜坂温泉別荘地（580万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Kawazu",
+      "priceJpy": 5800000,
+      "landSqm": null,
+      "buildingSqm": 88.92,
+      "yearBuilt": "1966",
+      "age": 58.2,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Sea View",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-KWB295H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB295H",
+      "title": "河津町 縄地（1190万円）の家情報はこちら！2025.12.6下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Kawazu 縄地（1190万円）の家情報はこちら！2025.12.6下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Kawazu",
+      "priceJpy": 11900000,
+      "landSqm": null,
+      "buildingSqm": 221.6,
+      "yearBuilt": "1969",
+      "age": 55.4,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI2001H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
+      "title": "南伊豆町 子浦（830万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 子浦（830万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 8300000,
+      "landSqm": null,
+      "buildingSqm": 135.76,
+      "yearBuilt": "1987",
+      "age": 37.3,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Walk to Sea",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI2002H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2002H",
+      "title": "南伊豆町 妻良（980万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 妻良（980万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 9800000,
+      "landSqm": null,
+      "buildingSqm": 112.54,
+      "yearBuilt": "1991",
+      "age": 33.3,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI8029G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI8029G",
+      "title": "南伊豆町 一色（500万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 一色（500万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 5000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI8033G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI8033G",
+      "title": "南伊豆町 加納（1200万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 加納（1200万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 12000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI8047G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI8047G",
+      "title": "南伊豆町 湯之元リゾートハイツ（330万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 湯之元リゾートハイツ（330万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 3300000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI8057G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI8057G",
+      "title": "南伊豆町 湯之元リゾートハイツ（200万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 湯之元リゾートハイツ（200万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 2000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI8075G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI8075G",
+      "title": "南伊豆町 蝶ヶ野（300万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 蝶ヶ野（300万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 3000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI9006G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI9006G",
+      "title": "南伊豆町 蝶ヶ野（1000万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 蝶ヶ野（1000万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 10000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MI9007G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI9007G",
+      "title": "南伊豆町 蝶ヶ野（1200万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 蝶ヶ野（1200万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 12000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB108G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB108G",
+      "title": "南伊豆町 下小野（150万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 下小野（150万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 1500000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB280H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB280H",
+      "title": "南伊豆町 下賀茂（150万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 下賀茂（150万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 1500000,
+      "landSqm": null,
+      "buildingSqm": 78.39,
+      "yearBuilt": "1974",
+      "age": 50.5,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB289M",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB289M",
+      "title": "南伊豆町 理光ヘルスケアマンション（333万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 理光ヘルスケアマンション（333万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "mansion",
+      "city": "Minami-Izu",
+      "priceJpy": 3330000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": "1984",
+      "age": 40.9,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Mansion",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB316H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB316H",
+      "title": "南伊豆町 入間（880万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 入間（880万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 8800000,
+      "landSqm": null,
+      "buildingSqm": 79.76,
+      "yearBuilt": "1968",
+      "age": 56.8,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Sea View",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB370H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB370H",
+      "title": "南伊豆町 南伊豆マリンパーク（880万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 南伊豆マリンパーク（880万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 8800000,
+      "landSqm": null,
+      "buildingSqm": 60.43,
+      "yearBuilt": "1972",
+      "age": 53.0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB371M",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB371M",
+      "title": "南伊豆町 理光ヘルスケアマンション（400万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 理光ヘルスケアマンション（400万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "mansion",
+      "city": "Minami-Izu",
+      "priceJpy": 4000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": "1984",
+      "age": 40.9,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Mansion",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB372M",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB372M",
+      "title": "南伊豆町 理光ヘルスケアマンション（650万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 理光ヘルスケアマンション（650万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "mansion",
+      "city": "Minami-Izu",
+      "priceJpy": 6500000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": "1984",
+      "age": 40.9,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Mansion",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB373M",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB373M",
+      "title": "南伊豆町 理光ヘルスケアマンション（600万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 理光ヘルスケアマンション（600万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "mansion",
+      "city": "Minami-Izu",
+      "priceJpy": 6000000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": "1984",
+      "age": 40.9,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Mansion",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB375H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
+      "title": "南伊豆町 下賀茂（3180万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 下賀茂（3180万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 31800000,
+      "landSqm": null,
+      "buildingSqm": 115.51,
+      "yearBuilt": "2016",
+      "age": 8.2,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIB386H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB386H",
+      "title": "南伊豆町 青野（780万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 青野（780万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 7800000,
+      "landSqm": null,
+      "buildingSqm": 67.06,
+      "yearBuilt": "1989",
+      "age": 35.3,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIL005H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIL005H",
+      "title": "南伊豆町 妻良（350万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 妻良（350万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Minami-Izu",
+      "priceJpy": 3500000,
+      "landSqm": null,
+      "buildingSqm": 188.77,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-MIT007G",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIT007G",
+      "title": "南伊豆町 加納（350万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Minami-Izu 加納（350万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "land",
+      "city": "Minami-Izu",
+      "priceJpy": 3500000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Land",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SM2003H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
+      "title": "下田市 須崎（1880万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "titleEn": "Shimoda 須崎（1880万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 18800000,
+      "landSqm": null,
+      "buildingSqm": 72.87,
+      "yearBuilt": "2012",
+      "age": 12.3,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SM2008H",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2008H",
-      "title": "下田市 須崎",
-      "titleEn": "Shimoda 須崎",
+      "title": "下田市 須崎（1280万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "titleEn": "Shimoda 須崎（1280万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
       "propertyType": "house",
       "city": "Shimoda",
       "priceJpy": 12800000,
-      "landSqm": 271.62,
+      "landSqm": null,
       "buildingSqm": 57.96,
+      "yearBuilt": "1994",
       "age": 30.5,
+      "lastUpdated": null,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2008ha.jpg",
+      "imageUrl": null,
       "highlightTags": [
-        "House"
+        "House",
+        "Onsen"
       ]
     },
     {
-      "id": "izutaiyo--276356344813884828",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
-      "title": "下田市 白浜",
-      "titleEn": "Shimoda 白浜",
+      "id": "izutaiyo-SM2009H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
+      "title": "下田市 田牛（2300万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "titleEn": "Shimoda 田牛（2300万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
       "propertyType": "house",
       "city": "Shimoda",
-      "priceJpy": 12800000,
-      "landSqm": 219.79,
-      "buildingSqm": 125.86,
-      "age": 33.2,
+      "priceJpy": 23000000,
+      "landSqm": null,
+      "buildingSqm": 82.81,
+      "yearBuilt": "1966",
+      "age": 58.4,
+      "lastUpdated": null,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg",
+      "imageUrl": null,
       "highlightTags": [
-        "House"
+        "House",
+        "Onsen"
       ]
     },
     {
-      "id": "izutaiyo-9107882257970498117",
+      "id": "izutaiyo-SM2010H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
+      "title": "下田市 白浜（1500万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "titleEn": "Shimoda 白浜（1500万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 15000000,
+      "landSqm": null,
+      "buildingSqm": 104.34,
+      "yearBuilt": "1997",
+      "age": 28.0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SM2013M",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2013M",
-      "title": "下田市 ロイヤルアーク下田",
-      "titleEn": "Shimoda ロイヤルアークShimoda",
+      "title": "下田市 ロイヤルアーク下田（400万円）のマンション情報はこちら！下田店 鈴木 が担当させて頂いてます。",
+      "titleEn": "Shimoda ロイヤルアーク下田（400万円）のマンション情報はこちら！下田店 鈴木 が担当させて頂いてます。",
       "propertyType": "mansion",
       "city": "Shimoda",
       "priceJpy": 4000000,
       "landSqm": null,
-      "buildingSqm": 70.94,
+      "buildingSqm": null,
+      "yearBuilt": "1989",
       "age": 35.6,
+      "lastUpdated": null,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2013ma.jpg",
+      "imageUrl": null,
       "highlightTags": [
         "Mansion",
         "Onsen"
       ]
     },
     {
-      "id": "izutaiyo-330011886750972422",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
-      "title": "南伊豆町 子浦",
-      "titleEn": "Minami-Izu 子浦",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 8300000,
-      "landSqm": 382.85,
-      "buildingSqm": 135.76,
-      "age": 37.3,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--6875219532310025469",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
-      "title": "南伊豆町 下賀茂",
-      "titleEn": "Minami-Izu 下賀茂",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 31800000,
-      "landSqm": 273.18,
-      "buildingSqm": 115.51,
-      "age": 8.2,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib375ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--1160052619430235064",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
-      "title": "下田市 リゾート129 碁石が浜パートＩ",
-      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ",
-      "propertyType": "mansion",
-      "city": "Shimoda",
-      "priceJpy": 15800000,
-      "landSqm": null,
-      "buildingSqm": 58.34,
-      "age": 37.7,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408ma.jpg",
-      "highlightTags": [
-        "Mansion",
-        "Onsen"
-      ]
-    },
-    {
-      "id": "izutaiyo-6400279857707945162",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
-      "title": "下田市 白浜",
-      "titleEn": "Shimoda 白浜",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 15000000,
-      "landSqm": 245.0,
-      "buildingSqm": 104.34,
-      "age": 28.0,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--2471601422486901813",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
-      "title": "下田市 パレスサイドヴィラ",
-      "titleEn": "Shimoda パレスサイドヴィラ",
-      "propertyType": "mansion",
-      "city": "Shimoda",
-      "priceJpy": 6800000,
-      "landSqm": 132.0,
-      "buildingSqm": 65.55,
-      "age": 32.9,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb391ha.jpg",
-      "highlightTags": [
-        "Mansion",
-        "Sea View"
-      ]
-    },
-    {
-      "id": "izutaiyo-5471435940229592347",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
-      "title": "下田市 田牛",
-      "titleEn": "Shimoda 田牛",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 23000000,
-      "landSqm": 330.57,
-      "buildingSqm": 82.81,
-      "age": 58.4,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo-6762260948684662420",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
-      "title": "下田市 武ガ浜",
-      "titleEn": "Shimoda 武ガ浜",
-      "propertyType": "house",
-      "city": "Shimoda",
-      "priceJpy": 10800000,
-      "landSqm": 84.12,
-      "buildingSqm": 71.22,
-      "age": 51.0,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg",
-      "highlightTags": [
-        "House"
-      ]
-    },
-    {
-      "id": "izutaiyo--1872565770561851051",
+      "id": "izutaiyo-SMB342G",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB342G",
-      "title": "下田市 西中",
-      "titleEn": "Shimoda 西中",
+      "title": "下田市 西中（900万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda 西中（900万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。",
       "propertyType": "land",
       "city": "Shimoda",
       "priceJpy": 9000000,
-      "landSqm": 333.0,
+      "landSqm": null,
       "buildingSqm": null,
+      "yearBuilt": null,
       "age": 0,
+      "lastUpdated": null,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb342ga.jpg",
+      "imageUrl": null,
       "highlightTags": [
-        "Land"
+        "Land",
+        "Onsen"
       ]
     },
     {
-      "id": "izutaiyo--1610941461799123914",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
-      "title": "下田市 須崎",
-      "titleEn": "Shimoda 須崎",
+      "id": "izutaiyo-SMB360H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB360H",
+      "title": "下田市 笹峯台（万円）の家情報はこちら！2025.11.25下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda 笹峯台（万円）の家情報はこちら！2025.11.25下田店 大上 が担当させて頂いてます。",
       "propertyType": "house",
       "city": "Shimoda",
-      "priceJpy": 18800000,
-      "landSqm": 136.7,
-      "buildingSqm": 72.87,
-      "age": 12.3,
+      "priceJpy": null,
+      "landSqm": null,
+      "buildingSqm": 42.96,
+      "yearBuilt": "1973",
+      "age": 51.3,
+      "lastUpdated": null,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2003ha.jpg",
+      "imageUrl": null,
       "highlightTags": [
-        "House"
+        "House",
+        "Onsen"
       ]
     },
     {
-      "id": "izutaiyo-6298138693257970488",
+      "id": "izutaiyo-SMB384Z",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB384Z",
+      "title": "下田市 吉佐美（5700万円）のその他情報はこちら！2025.11.28下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda 吉佐美（5700万円）のその他情報はこちら！2025.11.28下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 57000000,
+      "landSqm": null,
+      "buildingSqm": 1078.8,
+      "yearBuilt": "1980",
+      "age": 44.7,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SMB391H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
+      "title": "下田市 パレスサイドヴィラ（680万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda パレスサイドヴィラ（680万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 6800000,
+      "landSqm": null,
+      "buildingSqm": 65.55,
+      "yearBuilt": "1992",
+      "age": 32.9,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SMB392H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB392H",
+      "title": "下田市 柿崎（19800万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda 柿崎（19800万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 198000000,
+      "landSqm": null,
+      "buildingSqm": 298.98,
+      "yearBuilt": "2008",
+      "age": 16.8,
+      "lastUpdated": null,
+      "seaViewScore": 5,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Sea View",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SMB407M",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB407M",
-      "title": "下田市 リゾート129 碁石が浜パートＩ",
-      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ",
+      "title": "下田市 リゾート129 碁石が浜パートＩ（880万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ（880万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
       "propertyType": "mansion",
       "city": "Shimoda",
       "priceJpy": 8800000,
       "landSqm": null,
-      "buildingSqm": 56.15,
+      "buildingSqm": null,
+      "yearBuilt": "1987",
       "age": 37.7,
+      "lastUpdated": null,
       "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb407ma.jpg",
+      "imageUrl": null,
       "highlightTags": [
         "Mansion",
+        "Walk to Sea",
         "Onsen"
       ]
     },
     {
-      "id": "izutaiyo--3511614565109620517",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB392H",
-      "title": "下田市 柿崎",
-      "titleEn": "Shimoda 柿崎",
+      "id": "izutaiyo-SMB408M",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
+      "title": "下田市 リゾート129 碁石が浜パートＩ（1580万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda リゾート129 碁石が浜パートＩ（1580万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "mansion",
+      "city": "Shimoda",
+      "priceJpy": 15800000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": "1987",
+      "age": 37.7,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "Mansion",
+        "Walk to Sea",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SMB409H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
+      "title": "下田市 白浜（1280万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda 白浜（1280万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
       "propertyType": "house",
       "city": "Shimoda",
-      "priceJpy": 198000000,
-      "landSqm": 646.32,
-      "buildingSqm": 298.98,
-      "age": 16.8,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb392ha.jpg",
+      "priceJpy": 12800000,
+      "landSqm": null,
+      "buildingSqm": 125.86,
+      "yearBuilt": "1991",
+      "age": 33.2,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
       "highlightTags": [
         "House",
-        "Sea View"
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SMB410H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
+      "title": "下田市 武ガ浜（1080万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda 武ガ浜（1080万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 10800000,
+      "landSqm": null,
+      "buildingSqm": 71.22,
+      "yearBuilt": "1974",
+      "age": 51.0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Walk to Sea",
+        "Onsen"
+      ]
+    },
+    {
+      "id": "izutaiyo-SMB413H",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB413H",
+      "title": "下田市 加増野（880万円）の家情報はこちら！2025.12.12下田店 大上 が担当させて頂いてます。",
+      "titleEn": "Shimoda 加増野（880万円）の家情報はこちら！2025.12.12下田店 大上 が担当させて頂いてます。",
+      "propertyType": "house",
+      "city": "Shimoda",
+      "priceJpy": 8800000,
+      "landSqm": null,
+      "buildingSqm": 55.36,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 0,
+      "imageUrl": null,
+      "highlightTags": [
+        "House",
+        "Onsen"
       ]
     }
   ],
   "stats": {
-    "avgPrice": 25433333.333333332,
-    "avgSize": 100.37214285714286,
-    "count": 15
-  }
+    "avgPrice": 14764146.341463415,
+    "avgSize": 150.0717391304348,
+    "count": 42,
+    "rawHpnoCount": 42,
+    "failures": 0
+  },
+  "sources": {
+    "tokusenLanding": "https://www.izutaiyo.co.jp/tokusen.php?hptantou=shimoda",
+    "tokusenList": "https://www.izutaiyo.co.jp/tokusen.php?hptantou=shimoda&hpno=SMB410H+SMB408M+SM2013M+KWB235H+MI2001H+SMB407M+SMB409H+SMB391H+SMB342G+SMB392H+SM2009H+SM2010H+SM2008H+SM2003H+MIB375H+&hpkind=0&-Token=True",
+    "mobileResultsBase": "https://www.izutaiyo.co.jp/sp/sa.php",
+    "mobileSearchForm": "https://www.izutaiyo.co.jp/sp/s.php",
+    "targetCitiesJp": [
+      "下田市",
+      "河津町",
+      "東伊豆町",
+      "南伊豆町"
+    ]
+  },
+  "failures": []
 }
