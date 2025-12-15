@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-15T06:26:18Z",
+  "generatedAt": "2025-12-15T06:38:17Z",
   "fxRate": 155,
   "listings": [
     {
@@ -65,7 +65,9 @@
       "highlightTags": [
         "Sea View"
       ],
-      "firstSeen": "2025-12-15T06:26:18Z"
+      "firstSeen": "2025-12-15T06:26:18Z",
+      "eventTypeJp": "写真変更",
+      "eventDate": "2025-12-02"
     },
     {
       "id": "izutaiyo-KWB235H",
@@ -109,9 +111,7 @@
         "Sea View",
         "Walk to Sea"
       ],
-      "firstSeen": "2025-12-15T06:26:18Z",
-      "eventTypeJp": "価格変更",
-      "eventDate": "2025-12-06"
+      "firstSeen": "2025-12-15T06:26:18Z"
     },
     {
       "id": "izutaiyo-MI2001H",
@@ -267,25 +267,6 @@
       "firstSeen": "2025-12-15T06:26:18Z"
     },
     {
-      "id": "izutaiyo-MIB375H",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB375H",
-      "title": "南伊豆町 下賀茂",
-      "detailTitle": "南伊豆町 下賀茂（3180万円） の家情報はこちら！ 下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Minami-Izu Town 下賀茂",
-      "propertyType": "house",
-      "city": "南伊豆町",
-      "priceJpy": 31800000,
-      "landSqm": 273.18,
-      "buildingSqm": 115.51,
-      "yearBuilt": 2017,
-      "age": 8.2,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib375ha.jpg",
-      "highlightTags": [],
-      "firstSeen": "2025-12-15T06:26:18Z"
-    },
-    {
       "id": "izutaiyo-MIL005H",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIL005H",
       "title": "南伊豆町 妻良",
@@ -358,7 +339,7 @@
       "landSqm": 330.57,
       "buildingSqm": 82.81,
       "yearBuilt": 1967,
-      "age": 58.4,
+      "age": 58.5,
       "lastUpdated": null,
       "seaViewScore": 0,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009ha.jpg",
@@ -733,12 +714,12 @@
     }
   ],
   "stats": {
-    "count": 34,
-    "izutaiyoCount": 26,
+    "count": 33,
+    "izutaiyoCount": 25,
     "mapleCount": 8,
-    "tokusenHpnoCount": 15,
+    "tokusenHpnoCount": 14,
     "searchAddedHpnoCount": 26,
-    "rawHpnoCount": 41,
+    "rawHpnoCount": 40,
     "filteredOutSearchOnly": 15,
     "mapleFilteredOut": 98,
     "failures": 0
