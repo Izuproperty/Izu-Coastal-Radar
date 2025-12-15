@@ -49,10 +49,6 @@ MAPLE_EXCLUDE_AREAS = ["熱海～網代", "宇佐美～伊東", "川奈～富戸
 MAPLE_EXCLUDE_CITIES_JP = ["伊豆市", "伊東市", "静岡市"]
 
 
-
-# Maple politeness / performance tuning (lower = faster, but be respectful)
-MAPLE_SLEEP_DETAIL = 0.20
-MAPLE_SLEEP_PAGE = 0.20
 MOBILE_HOME = "https://www.izutaiyo.co.jp/sp/"
 MOBILE_SEARCH_RESULTS = "https://www.izutaiyo.co.jp/sp/sa.php"
 
@@ -340,7 +336,7 @@ def scrape_new_arrivals_events(session: requests.Session, max_pages: int = 6) ->
 
             events[hpno] = {"eventTypeJp": et, "eventDate": d_norm}
 
-        time.sleep(MAPLE_SLEEP_DETAIL)
+        time.sleep(0.4)
 
     return events
 
@@ -769,21 +765,32 @@ def _parse_sqm(text: str, key_variants: List[str]) -> Optional[float]:
         return None
 
 def _parse_city(text: str) -> str:
-    """
-    Extract 市/町/村 from the listing's own 所在地 field.
+    """Extract 市/町/村 token from the listing's own '所在地' field.
 
-    Important: do NOT fall back to scanning the full page for a city token, because Maple pages
-    include the company's office address (e.g., 伊東市...) in the footer, which would incorrectly
-    label/exclude unrelated listings.
+    Maple pages often include the broker's office address in headers/footers (e.g., 伊東市),
+    so we intentionally do NOT fall back to scanning the entire page for the first 市/町/村 token.
+    We also normalize county-prefixed towns (e.g., 賀茂郡東伊豆町 -> 東伊豆町) so they match Izutaiyo's city keys.
     """
     t = (text or "")
-    # Capture a short chunk after 所在地 / 物件所在地
-    m = re.search(r"(?:物件所在地|所在地)\s*[:：]?\s*([^\s　]{1,40})", t)
-    if not m:
+
+    m = re.search(r"所在地\s*[:：]?\s*([^\s　]+)", t)
+    loc = m.group(1) if m else ""
+    if not loc:
         return ""
-    loc = m.group(1).strip()
+
+    loc = re.sub(r"^静岡県", "", loc)
+
     m2 = re.search(r"(.+?(?:市|町|村))", loc)
-    return m2.group(1) if m2 else ""
+    if not m2:
+        return ""
+
+    city = m2.group(1)
+
+    if "郡" in city and re.search(r"(町|村)$", city):
+        city = city.split("郡")[-1]
+
+    return city
+
 
 def _parse_year_built(text: str) -> Optional[int]:
     t = text or ""
@@ -885,24 +892,15 @@ def _maple_context_text(a_tag) -> str:
     return clean_text(a_tag.get_text(" ", strip=True))
 
 def _maple_is_excluded_area(text: str) -> bool:
-    """
-    Exclude broad Maple "area bucket" regions (e.g., 熱海～網代).
-    Note: this must NOT check cities by naive substring against full page text, because
-    Maple pages include the company's office address in the footer (e.g., 伊東市...), which
-    would incorrectly exclude every listing.
-    """
+    """Exclude Maple area buckets only (city exclusions are enforced on parsed listing location, not raw page text)."""
     t = text or ""
     return any(a in t for a in MAPLE_EXCLUDE_AREAS)
 
-def _maple_context_is_excluded(card_text: str) -> bool:
-    """Safe exclusion using list-card context (avoids site-wide footer address contamination)."""
-    t = card_text or ""
-    return any(a in t for a in MAPLE_EXCLUDE_AREAS) or any(c in t for c in MAPLE_EXCLUDE_CITIES_JP)
 
 def _maple_should_fetch_detail(card_text: str) -> bool:
     """Heuristic prefilter to limit detail page fetches."""
     t = card_text or ""
-    if _maple_context_is_excluded(t):
+    if _maple_is_excluded_area(t):
         return False
     if any(k in t for k in ["眺望", "海", "海岸", "浜", "ビーチ", "徒歩", "オーシャン", "海一望"]):
         return True
@@ -931,11 +929,19 @@ def _maple_collect_detail_links(soup: BeautifulSoup, list_url: str, listing_slug
             continue
         if pu.path.rstrip("/") == root_path or pu.path.rstrip("/") == f"{root_path}/page":
             continue
-        u = u.split("#", 1)[0]
-
-        # Keep only likely "detail" links: /estate_db/<digits...> or ?p=<digits>
-        if not re.search(r"/estate_db/\d", pu.path) and not re.search(r"(?:^|&)p=\d{3,}(?:&|$)", pu.query):
+        # Keep only actual detail pages (reduces wasted fetches & avoids menu/nav links)
+        is_detail = False
+        if re.match(r"^/estate_db/\d{3,}", pu.path):
+            is_detail = True
+        else:
+            q = parse_qs(pu.query)
+            p = (q.get("p") or [None])[0]
+            if p and str(p).isdigit():
+                is_detail = True
+        if not is_detail:
             continue
+
+        u = u.split("#", 1)[0]
 
         if u in seen:
             continue
@@ -958,6 +964,80 @@ def _maple_find_max_page(soup: BeautifulSoup) -> int:
             except Exception:
                 pass
     return mx
+
+
+def _maple_clean_menu_artifact(s: str) -> str:
+    if not s:
+        return s
+    s = clean_text(s)
+    # Common Maple mobile-nav artifact
+    s = re.sub(r"\s*MENU\s*$", "", s, flags=re.IGNORECASE).strip()
+    if s.strip().upper() == "MENU":
+        return ""
+    # If MENU appears inline, remove the token conservatively
+    s = re.sub(r"\bMENU\b", "", s, flags=re.IGNORECASE)
+    s = clean_text(s)
+    return s
+
+def _maple_extract_title(soup: BeautifulSoup, detail_url: str, page_text: str, no: Optional[str]) -> str:
+    """Robust title extraction.
+
+    Some Maple pages have an <h1>/<h2> that resolves to 'MENU' (mobile nav), so we try multiple sources
+    and fall back to the URL slug (which usually contains the Japanese title after the listing number).
+    """
+    candidates: List[str] = []
+
+    # Prefer structured meta titles
+    og = soup.find("meta", attrs={"property": "og:title"})
+    if og and og.get("content"):
+        candidates.append(str(og.get("content")))
+
+    tw = soup.find("meta", attrs={"name": "twitter:title"})
+    if tw and tw.get("content"):
+        candidates.append(str(tw.get("content")))
+
+    # Common WP title classes
+    for sel in ["h1.entry-title", "h1.post-title", "h1.page-title", "h1", "h2.entry-title", "h2", "h3"]:
+        el = soup.select_one(sel)
+        if el:
+            candidates.append(el.get_text(" ", strip=True))
+
+    # <title> tag (often includes site name; we'll trim later)
+    if soup.title and soup.title.string:
+        candidates.append(str(soup.title.string))
+
+    # URL slug fallback (usually very good on Maple)
+    try:
+        slug = urlparse(detail_url).path.rstrip("/").split("/")[-1]
+        slug = unquote(slug)
+        slug = slug.replace("\u3000", " ")
+        candidates.append(slug)
+    except Exception:
+        pass
+
+    # Clean + validate
+    for raw in candidates:
+        s = _maple_clean_menu_artifact(raw)
+        if not s:
+            continue
+        # Trim site suffix patterns in <title>
+        s = re.sub(r"\s*\|\s*[^|]{0,40}$", "", s).strip()
+        s = re.sub(r"\s*[-–—]\s*[^-–—]{0,60}$", "", s).strip()
+
+        # Remove leading listing number if present (e.g., 6651：...)
+        s = re.sub(r"^\d{3,}\s*[:：]\s*", "", s).strip()
+
+        s = _maple_clean_menu_artifact(s)
+        if not s:
+            continue
+        if len(s) < 3:
+            continue
+        if s.strip().upper() == "MENU":
+            continue
+        return s
+
+    return f"Maple Listing {no}" if no else "Maple Listing"
+
 
 def parse_maple_detail_page(session: requests.Session, detail_url: str, property_type: str) -> Tuple[Optional[dict], bool]:
     """Return (item, kept_flag). kept_flag indicates whether it passed the sea/walk + exclusion rules."""
@@ -1004,9 +1084,7 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
         item_id = f"maple-{stable}" if stable else f"maple-{abs(hash(detail_url))}"
 
     # Title
-    h1 = soup.find(["h1", "h2"])
-    title = clean_text(h1.get_text(" ", strip=True) if h1 else (f"Maple Listing {no}" if no else "Maple Listing"))
-
+    title = _maple_extract_title(soup, detail_url, page_text, no)
     # Price
     price_jpy = None
     m = re.search(r"価格[^0-9]{0,10}([0-9,]+\s*億\s*[0-9,]*\s*万?\s*円|[0-9,]+\s*万\s*円|[0-9,]+\s*万円)", page_text)
@@ -1077,9 +1155,6 @@ def scrape_maple(
     failures: List[str] = []
     filtered_out = 0
 
-    # De-dupe detail pages across Maple categories/types
-    seen_detail_global: Set[str] = set()
-
     for ptype, slug in MAPLE_LISTING_TYPES.items():
         start_url = f"{MAPLE_ROOT}{slug}/"
         print(f"  - Maple: scanning {ptype} ({start_url})")
@@ -1093,6 +1168,8 @@ def scrape_maple(
 
         max_page_detected = _maple_find_max_page(soup0)
         page_limit = min(max_pages_per_type, max_page_detected if max_page_detected > 0 else max_pages_per_type)
+
+        seen_detail: Set[str] = set()
 
         for page in range(1, page_limit + 1):
             list_url = start_url if page == 1 else f"{start_url}page/{page}/"
@@ -1111,12 +1188,12 @@ def scrape_maple(
             filtered_links = [(u, ctx) for (u, ctx) in links if _maple_should_fetch_detail(ctx)]
             if len(filtered_links) < 3:
                 # Keep all non-excluded on that page
-                filtered_links = [(u, ctx) for (u, ctx) in links if not _maple_context_is_excluded(ctx)]
+                filtered_links = [(u, ctx) for (u, ctx) in links if not _maple_is_excluded_area(ctx)]
 
             for detail_url, ctx in filtered_links:
-                if detail_url in seen_detail_global:
+                if detail_url in seen_detail:
                     continue
-                seen_detail_global.add(detail_url)
+                seen_detail.add(detail_url)
 
                 try:
                     item, kept = parse_maple_detail_page(session, detail_url, ptype)
@@ -1135,9 +1212,9 @@ def scrape_maple(
                 except Exception:
                     failures.append(detail_url)
 
-                time.sleep(MAPLE_SLEEP_DETAIL)
+                time.sleep(0.4)
 
-            time.sleep(MAPLE_SLEEP_PAGE)
+            time.sleep(0.3)
 
     return listings, failures, filtered_out
 
