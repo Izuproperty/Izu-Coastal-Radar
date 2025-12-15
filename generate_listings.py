@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Izu Coastal Radar listings generator (Izutaiyo)
+Izu Coastal Radar listings generator (Izutaiyo + Maple Housing)
 
 Fixes vs prior versions:
 - Mobile search harvesting restored to the *working* "variant params + pagination" approach
@@ -31,6 +31,23 @@ from bs4 import BeautifulSoup
 
 BASE = "https://www.izutaiyo.co.jp/"
 TOKUSEN_LANDING = "https://www.izutaiyo.co.jp/tokusen.php?hptantou=shimoda"
+
+
+# Maple Housing
+MAPLE_BASE = "https://www.maple-h.co.jp"
+MAPLE_ROOT = f"{MAPLE_BASE}/estate_db/"
+MAPLE_LISTING_TYPES = {
+    "house": "house",     # 戸建
+    "land": "estate",     # 土地
+    "mansion": "mansion", # マンション
+}
+
+# Exclude these Maple area buckets entirely
+MAPLE_EXCLUDE_AREAS = ["熱海～網代", "宇佐美～伊東", "川奈～富戸"]
+
+# Exclude these Maple cities entirely (to keep the feed focused on Izu South)
+MAPLE_EXCLUDE_CITIES_JP = ["伊豆市", "伊東市", "静岡市"]
+
 
 MOBILE_HOME = "https://www.izutaiyo.co.jp/sp/"
 MOBILE_SEARCH_RESULTS = "https://www.izutaiyo.co.jp/sp/sa.php"
@@ -691,6 +708,415 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
 
 
 # ---------------------------
+# Maple Housing scraping
+# ---------------------------
+
+CITY_EN_MAP = {
+    "下田市": "Shimoda City",
+    "河津町": "Kawazu Town",
+    "東伊豆町": "Higashi-Izu Town",
+    "南伊豆町": "Minami-Izu Town",
+    "伊東市": "Ito City",
+    "熱海市": "Atami City",
+    "伊豆市": "Izu City",
+    "伊豆の国市": "Izu-no-Kuni City",
+    "函南町": "Kannami Town",
+}
+
+def _abs_url(base: str, href: str) -> str:
+    href = (href or "").strip()
+    if not href:
+        return ""
+    if href.startswith("//"):
+        return "https:" + href
+    if href.startswith("http://") or href.startswith("https://"):
+        return href
+    return urljoin(base, href)
+
+def _parse_price_jpy(text: str) -> Optional[int]:
+    """Parse Japanese price strings like '4,800万円', '1億2,500万円', '価格 980 万円'."""
+    t = (text or "").replace(",", "").replace(" ", "")
+    m = re.search(r"([0-9]+)億([0-9]+)?万?円", t)
+    if m:
+        oku = int(m.group(1))
+        man = int(m.group(2) or "0")
+        return oku * 100_000_000 + man * 10_000
+
+    m = re.search(r"([0-9]+)万円", t)
+    if m:
+        return int(m.group(1)) * 10_000
+
+    # Sometimes: 価格 980 万円
+    m = re.search(r"([0-9]+)万?円", t)
+    if m and "万" in t:
+        return int(m.group(1)) * 10_000
+
+    return None
+
+def _parse_sqm(text: str, key_variants: List[str]) -> Optional[float]:
+    t = (text or "").replace(",", "")
+    keys = "|".join(map(re.escape, key_variants))
+    m = re.search(rf"(?:{keys})\s*[:：]?\s*([0-9]+(?:\.[0-9]+)?)\s*(?:㎡|m²|m2)", t)
+    if not m:
+        return None
+    try:
+        return float(m.group(1))
+    except Exception:
+        return None
+
+def _parse_city(text: str) -> str:
+    """Extract 市/町/村 token from '所在地' lines (e.g., 伊東市八幡野 -> 伊東市)."""
+    t = (text or "")
+    m = re.search(r"所在地\s*[:：]?\s*([^\s　]+)", t)
+    if m:
+        loc = m.group(1)
+        m2 = re.search(r"(.+?(?:市|町|村))", loc)
+        if m2:
+            return m2.group(1)
+    m = re.search(r"([^\s　]+?(?:市|町|村))", t)
+    return m.group(1) if m else ""
+
+def _parse_year_built(text: str) -> Optional[int]:
+    t = text or ""
+    # Western year
+    m = re.search(r"(?:築年月|築年|建築年月|建築年|完成年月|完成年)\s*[:：]?\s*([12]\d{3})\s*年", t)
+    if m:
+        try:
+            y = int(m.group(1))
+            if 1800 <= y <= datetime.now().year + 1:
+                return y
+        except Exception:
+            pass
+
+    # Japanese era
+    era_map = {"令和": 2018, "平成": 1988, "昭和": 1925, "大正": 1911, "明治": 1867}
+    m = re.search(r"(令和|平成|昭和|大正|明治)\s*([0-9]{1,2})\s*年", t)
+    if m:
+        era, n = m.group(1), int(m.group(2))
+        base = era_map.get(era)
+        if base:
+            y = base + n
+            if 1800 <= y <= datetime.now().year + 1:
+                return y
+
+    return None
+
+def _maple_has_onsen(text: str) -> bool:
+    t = text or ""
+    # Prefer explicit field like 温泉：有/無
+    m = re.search(r"温泉\s*[:：]\s*([^\s　]+)", t)
+    if m:
+        v = m.group(1)
+        if any(x in v for x in ["有", "あり", "○"]):
+            return True
+        if any(x in v for x in ["無", "なし", "×"]):
+            return False
+    # Fallback keyword
+    return "温泉" in t and any(x in t for x in ["あり", "有", "源泉", "かけ流し", "掛け流し"])
+
+def _maple_sea_view_and_walk(text: str) -> Tuple[bool, bool]:
+    """Heuristic: (sea_view, walk_to_sea). walk_to_sea if <= 20 min on foot or <=1500m."""
+    t = text or ""
+    sea_view = any(k in t for k in ["海一望", "海が見える", "オーシャンビュー", "海眺望", "海を望む"])
+    if not sea_view and ("眺望" in t and "海" in t):
+        sea_view = True
+
+    walk_to_sea = False
+
+    # 徒歩-based
+    m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで)?[^\n]{0,24}?徒歩\s*([0-9]{1,2})\s*分", t)
+    if m:
+        try:
+            walk_to_sea = int(m.group(1)) <= 20
+        except Exception:
+            walk_to_sea = True
+
+    # Meter-based
+    if not walk_to_sea:
+        m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで)?[^\n]{0,24}?約\s*([0-9]{1,4})\s*m", t)
+        if m:
+            try:
+                walk_to_sea = int(m.group(1)) <= 1500
+            except Exception:
+                walk_to_sea = True
+
+    # Qualitative
+    if not walk_to_sea and any(k in t for k in ["海まで徒歩圏", "海まで徒歩圏内"]):
+        walk_to_sea = True
+
+    return sea_view, walk_to_sea
+
+def _maple_pick_image_url(soup: BeautifulSoup, page_url: str) -> Optional[str]:
+    imgs = soup.find_all("img")
+    candidates: List[str] = []
+    for img in imgs:
+        src = (img.get("src") or "").strip()
+        if not src:
+            continue
+        u = _abs_url(page_url, src)
+        ul = u.lower()
+        if "wp-content/uploads" not in ul:
+            continue
+        if any(bad in ul for bad in ["logo", "icon", "sprite", "banner", "header", "footer"]):
+            continue
+        candidates.append(u)
+    return candidates[0] if candidates else None
+
+def _maple_context_text(a_tag) -> str:
+    """Get a reasonably localized card/row text for a listing link."""
+    if not a_tag:
+        return ""
+    node = a_tag
+    for _ in range(5):
+        if not node:
+            break
+        if getattr(node, "name", None) in {"article", "li", "tr"}:
+            return clean_text(node.get_text(" ", strip=True))
+        node = node.parent
+    return clean_text(a_tag.get_text(" ", strip=True))
+
+def _maple_is_excluded_area(text: str) -> bool:
+    t = text or ""
+    return any(a in t for a in MAPLE_EXCLUDE_AREAS) or any(c in t for c in MAPLE_EXCLUDE_CITIES_JP)
+
+def _maple_should_fetch_detail(card_text: str) -> bool:
+    """Heuristic prefilter to limit detail page fetches."""
+    t = card_text or ""
+    if _maple_is_excluded_area(t):
+        return False
+    if any(k in t for k in ["眺望", "海", "海岸", "浜", "ビーチ", "徒歩", "オーシャン", "海一望"]):
+        return True
+    return False
+
+def _maple_collect_detail_links(soup: BeautifulSoup, list_url: str, listing_slug: str) -> List[Tuple[str, str]]:
+    """Return list of (detail_url, context_text) from a Maple list page."""
+    out: List[Tuple[str, str]] = []
+    seen: Set[str] = set()
+
+    root_path = f"/estate_db/{listing_slug}".rstrip("/")
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        if not href:
+            continue
+        u = _abs_url(list_url, href)
+        if not u:
+            continue
+
+        pu = urlparse(u)
+        if pu.netloc and "maple-h.co.jp" not in pu.netloc:
+            continue
+        if "/estate_db/" not in pu.path:
+            continue
+        if "/page/" in pu.path:
+            continue
+        if pu.path.rstrip("/") == root_path or pu.path.rstrip("/") == f"{root_path}/page":
+            continue
+        u = u.split("#", 1)[0]
+
+        if u in seen:
+            continue
+        seen.add(u)
+
+        ctx = _maple_context_text(a)
+        out.append((u, ctx))
+
+    return out
+
+def _maple_find_max_page(soup: BeautifulSoup) -> int:
+    """Best-effort detection of last /page/<n>/ from pagination links."""
+    mx = 1
+    for a in soup.find_all("a", href=True):
+        href = a.get("href") or ""
+        m = re.search(r"/page/(\d+)/", href)
+        if m:
+            try:
+                mx = max(mx, int(m.group(1)))
+            except Exception:
+                pass
+    return mx
+
+def parse_maple_detail_page(session: requests.Session, detail_url: str, property_type: str) -> Tuple[Optional[dict], bool]:
+    """Return (item, kept_flag). kept_flag indicates whether it passed the sea/walk + exclusion rules."""
+    r = request(session, detail_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
+    html = r.text or ""
+    soup = BeautifulSoup(html, "html.parser")
+    page_text = clean_text(soup.get_text(" ", strip=True))
+
+    # Exclusion buckets (enforce on detail too)
+    if _maple_is_excluded_area(page_text):
+        return None, False
+
+    # City-based exclusion (enforce on detail too)
+    city = _parse_city(page_text)
+    if city in MAPLE_EXCLUDE_CITIES_JP:
+        return None, False
+
+    # Sea view / walk to sea rules
+    sea_view, walk_to_sea = _maple_sea_view_and_walk(page_text)
+    if not (sea_view or walk_to_sea):
+        return None, False
+
+    # Listing number
+    no = None
+    m = re.search(r"No\.?\s*([0-9]{3,})", page_text)
+    if m:
+        no = m.group(1)
+    if not no:
+        q = parse_qs(urlparse(detail_url).query)
+        p = (q.get("p") or [None])[0]
+        if p and str(p).isdigit():
+            no = str(p)
+    if not no:
+        m = re.search(r"(\d{3,})", urlparse(detail_url).path)
+        if m:
+            no = m.group(1)
+
+    if no:
+        item_id = f"maple-{no}"
+    else:
+        pu = urlparse(detail_url)
+        stable = (pu.path + ("?" + pu.query if pu.query else "")).strip()
+        stable = re.sub(r"[^a-zA-Z0-9]+", "-", stable).strip("-")
+        item_id = f"maple-{stable}" if stable else f"maple-{abs(hash(detail_url))}"
+
+    # Title
+    h1 = soup.find(["h1", "h2"])
+    title = clean_text(h1.get_text(" ", strip=True) if h1 else (f"Maple Listing {no}" if no else "Maple Listing"))
+
+    # Price
+    price_jpy = None
+    m = re.search(r"価格[^0-9]{0,10}([0-9,]+\s*億\s*[0-9,]*\s*万?\s*円|[0-9,]+\s*万\s*円|[0-9,]+\s*万円)", page_text)
+    if m:
+        price_jpy = _parse_price_jpy(m.group(1))
+    if price_jpy is None:
+        price_jpy = _parse_price_jpy(page_text)
+
+    # Areas
+    land_sqm = _parse_sqm(page_text, ["土地面積", "敷地面積", "地積"])
+    building_sqm = _parse_sqm(page_text, ["建物面積", "延床面積", "専有面積"])
+
+    # Year built / age
+    year_built = _parse_year_built(page_text)
+    age = 0.0
+    now_year = datetime.now().year
+    if year_built:
+        age = max(0.0, now_year - year_built)
+
+    tags: List[str] = []
+    sea_score = 0
+    if sea_view:
+        tags.append("Sea View")
+        sea_score = 4
+    if walk_to_sea:
+        tags.append("Walk to Sea")
+    if _maple_has_onsen(page_text):
+        tags.append("Onsen")
+
+    image_url = _maple_pick_image_url(soup, detail_url)
+
+    title_en = title
+    if city and city in CITY_EN_MAP:
+        title_en = re.sub(re.escape(city), CITY_EN_MAP[city], title_en)
+        if title_en == title:
+            title_en = f"{CITY_EN_MAP[city]} {title}"
+
+    item = {
+        "id": item_id,
+        "source": "Maple Housing",
+        "sourceUrl": detail_url,
+        "title": title,
+        "titleEn": title_en,
+        "propertyType": property_type,
+        "city": city,
+        "priceJpy": price_jpy,
+        "landSqm": land_sqm,
+        "buildingSqm": building_sqm,
+        "yearBuilt": year_built,
+        "age": round(age, 1) if age else 0,
+        "lastUpdated": None,
+        "seaViewScore": sea_score,
+        "imageUrl": image_url,
+        "highlightTags": tags,
+    }
+
+    return item, True
+
+def scrape_maple(
+    session: requests.Session,
+    *,
+    now_iso: str,
+    prev_first_seen: Dict[str, str],
+    max_pages_per_type: int = 12,
+) -> Tuple[List[dict], List[str], int]:
+    """Scrape Maple Housing and return (listings, failures, filtered_out_count)."""
+    listings: List[dict] = []
+    failures: List[str] = []
+    filtered_out = 0
+
+    for ptype, slug in MAPLE_LISTING_TYPES.items():
+        start_url = f"{MAPLE_ROOT}{slug}/"
+        print(f"  - Maple: scanning {ptype} ({start_url})")
+
+        try:
+            r0 = request(session, start_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
+            soup0 = BeautifulSoup(r0.text or "", "html.parser")
+        except Exception:
+            failures.append(start_url)
+            continue
+
+        max_page_detected = _maple_find_max_page(soup0)
+        page_limit = min(max_pages_per_type, max_page_detected if max_page_detected > 0 else max_pages_per_type)
+
+        seen_detail: Set[str] = set()
+
+        for page in range(1, page_limit + 1):
+            list_url = start_url if page == 1 else f"{start_url}page/{page}/"
+            try:
+                r = request(session, list_url, headers=HEADERS_DESKTOP, retries=3, timeout=25)
+            except Exception:
+                failures.append(list_url)
+                continue
+
+            soup = BeautifulSoup(r.text or "", "html.parser")
+            links = _maple_collect_detail_links(soup, list_url, slug)
+            if not links:
+                break
+
+            # Prefilter to limit detail fetches; loosen if it gets too strict.
+            filtered_links = [(u, ctx) for (u, ctx) in links if _maple_should_fetch_detail(ctx)]
+            if len(filtered_links) < 3:
+                # Keep all non-excluded on that page
+                filtered_links = [(u, ctx) for (u, ctx) in links if not _maple_is_excluded_area(ctx)]
+
+            for detail_url, ctx in filtered_links:
+                if detail_url in seen_detail:
+                    continue
+                seen_detail.add(detail_url)
+
+                try:
+                    item, kept = parse_maple_detail_page(session, detail_url, ptype)
+                    if not kept or not item:
+                        filtered_out += 1
+                        continue
+
+                    item_id = item.get("id")
+                    if item_id and item_id in prev_first_seen:
+                        item["firstSeen"] = prev_first_seen[item_id]
+                    else:
+                        item["firstSeen"] = now_iso
+
+                    listings.append(item)
+
+                except Exception:
+                    failures.append(detail_url)
+
+                time.sleep(0.4)
+
+            time.sleep(0.3)
+
+    return listings, failures, filtered_out
+
+# ---------------------------
 # Main
 # ---------------------------
 
@@ -784,16 +1210,37 @@ def main() -> None:
         if i % 10 == 0:
             print(f"  ...{i}/{len(hpnos)}")
 
+    
+    print("Step 4: Scraping Maple Housing...")
+    maple_listings: List[dict] = []
+    maple_failures: List[str] = []
+    maple_filtered_out = 0
+    try:
+        maple_listings, maple_failures, maple_filtered_out = scrape_maple(
+            session,
+            now_iso=now_iso,
+            prev_first_seen=prev_first_seen,
+        )
+        print(f"  - Maple: kept {len(maple_listings)} listings (filtered out {maple_filtered_out}).")
+    except Exception:
+        print("  - Warning: Maple scrape failed (continuing with Izu Taiyo only).")
+
+    listings.extend(maple_listings)
+    failures.extend(maple_failures)
+
     out = {
         "generatedAt": now_iso,
         "fxRate": 155,
         "listings": listings,
         "stats": {
             "count": len(listings),
+            "izutaiyoCount": len(listings) - len(maple_listings),
+            "mapleCount": len(maple_listings),
             "tokusenHpnoCount": len(tokusen_set),
             "searchAddedHpnoCount": len(search_set),
             "rawHpnoCount": len(hpnos),
             "filteredOutSearchOnly": filtered_out,
+            "mapleFilteredOut": maple_filtered_out,
             "failures": len(failures),
         },
         "failures": failures,
@@ -801,7 +1248,11 @@ def main() -> None:
 
     Path("listings.json").write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
     Path("buildInfo.json").write_text(json.dumps({"generatedAt": now_iso}, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Done. Saved {len(listings)} valid listings. (filtered out {filtered_out} search-only false positives)")
+    print(
+        f"Done. Saved {len(listings)} valid listings. "
+        f"(filtered out {filtered_out} Izutaiyo search-only false positives; "
+        f"filtered out {maple_filtered_out} Maple non-qualifiers)"
+    )
     if failures:
         print(f"Note: {len(failures)} pages failed.")
 
