@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-15T11:57:12Z",
+  "generatedAt": "2025-12-15T12:28:22Z",
   "fxRate": 155,
   "listings": [
     {
@@ -618,7 +618,8 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/06/6722-1.jpg",
       "highlightTags": [
-        "Sea View"
+        "Sea View",
+        "Walk to Sea"
       ],
       "firstSeen": "2025-12-15T05:56:38Z"
     },
@@ -640,7 +641,6 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/12/6613-1.jpg",
       "highlightTags": [
         "Sea View",
-        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-15T05:56:38Z"
@@ -663,6 +663,7 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/08/6601-1-1.jpg",
       "highlightTags": [
         "Sea View",
+        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
@@ -706,7 +707,8 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/12/6662-1.jpg",
       "highlightTags": [
-        "Sea View"
+        "Sea View",
+        "Onsen"
       ],
       "firstSeen": "2025-12-15T05:56:38Z"
     },
@@ -733,32 +735,10 @@
       "firstSeen": "2025-12-15T05:34:27Z"
     },
     {
-      "id": "aoba-99755185",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22208/room99755185.html",
-      "title": "東伊豆町 戸建 No.99755185",
-      "titleEn": "Higashi-Izu Town House No.99755185",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 23800000,
-      "landSqm": 373.0,
-      "buildingSqm": 99.36,
-      "yearBuilt": 2001,
-      "age": 24,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/97148757_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
       "id": "aoba-99255589",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room99255589.html",
-      "title": "東伊豆町 奈良本 戸建 No.99255589",
+      "title": "東伊豆町 戸建 No.99255589",
       "titleEn": "Higashi-Izu Town House No.99255589",
       "propertyType": "house",
       "city": "東伊豆町",
@@ -769,31 +749,9 @@
       "age": 26,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/83722559_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/94500004_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-98671615",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22208/room98671615.html",
-      "title": "東伊豆町 戸建 No.98671615",
-      "titleEn": "Higashi-Izu Town House No.98671615",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 13000000,
-      "landSqm": 250.85,
-      "buildingSqm": 164.19,
-      "yearBuilt": 1979,
-      "age": 46,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/82162281_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Walk to Sea"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
     },
@@ -801,7 +759,7 @@
       "id": "aoba-98586218",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
-      "title": "東伊豆町 大川 戸建 No.98586218",
+      "title": "東伊豆町 戸建 No.98586218",
       "titleEn": "Higashi-Izu Town House No.98586218",
       "propertyType": "house",
       "city": "東伊豆町",
@@ -812,96 +770,10 @@
       "age": 52,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/94761332_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/99222271_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View",
         "Onsen"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-98224108",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22205/room98224108.html",
-      "title": "東伊豆町 戸建 No.98224108",
-      "titleEn": "Higashi-Izu Town House No.98224108",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 18900000,
-      "landSqm": 143.63,
-      "buildingSqm": 124.34,
-      "yearBuilt": 1989,
-      "age": 36,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/92341461_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-98170970",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22205/room98170970.html",
-      "title": "東伊豆町 戸建 No.98170970",
-      "titleEn": "Higashi-Izu Town House No.98170970",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 45000000,
-      "landSqm": 165.28,
-      "buildingSqm": 382.41,
-      "yearBuilt": 1990,
-      "age": 35,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/94638758_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Walk to Sea"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-98097884",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22208/room98097884.html",
-      "title": "東伊豆町 戸建 No.98097884",
-      "titleEn": "Higashi-Izu Town House No.98097884",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 2500000,
-      "landSqm": 1029.0,
-      "buildingSqm": 67.06,
-      "yearBuilt": 1980,
-      "age": 45,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/75534572_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-98042451",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22208/room98042451.html",
-      "title": "東伊豆町 戸建 No.98042451",
-      "titleEn": "Higashi-Izu Town House No.98042451",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 11500000,
-      "landSqm": 112.0,
-      "buildingSqm": 95.58,
-      "yearBuilt": 1996,
-      "age": 29,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/99901892_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
     },
@@ -909,7 +781,7 @@
       "id": "aoba-98036165",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
-      "title": "下田市 吉佐美 戸建 No.98036165",
+      "title": "下田市 戸建 No.98036165",
       "titleEn": "Shimoda City House No.98036165",
       "propertyType": "house",
       "city": "下田市",
@@ -919,54 +791,10 @@
       "yearBuilt": 1989,
       "age": 36,
       "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/87257384_1_0_0_3.jpg",
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/87193712_1_0_0_3.jpg",
       "highlightTags": [
         "Walk to Sea"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-97783803",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22208/room97783803.html",
-      "title": "東伊豆町 戸建 No.97783803",
-      "titleEn": "Higashi-Izu Town House No.97783803",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 10800000,
-      "landSqm": 405.97,
-      "buildingSqm": 109.53,
-      "yearBuilt": 2002,
-      "age": 23,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/87480803_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-97182619",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao14384/room97182619.html",
-      "title": "東伊豆町 戸建 No.97182619",
-      "titleEn": "Higashi-Izu Town House No.97182619",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 85000000,
-      "landSqm": 719.43,
-      "buildingSqm": 275.74,
-      "yearBuilt": 2019,
-      "age": 6,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98224108_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Onsen"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
     },
@@ -974,7 +802,7 @@
       "id": "aoba-96311271",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
-      "title": "東伊豆町 大川 戸建 No.96311271",
+      "title": "東伊豆町 戸建 No.96311271",
       "titleEn": "Higashi-Izu Town House No.96311271",
       "propertyType": "house",
       "city": "東伊豆町",
@@ -985,7 +813,7 @@
       "age": 37,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/94988845_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98204121_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View",
         "Walk to Sea",
@@ -994,52 +822,10 @@
       "firstSeen": "2025-12-15T11:57:12Z"
     },
     {
-      "id": "aoba-95157183",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22208/room95157183.html",
-      "title": "東伊豆町 戸建 No.95157183",
-      "titleEn": "Higashi-Izu Town House No.95157183",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 2400000,
-      "landSqm": 384.04,
-      "buildingSqm": 82.8,
-      "yearBuilt": 1979,
-      "age": 46,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/91694547_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-94638758",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22208/room94638758.html",
-      "title": "東伊豆町 戸建 No.94638758",
-      "titleEn": "Higashi-Izu Town House No.94638758",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 10400000,
-      "landSqm": 116.72,
-      "buildingSqm": 63.13,
-      "yearBuilt": 1984,
-      "age": 41,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/78837589_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
       "id": "aoba-94642399",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94642399.html",
-      "title": "東伊豆町 奈良本 戸建 No.94642399",
+      "title": "東伊豆町 戸建 No.94642399",
       "titleEn": "Higashi-Izu Town House No.94642399",
       "propertyType": "house",
       "city": "東伊豆町",
@@ -1050,53 +836,10 @@
       "age": 36,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/97617089_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View",
         "Onsen"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-99459257",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room99459257.html",
-      "title": "東伊豆町 奈良本 1374 マンション No.99459257",
-      "titleEn": "Higashi-Izu Town Mansion No.99459257",
-      "propertyType": "mansion",
-      "city": "東伊豆町",
-      "priceJpy": 2600000,
-      "landSqm": null,
-      "buildingSqm": 60.53,
-      "yearBuilt": 1975,
-      "age": 50,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/86168953_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-98956439",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22208/room98956439.html",
-      "title": "東伊豆町 マンション No.98956439",
-      "titleEn": "Higashi-Izu Town Mansion No.98956439",
-      "propertyType": "mansion",
-      "city": "東伊豆町",
-      "priceJpy": 12800000,
-      "landSqm": null,
-      "buildingSqm": 97.15,
-      "yearBuilt": 1993,
-      "age": 32,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/89800119_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
     },
@@ -1104,18 +847,18 @@
       "id": "aoba-98691144",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room98691144.html",
-      "title": "東伊豆町 奈良本 マンション No.98691144",
+      "title": "東伊豆町 マンション No.98691144",
       "titleEn": "Higashi-Izu Town Mansion No.98691144",
       "propertyType": "mansion",
       "city": "東伊豆町",
       "priceJpy": 9000000,
       "landSqm": null,
-      "buildingSqm": 64.26,
+      "buildingSqm": null,
       "yearBuilt": 1993,
       "age": 32,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/99286926_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/99154713_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View",
         "Onsen"
@@ -1126,18 +869,18 @@
       "id": "aoba-97414685",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room97414685.html",
-      "title": "東伊豆町 奈良本 マンション No.97414685",
+      "title": "東伊豆町 マンション No.97414685",
       "titleEn": "Higashi-Izu Town Mansion No.97414685",
       "propertyType": "mansion",
       "city": "東伊豆町",
       "priceJpy": 5800000,
       "landSqm": null,
-      "buildingSqm": 64.26,
+      "buildingSqm": null,
       "yearBuilt": 1993,
       "age": 32,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95771773_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/93037812_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View"
       ],
@@ -1147,18 +890,18 @@
       "id": "aoba-96926432",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room96926432.html",
-      "title": "東伊豆町 奈良本 マンション No.96926432",
+      "title": "東伊豆町 マンション No.96926432",
       "titleEn": "Higashi-Izu Town Mansion No.96926432",
       "propertyType": "mansion",
       "city": "東伊豆町",
       "priceJpy": 3300000,
       "landSqm": null,
-      "buildingSqm": 32.13,
+      "buildingSqm": null,
       "yearBuilt": 1993,
       "age": 32,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/84928768_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/95394204_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View",
         "Onsen"
@@ -1169,18 +912,18 @@
       "id": "aoba-89800119",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room89800119.html",
-      "title": "東伊豆町 片瀬 マンション No.89800119",
+      "title": "東伊豆町 マンション No.89800119",
       "titleEn": "Higashi-Izu Town Mansion No.89800119",
       "propertyType": "mansion",
       "city": "東伊豆町",
       "priceJpy": 4500000,
       "landSqm": null,
-      "buildingSqm": 50.81,
+      "buildingSqm": null,
       "yearBuilt": 1991,
       "age": 34,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95052990_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/95523750_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View",
         "Onsen"
@@ -1191,18 +934,18 @@
       "id": "aoba-83492601",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room83492601.html",
-      "title": "東伊豆町 奈良本 マンション No.83492601",
+      "title": "東伊豆町 マンション No.83492601",
       "titleEn": "Higashi-Izu Town Mansion No.83492601",
       "propertyType": "mansion",
       "city": "東伊豆町",
       "priceJpy": 2700000,
       "landSqm": null,
-      "buildingSqm": 23.32,
+      "buildingSqm": null,
       "yearBuilt": 1992,
       "age": 33,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/90381383_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/88239496_1_0_0_3.jpg",
       "highlightTags": [
         "Sea View",
         "Walk to Sea",
@@ -1211,32 +954,10 @@
       "firstSeen": "2025-12-15T11:57:12Z"
     },
     {
-      "id": "aoba-80077453",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room80077453.html",
-      "title": "東伊豆町 奈良本 1248-1 マンション No.80077453",
-      "titleEn": "Higashi-Izu Town Mansion No.80077453",
-      "propertyType": "mansion",
-      "city": "東伊豆町",
-      "priceJpy": 9000000,
-      "landSqm": null,
-      "buildingSqm": 108.74,
-      "yearBuilt": 1991,
-      "age": 34,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98255298_1_0_0_3.jpg",
-      "highlightTags": [
-        "Sea View",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
       "id": "aoba-93233048",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room93233048.html",
-      "title": "東伊豆町 稲取 土地 No.93233048",
+      "title": "東伊豆町 土地 No.93233048",
       "titleEn": "Higashi-Izu Town Land No.93233048",
       "propertyType": "land",
       "city": "東伊豆町",
@@ -1247,7 +968,7 @@
       "age": 0,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://www.aoba-resort.com/images/page_top.png",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/93233048_1_630_417_3.jpg?t=1765413781",
       "highlightTags": [
         "Sea View"
       ],
@@ -1257,7 +978,7 @@
       "id": "aoba-83802693",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room83802693.html",
-      "title": "東伊豆町 稲取 土地 No.83802693",
+      "title": "東伊豆町 土地 No.83802693",
       "titleEn": "Higashi-Izu Town Land No.83802693",
       "propertyType": "land",
       "city": "東伊豆町",
@@ -1268,7 +989,7 @@
       "age": 0,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://www.aoba-resort.com/images/page_top.png",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/83802693_1_630_417_3.jpg?t=1765413834",
       "highlightTags": [
         "Sea View"
       ],
@@ -1276,16 +997,16 @@
     }
   ],
   "stats": {
-    "count": 60,
+    "count": 47,
     "izutaiyoCount": 25,
     "mapleCount": 10,
-    "aobaCount": 25,
+    "aobaCount": 12,
     "tokusenHpnoCount": 14,
     "searchAddedHpnoCount": 26,
     "rawHpnoCount": 40,
     "filteredOutSearchOnly": 15,
     "mapleFilteredOut": 143,
-    "aobaFilteredOut": 242,
+    "aobaFilteredOut": 255,
     "failures": 0
   },
   "failures": []

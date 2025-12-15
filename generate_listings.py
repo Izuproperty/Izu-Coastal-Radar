@@ -1233,13 +1233,70 @@ def _aoba_find_max_page(soup: BeautifulSoup) -> int:
 
 
 def _aoba_extract_city_from_text(text: str) -> str:
+    """Best-effort city extraction from *local* text (e.g., listing card).
+    Do NOT use this on full-page text (it can pick up unrelated 'recommended' items).
+    """
     t = text or ""
     if "下田市" in t:
         return "下田市"
-    # Handle both 東伊豆町 and 賀茂郡東伊豆町
     if "賀茂郡東伊豆町" in t or "東伊豆町" in t:
         return "東伊豆町"
     return ""
+
+
+def _aoba_extract_address(soup: BeautifulSoup, scope: Optional[BeautifulSoup] = None) -> str:
+    """Extract the listing's own address/location string from the detail page."""
+    search_scopes = [scope, soup] if scope is not None else [soup]
+
+    # Common patterns: table rows (th/td) or definition lists (dt/dd)
+    for sc in search_scopes:
+        if sc is None:
+            continue
+
+        # Table / DL label matching
+        for label in ("所在地", "住所"):
+            # th/td
+            for th in sc.find_all("th"):
+                th_txt = clean_text(th.get_text(" ", strip=True))
+                if label in th_txt:
+                    td = th.find_next_sibling("td")
+                    if td:
+                        return clean_text(td.get_text(" ", strip=True))
+
+            # dt/dd
+            for dt in sc.find_all("dt"):
+                dt_txt = clean_text(dt.get_text(" ", strip=True))
+                if label in dt_txt:
+                    dd = dt.find_next_sibling("dd")
+                    if dd:
+                        return clean_text(dd.get_text(" ", strip=True))
+
+        # Some themes use <span class="label">所在地</span><span class="value">...</span>
+        for lab in sc.find_all(string=re.compile(r"(所在地|住所)")):
+            try:
+                parent = lab.parent
+                # Look for next element that isn't the label itself
+                nxt = parent.find_next()
+                if nxt and nxt != parent:
+                    cand = clean_text(nxt.get_text(" ", strip=True))
+                    if cand and cand != clean_text(str(lab)):
+                        # Avoid catching the whole page; require some address-like token
+                        if any(tok in cand for tok in ("市", "郡", "町", "村", "区", "丁目", "番")):
+                            return cand
+            except Exception:
+                pass
+
+    return ""
+
+
+def _aoba_city_from_address(addr: str) -> str:
+    a = addr or ""
+    if "下田市" in a:
+        return "下田市"
+    if "賀茂郡東伊豆町" in a or "東伊豆町" in a:
+        return "東伊豆町"
+    return ""
+
 
 
 def _aoba_sea_view_and_walk(text: str) -> Tuple[bool, bool]:
@@ -1300,34 +1357,50 @@ def _aoba_has_onsen(text: str) -> bool:
     return False
 
 
-def _aoba_pick_image_url(soup: BeautifulSoup, page_url: str) -> Optional[str]:
+def _aoba_pick_image_url(scope: BeautifulSoup, page_url: str) -> Optional[str]:
+    """Pick a representative image for an Aoba listing.
+
+    Important: limit to the listing's own detail container whenever possible to avoid
+    picking thumbnails from 'recommended listings' blocks.
+    """
     candidates: List[str] = []
-    for img in soup.find_all("img"):
+    for img in scope.find_all("img"):
         src = (img.get("data-src") or img.get("data-lazy-src") or img.get("src") or "").strip()
         if not src:
             continue
         u = _abs_url(page_url, src)
         ul = u.lower()
 
+        # Hard exclusions (site chrome / placeholders)
+        if "page_top" in ul or "noimage" in ul or "loading" in ul:
+            continue
+        if any(bad in ul for bad in ["logo", "icon", "sprite", "common/", "/common", "header", "footer", "btn"]):
+            continue
+
+        # Prefer real photos
         if not re.search(r"\.(jpg|jpeg|png|webp)(\?|$)", ul):
             continue
-        if any(bad in ul for bad in ["logo", "icon", "sprite", "loading", "common/", "/common", "header", "footer", "btn"]):
-            continue
+
         candidates.append(u)
 
     if not candidates:
         return None
 
-    def rank(u: str) -> Tuple[int, int]:
+    def rank(u: str) -> Tuple[int, int, int]:
         ul = u.lower()
         s = 0
+        # Aoba pages often use img-asp CDN for listing photos
+        if "img-asp.jp/bkn/" in ul:
+            s += 50
         if "room" in ul:
             s += 20
         if "upload" in ul or "uploads" in ul:
             s += 10
+        # Avoid picking floorplans as the main photo
         if "madori" in ul or "floor" in ul or "plan" in ul:
-            s -= 5
-        return (s, -len(u))
+            s -= 10
+        # Prefer shorter URLs if tie (usually the primary)
+        return (s, -len(ul), 0)
 
     candidates = list(dict.fromkeys(candidates))
     candidates.sort(key=rank, reverse=True)
@@ -1338,13 +1411,32 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
     r = request(session, detail_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
     html = r.text or ""
     soup = BeautifulSoup(html, "html.parser")
-    page_text = clean_text(soup.get_text(" ", strip=True))
 
-    city = _aoba_extract_city_from_text(page_text)
+    # Try to focus on the main content area (avoid nav/footer/recommended contamination where possible)
+    def _pick_detail_scope(s: BeautifulSoup) -> BeautifulSoup:
+        candidates = []
+        for sel in ("main", "article", "div#main", "div#content", "div#contents", "div.entry-content", "div.l-main", "div.container"):
+            el = s.select_one(sel)
+            if el:
+                t = clean_text(el.get_text(" ", strip=True))
+                if len(t) > 400:
+                    candidates.append((len(t), el))
+        if candidates:
+            candidates.sort(key=lambda x: x[0], reverse=True)
+            return candidates[0][1]
+        return s
+
+    scope = _pick_detail_scope(soup)
+    scope_text = clean_text(scope.get_text(" ", strip=True))
+
+    addr = _aoba_extract_address(soup, scope)
+    city = _aoba_city_from_address(addr)
+
+    # Strict: only keep allowed cities confirmed from the listing's own address field.
     if city not in {"下田市", "東伊豆町"}:
         return None, False
 
-    sea_view, walk_to_sea = _aoba_sea_view_and_walk(page_text)
+    sea_view, walk_to_sea = _aoba_sea_view_and_walk(scope_text)
     if not (sea_view or walk_to_sea):
         return None, False
 
@@ -1352,57 +1444,93 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
     m = re.search(r"room(\d+)\.html", urlparse(detail_url).path)
     if m:
         room_id = m.group(1)
-    if not room_id:
-        room_id = str(abs(hash(detail_url)))
 
-    item_id = f"aoba-{room_id}"
-
-    # Location suffix for a compact, readable title
-    loc_suffix = ""
-    m = re.search(r"所在地\s*([^\\n]+?)\s*(?:間取り|交通|築年|価格|土地面積|建物面積|構造)", page_text)
-    if m:
-        loc_line = m.group(1)
-        if city in loc_line:
-            loc_suffix = loc_line.split(city, 1)[-1].strip()
-            loc_suffix = re.sub(r"^(静岡県|賀茂郡)", "", loc_suffix).strip()
-
-    jp_type = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, property_type)
-    title = f"{city} {loc_suffix} {jp_type} No.{room_id}".replace("  ", " ").strip()
-
+    # Price (JPY)
     price_jpy = None
-    m = re.search(r"価格\s*([0-9,]+\s*億\s*[0-9,]*\s*万?\s*円|[0-9,]+\s*万\s*円|[0-9,]+\s*万円)", page_text)
+    m = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*万円", scope_text)
     if m:
-        price_jpy = _parse_price_jpy(m.group(1))
+        try:
+            price_jpy = int(m.group(1).replace(",", "")) * 10000
+        except Exception:
+            price_jpy = None
     if price_jpy is None:
-        price_jpy = _parse_price_jpy(page_text)
+        m = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*円", scope_text)
+        if m:
+            try:
+                price_jpy = int(m.group(1).replace(",", ""))
+            except Exception:
+                price_jpy = None
 
-    land_sqm = _parse_sqm(page_text, ["土地面積(坪数)", "土地面積", "敷地面積(坪数)", "敷地面積"])
-    building_sqm = _parse_sqm(page_text, ["建物面積(坪数)", "建物面積", "専有面積(坪数)", "専有面積"])
+    # Areas
+    land_sqm = None
+    building_sqm = None
 
-    year_built = _parse_year_built(page_text)
-    age = 0.0
-    now_year = datetime.now().year
+    # Prefer table-derived values when possible
+    m = re.search(r"(土地面積|敷地面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", scope_text)
+    if m:
+        try:
+            land_sqm = float(m.group(2))
+        except Exception:
+            land_sqm = None
+
+    m = re.search(r"(建物面積|延床面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", scope_text)
+    if m:
+        try:
+            building_sqm = float(m.group(2))
+        except Exception:
+            building_sqm = None
+
+    # Year built
+    year_built = None
+    m = re.search(r"(築年数|築年月|築)\s*[:：]?\s*(\d{4})\s*年", scope_text)
+    if m:
+        try:
+            year_built = int(m.group(2))
+        except Exception:
+            year_built = None
+
+    # Age
+    age = None
     if year_built:
-        age = max(0.0, now_year - year_built)
+        try:
+            age = datetime.now(timezone.utc).year - year_built
+        except Exception:
+            age = None
 
+    # Tags
     tags: List[str] = []
-    sea_score = 0
     if sea_view:
         tags.append("Sea View")
-        sea_score = 4
     if walk_to_sea:
         tags.append("Walk to Sea")
-    if _aoba_has_onsen(page_text):
+    if _aoba_has_onsen(scope_text):
         tags.append("Onsen")
 
-    image_url = _aoba_pick_image_url(soup, detail_url)
+    sea_score = 4 if sea_view else (3 if walk_to_sea else 0)
 
-    city_en = CITY_EN_MAP.get(city, city)
-    type_en = {"house": "House", "mansion": "Mansion", "land": "Land"}.get(property_type, property_type)
-    title_en = f"{city_en} {type_en} No.{room_id}"
+    # Image: prefer within scope; fallback to whole page
+    image_url = _aoba_pick_image_url(scope, detail_url) or _aoba_pick_image_url(soup, detail_url)
+
+    # If the fallback grabbed a generic site image, drop it
+    if image_url and any(bad in image_url.lower() for bad in ["page_top", "logo", "icon", "sprite"]):
+        image_url = None
+
+    # Titles (keep simple and consistent with other sources)
+    type_jp = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, "物件")
+    no_part = f"No.{room_id}" if room_id else "No."
+    title = f"{city} {type_jp} {no_part}".strip()
+    title_en_city = {"下田市": "Shimoda City", "東伊豆町": "Higashi-Izu Town"}.get(city, city)
+    title_en = f"{title_en_city} {type_jp if property_type!='mansion' else 'Mansion'} {no_part}".strip()
+    # Normalize EN type label
+    if property_type == "house":
+        title_en = f"{title_en_city} House {no_part}".strip()
+    elif property_type == "land":
+        title_en = f"{title_en_city} Land {no_part}".strip()
+    elif property_type == "mansion":
+        title_en = f"{title_en_city} Mansion {no_part}".strip()
 
     item = {
-        "id": item_id,
+        "id": f"aoba-{room_id}" if room_id else f"aoba-{hash(detail_url)}",
         "source": "Aoba Resort",
         "sourceUrl": detail_url,
         "title": title,
@@ -1485,12 +1613,7 @@ def scrape_aoba(
 
                 city = _aoba_extract_city_from_text(ctx_text)
                 if city not in {"下田市", "東伊豆町"}:
-                    # Fallback: infer from bknarea-ao<code> in the URL
-                    m_area = re.search(r"bknarea-ao(\d+)", detail_url)
-                    if m_area and m_area.group(1) in AOBA_BKNAREA_TO_CITY:
-                        city = AOBA_BKNAREA_TO_CITY[m_area.group(1)]
-                    else:
-                        continue
+                    continue
 
                 seen_detail.add(detail_url)
 
