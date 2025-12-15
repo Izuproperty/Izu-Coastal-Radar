@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-15T12:28:22Z",
+  "generatedAt": "2025-12-15T13:10:36Z",
   "fxRate": 155,
   "listings": [
     {
@@ -518,10 +518,10 @@
       "id": "maple-6763",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6763%ef%bc%9a%e8%87%aa%e7%84%b6%e3%81%ab%e5%8c%85%e3%81%be%e3%82%8c%e3%81%9f%e4%bd%8f%e7%92%b0%e5%a2%83%e3%83%bb%e5%90%b9%e3%81%8d%e6%8a%9c%e3%81%91%e3%83%aa%e3%83%93%e3%83%b3%e3%82%b0%e3%81%a7/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 戸建 No.6763",
+      "titleEn": "Higashi-Izu Town House No.6763",
       "propertyType": "house",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 16600000,
       "landSqm": 502.0,
       "buildingSqm": 93.0,
@@ -540,10 +540,10 @@
       "id": "maple-6780",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6780%ef%bc%9a%e7%95%91%e3%81%a8%e6%9e%9c%e6%a8%b9%e5%9c%92%e3%81%ae%e3%81%82%e3%82%8b281%e5%9d%aa%e3%81%ae%e6%95%b7%e5%9c%b0%e3%81%8c%e9%ad%85%e5%8a%9b%e3%83%bb%e7%86%b1%e5%b7%9d%e3%81%ae%e6%a3%ae/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 戸建 No.6780",
+      "titleEn": "Higashi-Izu Town House No.6780",
       "propertyType": "house",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 12000000,
       "landSqm": 930.0,
       "buildingSqm": 82.0,
@@ -562,10 +562,10 @@
       "id": "maple-6765",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6765%ef%bc%9a%e6%b5%b7%e3%82%92%e4%b8%80%e6%9c%9b%e3%81%99%e3%82%8b%e9%ab%98%e5%8f%b0%e3%81%ab%e5%bb%ba%e3%81%a4%e3%80%81%e9%87%8d%e5%8e%9a%e3%81%aarc%e6%b7%b7%e6%a7%8b%e9%80%a0%e3%81%ae%e6%b8%a9/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 戸建 No.6765",
+      "titleEn": "Higashi-Izu Town House No.6765",
       "propertyType": "house",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 16800000,
       "landSqm": 538.0,
       "buildingSqm": 177.0,
@@ -583,10 +583,10 @@
       "id": "maple-6750",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6750%ef%bc%9a%e6%b8%a9%e6%b3%89%e3%81%a8%e3%82%b5%e3%82%a6%e3%83%8a%e3%81%ae%e3%81%82%e3%82%8b%e5%b1%b1%e8%8d%98%e9%a2%a83ldk/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 戸建 No.6750",
+      "titleEn": "Higashi-Izu Town House No.6750",
       "propertyType": "house",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 14500000,
       "landSqm": 506.0,
       "buildingSqm": 152.0,
@@ -605,10 +605,10 @@
       "id": "maple-6722",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6722%ef%bc%9a%e6%b5%b7%e3%82%92%e6%9c%9b%e3%82%80%e5%90%b9%e6%8a%9c%e3%81%91%e3%83%aa%e3%83%93%e3%83%b3%e3%82%b0%e3%81%8c%e9%96%8b%e6%94%be%e7%9a%84%e3%81%aa%e6%b8%a9%e6%b3%89%e4%bb%98%e3%81%8d/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 戸建 No.6722",
+      "titleEn": "Higashi-Izu Town House No.6722",
       "propertyType": "house",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 14800000,
       "landSqm": 549.0,
       "buildingSqm": 98.0,
@@ -618,8 +618,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/06/6722-1.jpg",
       "highlightTags": [
-        "Sea View",
-        "Walk to Sea"
+        "Sea View"
       ],
       "firstSeen": "2025-12-15T05:56:38Z"
     },
@@ -627,10 +626,10 @@
       "id": "maple-6613",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6613%ef%bc%9a%e5%a4%a7%e6%b5%b7%e5%8e%9f%e3%82%92%e8%a6%8b%e4%b8%8b%e3%82%8d%e3%81%99%e9%ab%98%e5%8f%b0%e3%81%ab%e5%bb%ba%e3%81%a4%e3%80%81bess%e6%96%bd%e5%b7%a5%e3%81%ae%e6%b8%a9%e6%b3%89%e4%bb%98/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 戸建 No.6613",
+      "titleEn": "Higashi-Izu Town House No.6613",
       "propertyType": "house",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 13800000,
       "landSqm": 1154.0,
       "buildingSqm": 134.0,
@@ -649,8 +648,8 @@
       "id": "maple-6601",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6601%ef%bc%9a%e3%83%9f%e3%83%8b%e6%9e%9c%e6%a8%b9%e5%9c%92%e3%81%ae%e3%81%82%e3%82%8b%e3%81%8a%e5%ba%ad%e4%bb%98%e3%81%8d%e3%83%bb%e4%bc%8a%e8%b1%86%e4%b8%83%e5%b3%b6%e3%81%a8%e5%a4%a7%e6%b5%b7/",
-      "title": "MENU",
-      "titleEn": "Higashi-Izu Town MENU",
+      "title": "東伊豆町 戸建 No.6601",
+      "titleEn": "Higashi-Izu Town House No.6601",
       "propertyType": "house",
       "city": "東伊豆町",
       "priceJpy": 17800000,
@@ -663,7 +662,6 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/08/6601-1-1.jpg",
       "highlightTags": [
         "Sea View",
-        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
@@ -672,10 +670,10 @@
       "id": "maple-6383",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6383%ef%bc%9a%e5%a4%a7%e5%b7%9d%e3%81%ae%e9%9d%99%e3%81%8b%e3%81%aa%e6%a3%ae%e3%81%ab%e4%bd%87%e3%82%80%e3%80%81%e5%88%a5%e8%8d%98%e6%84%9f%e3%81%ae%e3%81%82%e3%82%8b%e6%b8%a9%e6%b3%89%e4%bb%98/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 戸建 No.6383",
+      "titleEn": "Higashi-Izu Town House No.6383",
       "propertyType": "house",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 9800000,
       "landSqm": 346.0,
       "buildingSqm": 92.0,
@@ -694,10 +692,10 @@
       "id": "maple-6662",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6662%ef%bc%9a%e6%b5%b7%e3%82%92%e6%9c%9b%e3%82%80%e9%ab%98%e5%8f%b0%e3%81%ae%e6%9d%b1%e5%8d%97%e5%82%be%e6%96%9c%e3%81%ab%e5%ba%83%e3%81%8c%e3%82%8b302%e5%9d%aa%e3%81%ae%e5%9c%9f%e5%9c%b0/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 土地 No.6662",
+      "titleEn": "Higashi-Izu Town Land No.6662",
       "propertyType": "land",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 4200000,
       "landSqm": 1000.0,
       "buildingSqm": null,
@@ -707,8 +705,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/12/6662-1.jpg",
       "highlightTags": [
-        "Sea View",
-        "Onsen"
+        "Sea View"
       ],
       "firstSeen": "2025-12-15T05:56:38Z"
     },
@@ -716,10 +713,10 @@
       "id": "maple-6734",
       "source": "Maple Housing",
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6734%ef%bc%9a%e5%ae%a4%e5%86%85%e7%8a%b6%e6%85%8b%e8%89%af%e5%a5%bd%e3%83%bb%e3%83%aa%e3%83%93%e3%83%b3%e3%82%b0%e3%82%88%e3%82%8a%e6%b5%b7%e3%82%92%e6%9c%9b%e3%82%802ldk/",
-      "title": "MENU",
-      "titleEn": "MENU",
+      "title": "東伊豆町 マンション No.6734",
+      "titleEn": "Higashi-Izu Town Mansion No.6734",
       "propertyType": "mansion",
-      "city": "賀茂郡東伊豆町",
+      "city": "東伊豆町",
       "priceJpy": 6900000,
       "landSqm": 9736.0,
       "buildingSqm": 100.0,
@@ -749,7 +746,7 @@
       "age": 26,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/94500004_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/99255589_1_500_500_3.jpg?t=1765413868",
       "highlightTags": [
         "Sea View"
       ],
@@ -770,7 +767,7 @@
       "age": 52,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/99222271_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=1765413771",
       "highlightTags": [
         "Sea View",
         "Onsen"
@@ -792,7 +789,7 @@
       "age": 36,
       "lastUpdated": null,
       "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/87193712_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=1765413862",
       "highlightTags": [
         "Walk to Sea"
       ],
@@ -813,7 +810,7 @@
       "age": 37,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98204121_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=1765413776",
       "highlightTags": [
         "Sea View",
         "Walk to Sea",
@@ -836,12 +833,34 @@
       "age": 36,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=1765413867",
       "highlightTags": [
         "Sea View",
         "Onsen"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
+    },
+    {
+      "id": "aoba-99459257",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room99459257.html",
+      "title": "東伊豆町 マンション No.99459257",
+      "titleEn": "Higashi-Izu Town Mansion No.99459257",
+      "propertyType": "mansion",
+      "city": "東伊豆町",
+      "priceJpy": 2600000,
+      "landSqm": null,
+      "buildingSqm": null,
+      "yearBuilt": 1975,
+      "age": 50,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/99459257_1_500_500_3.jpg?t=1765413872",
+      "highlightTags": [
+        "Sea View",
+        "Onsen"
+      ],
+      "firstSeen": "2025-12-15T13:10:36Z"
     },
     {
       "id": "aoba-98691144",
@@ -858,7 +877,7 @@
       "age": 32,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/99154713_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98691144_1_500_500_3.jpg?t=1765413769",
       "highlightTags": [
         "Sea View",
         "Onsen"
@@ -880,7 +899,7 @@
       "age": 32,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/93037812_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/97414685_1_500_500_3.jpg?t=1765766175",
       "highlightTags": [
         "Sea View"
       ],
@@ -901,7 +920,7 @@
       "age": 32,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95394204_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/96926432_1_500_500_3.jpg?t=1765413798",
       "highlightTags": [
         "Sea View",
         "Onsen"
@@ -923,7 +942,7 @@
       "age": 34,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95523750_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/89800119_1_500_500_3.jpg?t=1765413862",
       "highlightTags": [
         "Sea View",
         "Onsen"
@@ -945,7 +964,7 @@
       "age": 33,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/88239496_1_0_0_3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/83492601_1_500_500_3.jpg?t=1765413804",
       "highlightTags": [
         "Sea View",
         "Walk to Sea",
@@ -968,7 +987,7 @@
       "age": 0,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/93233048_1_630_417_3.jpg?t=1765413781",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/93233048_1_500_500_3.jpg?t=1765413781",
       "highlightTags": [
         "Sea View"
       ],
@@ -989,7 +1008,7 @@
       "age": 0,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/83802693_1_630_417_3.jpg?t=1765413834",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/83802693_1_500_500_3.jpg?t=1765413834",
       "highlightTags": [
         "Sea View"
       ],
@@ -997,16 +1016,16 @@
     }
   ],
   "stats": {
-    "count": 47,
+    "count": 48,
     "izutaiyoCount": 25,
     "mapleCount": 10,
-    "aobaCount": 12,
+    "aobaCount": 13,
     "tokusenHpnoCount": 14,
     "searchAddedHpnoCount": 26,
     "rawHpnoCount": 40,
     "filteredOutSearchOnly": 15,
     "mapleFilteredOut": 143,
-    "aobaFilteredOut": 255,
+    "aobaFilteredOut": 254,
     "failures": 0
   },
   "failures": []

@@ -790,17 +790,37 @@ def _parse_city(text: str) -> str:
     Extract 市/町/村 from the listing's own 所在地 field.
 
     Important: do NOT fall back to scanning the full page for a city token, because Maple pages
-    include the company's office address (e.g., 伊東市...) in the footer, which would incorrectly
+    can include the company's office address (e.g., 伊東市...) in the footer, which would incorrectly
     label/exclude unrelated listings.
+
+    Normalization:
+    - Treat 「賀茂郡東伊豆町」等 as the same city key as Izutaiyo uses (e.g., 「東伊豆町」).
     """
     t = (text or "")
     # Capture a short chunk after 所在地 / 物件所在地
-    m = re.search(r"(?:物件所在地|所在地)\s*[:：]?\s*([^\s　]{1,40})", t)
+    m = re.search(r"(?:物件所在地|所在地)\s*[:：]?\s*([^\s　]{1,60})", t)
     if not m:
         return ""
     loc = m.group(1).strip()
+
+    # Try to capture up to 市/町/村, allowing 郡 prefix
     m2 = re.search(r"(.+?(?:市|町|村))", loc)
-    return m2.group(1) if m2 else ""
+    if not m2:
+        # Sometimes romanized / odd formatting leaks in; handle the one we know
+        ll = loc.lower()
+        if "kamogun" in ll and "higashi" in ll and "izu" in ll:
+            return "東伊豆町"
+        return ""
+    city = m2.group(1).strip()
+
+    # Normalize county-prefixed towns (賀茂郡東伊豆町 -> 東伊豆町, etc.)
+    city = re.sub(r"^賀茂郡", "", city)
+
+    # Defensive: normalize any lingering romanization variant
+    if "kamogun" in city.lower() and "higashi" in city.lower() and "izu" in city.lower():
+        city = "東伊豆町"
+
+    return city
 
 def _parse_year_built(text: str) -> Optional[int]:
     t = text or ""
@@ -1021,8 +1041,16 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
         item_id = f"maple-{stable}" if stable else f"maple-{abs(hash(detail_url))}"
 
     # Title
-    h1 = soup.find(["h1", "h2"])
-    title = clean_text(h1.get_text(" ", strip=True) if h1 else (f"Maple Listing {no}" if no else "Maple Listing"))
+    # Maple pages often render a global NAV heading (e.g., "MENU") as the first <h1>/<h2>.
+    # To keep the UI consistent (and translation-friendly), synthesize a compact title.
+    type_jp = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, "物件")
+    type_en = {"house": "House", "mansion": "Mansion", "land": "Land"}.get(property_type, "Listing")
+    no_part = f"No.{no}" if no else "No."
+    title_city = city or "Maple"
+    title = f"{title_city} {type_jp} {no_part}".strip()
+
+    title_en_city = CITY_EN_MAP.get(city, city) if city else "Maple"
+    title_en = f"{title_en_city} {type_en} {no_part}".strip()
 
     # Price
     price_jpy = None
@@ -1044,10 +1072,9 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
         age = max(0.0, now_year - year_built)
 
     tags: List[str] = []
-    sea_score = 0
+    sea_score = 4 if sea_view else (3 if walk_to_sea else 0)
     if sea_view:
         tags.append("Sea View")
-        sea_score = 4
     if walk_to_sea:
         tags.append("Walk to Sea")
     if _maple_has_onsen(page_text):
@@ -1055,11 +1082,6 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
 
     image_url = _maple_pick_image_url(soup, detail_url)
 
-    title_en = title
-    if city and city in CITY_EN_MAP:
-        title_en = re.sub(re.escape(city), CITY_EN_MAP[city], title_en)
-        if title_en == title:
-            title_en = f"{CITY_EN_MAP[city]} {title}"
 
     item = {
         "id": item_id,
@@ -1357,55 +1379,85 @@ def _aoba_has_onsen(text: str) -> bool:
     return False
 
 
-def _aoba_pick_image_url(scope: BeautifulSoup, page_url: str) -> Optional[str]:
+def _aoba_pick_image_url(
+    scope: BeautifulSoup,
+    page_url: str,
+    *,
+    room_id: Optional[str] = None,
+    og_image: Optional[str] = None,
+) -> Optional[str]:
     """Pick a representative image for an Aoba listing.
 
-    Important: limit to the listing's own detail container whenever possible to avoid
-    picking thumbnails from 'recommended listings' blocks.
+    Key fixes:
+    - Prefer og:image when it looks like a listing photo.
+    - If we know the room_id, only accept images that match that room_id to avoid
+      accidentally picking thumbnails from 'recommended listings' blocks.
     """
+
+    def _looks_like_listing_photo(u: str) -> bool:
+        ul = (u or "").lower()
+        if not ul:
+            return False
+        if any(bad in ul for bad in ["page_top", "noimage", "loading", "logo", "icon", "sprite", "common/", "/common", "header", "footer", "btn"]):
+            return False
+        if not re.search(r"\.(jpg|jpeg|png|webp)(\?|$)", ul):
+            return False
+        # Aoba listing photos typically live on this CDN path
+        if "img-asp.jp/bkn/" in ul:
+            return True
+        return True
+
+    # 1) og:image (often the cleanest single representative photo)
+    if og_image:
+        u = _abs_url(page_url, og_image.strip())
+        if _looks_like_listing_photo(u):
+            if room_id:
+                if re.search(rf"/bkn/{re.escape(room_id)}[_-]", u):
+                    return u
+            else:
+                return u
+
+    # 2) Gather <img> candidates from the chosen scope
     candidates: List[str] = []
     for img in scope.find_all("img"):
         src = (img.get("data-src") or img.get("data-lazy-src") or img.get("src") or "").strip()
         if not src:
             continue
         u = _abs_url(page_url, src)
-        ul = u.lower()
-
-        # Hard exclusions (site chrome / placeholders)
-        if "page_top" in ul or "noimage" in ul or "loading" in ul:
+        if not _looks_like_listing_photo(u):
             continue
-        if any(bad in ul for bad in ["logo", "icon", "sprite", "common/", "/common", "header", "footer", "btn"]):
-            continue
-
-        # Prefer real photos
-        if not re.search(r"\.(jpg|jpeg|png|webp)(\?|$)", ul):
-            continue
-
         candidates.append(u)
 
     if not candidates:
         return None
 
+    # De-dupe preserving order
+    candidates = list(dict.fromkeys(candidates))
+
+    # If we know room_id, keep only images for that room_id when possible
+    if room_id:
+        rid_re = re.compile(rf"/bkn/{re.escape(room_id)}[_-]")
+        exact = [u for u in candidates if rid_re.search(u)]
+        if exact:
+            candidates = exact
+
     def rank(u: str) -> Tuple[int, int, int]:
         ul = u.lower()
         s = 0
-        # Aoba pages often use img-asp CDN for listing photos
         if "img-asp.jp/bkn/" in ul:
-            s += 50
-        if "room" in ul:
-            s += 20
+            s += 60
+        if room_id and re.search(rf"/bkn/{re.escape(room_id)}[_-]", ul):
+            s += 80
         if "upload" in ul or "uploads" in ul:
             s += 10
         # Avoid picking floorplans as the main photo
-        if "madori" in ul or "floor" in ul or "plan" in ul:
-            s -= 10
-        # Prefer shorter URLs if tie (usually the primary)
+        if any(k in ul for k in ["madori", "floor", "plan"]):
+            s -= 15
+        # Prefer shorter URLs if tie (often the primary)
         return (s, -len(ul), 0)
 
-    candidates = list(dict.fromkeys(candidates))
     candidates.sort(key=rank, reverse=True)
     return candidates[0]
-
 
 def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_type: str) -> Tuple[Optional[dict], bool]:
     r = request(session, detail_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
@@ -1508,14 +1560,29 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
 
     sea_score = 4 if sea_view else (3 if walk_to_sea else 0)
 
-    # Image: prefer within scope; fallback to whole page
-    image_url = _aoba_pick_image_url(scope, detail_url) or _aoba_pick_image_url(soup, detail_url)
+        # Image: prefer og:image; otherwise pick from the main scope.
+    og_image = None
+    try:
+        mtag = soup.find("meta", property="og:image")
+        if mtag and mtag.get("content"):
+            og_image = mtag.get("content")
+    except Exception:
+        og_image = None
 
-    # If the fallback grabbed a generic site image, drop it
-    if image_url and any(bad in image_url.lower() for bad in ["page_top", "logo", "icon", "sprite"]):
-        image_url = None
+    image_url = (
+        _aoba_pick_image_url(scope, detail_url, room_id=room_id, og_image=og_image)
+        or _aoba_pick_image_url(soup, detail_url, room_id=room_id, og_image=og_image)
+    )
 
-    # Titles (keep simple and consistent with other sources)
+    # Drop obvious chrome/placeholder or mismatched IDs
+    if image_url:
+        ul = image_url.lower()
+        if any(bad in ul for bad in ["page_top", "logo", "icon", "sprite", "noimage", "loading"]):
+            image_url = None
+        if room_id and image_url and ("img-asp.jp/bkn/" in ul) and (not re.search(rf"/bkn/{re.escape(room_id)}[_-]", ul)):
+            image_url = None
+
+# Titles (keep simple and consistent with other sources)
     type_jp = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, "物件")
     no_part = f"No.{room_id}" if room_id else "No."
     title = f"{city} {type_jp} {no_part}".strip()
