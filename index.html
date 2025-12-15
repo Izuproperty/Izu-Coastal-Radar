@@ -14,6 +14,7 @@
       --accent: #0a84ff;
       --tag-sea: #0a84ff;
       --tag-onsen: #ff453a;
+      --tag-new: #30d158;
       --border: #333;
       --footer-bg: #0b0b0c;
       --footer-border: #1f1f21;
@@ -74,14 +75,25 @@
     .ov-type { background: rgba(0,0,0,0.6); }
     .ov-sea { background: var(--tag-sea); }
     .ov-onsen { background: var(--tag-onsen); }
+    .ov-new { background: var(--tag-new); }
 
     .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
     .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 10px; }
     .card-price { font-size: 1.5rem; font-weight: 700; color: #fff; }
     .card-age { background: #333; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: #ccc; white-space: nowrap; }
 
-    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: #ddd; text-decoration: none; line-height: 1.4; }
+    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; color: #ddd; text-decoration: none; line-height: 1.4; }
     .card-title:hover { color: var(--accent); }
+
+    .card-event {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .card-event strong {
+      color: #e6e6ea;
+      font-weight: 700;
+    }
 
     .card-metrics { display: flex; gap: 15px; color: var(--text-secondary); font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #333; margin-bottom: 15px; flex-wrap: wrap; }
     .metric span { color: #fff; font-weight: 600; }
@@ -266,9 +278,11 @@
       unit: "Price / Unit",
       seaTag: "SEA VIEW",
       onsenTag: "ONSEN",
+      newTag: "NEW!",
       landLabel: "Land",
       usefulLinks: "Useful Izu Links",
-      fxLabel: "FX"
+      fxLabel: "FX",
+      eventLabel: "Update"
     },
     JP: {
       subtitle: "市場インテリジェンス：下田・南伊豆",
@@ -285,9 +299,11 @@
       unit: "単価",
       seaTag: "海眺望",
       onsenTag: "温泉",
+      newTag: "新着",
       landLabel: "土地",
       usefulLinks: "役立つ伊豆リンク",
-      fxLabel: "為替"
+      fxLabel: "為替",
+      eventLabel: "更新"
     },
     CN: {
       subtitle: "市场情报：下田与南伊豆",
@@ -304,9 +320,11 @@
       unit: "单价",
       seaTag: "海景",
       onsenTag: "温泉",
+      newTag: "新",
       landLabel: "土地",
       usefulLinks: "伊豆实用链接",
-      fxLabel: "汇率"
+      fxLabel: "汇率",
+      eventLabel: "更新"
     }
   };
 
@@ -316,9 +334,40 @@
     CN: { house: "独栋", mansion: "公寓", land: "土地" }
   };
 
+  const EVENT_TYPE_MAP = {
+    "新規登録": { EN: "New listing", JP: "新規登録", CN: "新上架" },
+    "価格変更": { EN: "Price change", JP: "価格変更", CN: "价格调整" },
+    "写真変更": { EN: "Photos updated", JP: "写真変更", CN: "照片更新" },
+    "情報更新": { EN: "Info updated", JP: "情報更新", CN: "信息更新" },
+    "商談中":   { EN: "Under negotiation", JP: "商談中", CN: "洽谈中" },
+    "成約":     { EN: "Sold", JP: "成約", CN: "已成交" }
+  };
+
+  async function fetchJsonNoStore(url) {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to fetch ${url} (${res.status})`);
+    return res.json();
+  }
+
+  async function loadBuildInfo() {
+    // Support either buildInfo.json or buildinfo.json (case differences)
+    try {
+      return await fetchJsonNoStore("buildInfo.json");
+    } catch (_) {
+      try {
+        return await fetchJsonNoStore("buildinfo.json");
+      } catch (_) {
+        return null;
+      }
+    }
+  }
+
   async function init() {
     try {
-      const res = await fetch('listings.json?v=' + Date.now());
+      const build = await loadBuildInfo();
+      const v = (build && build.generatedAt) ? encodeURIComponent(build.generatedAt) : Date.now();
+
+      const res = await fetch('listings.json?v=' + v, { cache: "no-store" });
       if (!res.ok) throw new Error("JSON not found");
       const json = await res.json();
       if (!json || !Array.isArray(json.listings)) throw new Error("Invalid JSON structure");
@@ -331,7 +380,9 @@
       DATA.fxUsdJpy = json.fxRateUsd || json.fxRate || 155;
       DATA.fxCnyJpy = json.fxRateCny || 20;
       DATA.fxSource = json.fxSource || "Manual";
-      DATA.generatedAt = json.generatedAt || null;
+
+      // Prefer buildInfo.json generatedAt (new), fall back to listings.json generatedAt (legacy)
+      DATA.generatedAt = (build && build.generatedAt) ? build.generatedAt : (json.generatedAt || null);
 
       updateToggles();
       updateLabels();
@@ -552,6 +603,38 @@
     return "";
   }
 
+  function isNewListing(listing, hours = 24) {
+    if (!listing || !listing.firstSeen) return false;
+    const t = Date.parse(listing.firstSeen);
+    if (!Number.isFinite(t)) return false;
+    return (Date.now() - t) < hours * 60 * 60 * 1000;
+  }
+
+  function formatEventDate(dateStr) {
+    // Expect YYYY-MM-DD; show JP as YYYY.MM.DD for readability
+    if (!dateStr) return "";
+    const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return String(dateStr);
+    const y = m[1], mm = m[2], dd = m[3];
+    if (STATE.lang === "JP") return `${y}.${mm}.${dd}`;
+    return `${y}-${mm}-${dd}`;
+  }
+
+  function formatEventText(listing) {
+    if (!listing || !listing.eventDate || !listing.eventTypeJp) return "";
+    const t = TXT[STATE.lang];
+
+    const jpType = String(listing.eventTypeJp);
+    const labelObj = EVENT_TYPE_MAP[jpType] || { EN: jpType, JP: jpType, CN: jpType };
+    const label = labelObj[STATE.lang] || jpType;
+
+    const d = formatEventDate(listing.eventDate);
+    if (!d) return "";
+
+    // e.g., "Update: Price change • 2025-12-14"
+    return `<strong>${t.eventLabel}:</strong> ${label} • ${d}`;
+  }
+
   function renderListings(items) {
     const container = document.getElementById('listings-container');
     const t = TXT[STATE.lang];
@@ -576,12 +659,16 @@
       const ageInfo = ageBadge ? `<div class="card-age">${ageBadge}</div>` : '';
 
       let tagsHtml = `<span class="ov-tag ov-type">${typeLabel}</span>`;
+      if (isNewListing(l, 24)) tagsHtml += `<span class="ov-tag ov-new">${t.newTag}</span>`;
       if ((l.seaViewScore || 0) >= 4) tagsHtml += `<span class="ov-tag ov-sea">${t.seaTag}</span>`;
       if ((l.highlightTags || []).includes("Onsen")) tagsHtml += `<span class="ov-tag ov-onsen">${t.onsenTag}</span>`;
 
       let metrics = [];
       if (l.propertyType !== "land" && l.buildingSqm) metrics.push(`<span>${Math.round(l.buildingSqm)}</span> m²`);
       if (l.landSqm) metrics.push(`${t.landLabel} <span>${Math.round(l.landSqm)}</span> m²`);
+
+      const eventText = formatEventText(l);
+      const eventHtml = eventText ? `<div class="card-event">${eventText}</div>` : '';
 
       const card = `
         <div class="card">
@@ -597,6 +684,7 @@
               ${ageInfo}
             </div>
             <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="card-title">${title}</a>
+            ${eventHtml}
             <div class="card-metrics">
               ${metrics.map(m => `<div class="metric">${m}</div>`).join('<div style="color:#333">|</div>')}
             </div>
