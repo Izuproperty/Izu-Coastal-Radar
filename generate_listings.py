@@ -49,6 +49,10 @@ MAPLE_EXCLUDE_AREAS = ["熱海～網代", "宇佐美～伊東", "川奈～富戸
 MAPLE_EXCLUDE_CITIES_JP = ["伊豆市", "伊東市", "静岡市"]
 
 
+
+# Maple politeness / performance tuning (lower = faster, but be respectful)
+MAPLE_SLEEP_DETAIL = 0.20
+MAPLE_SLEEP_PAGE = 0.20
 MOBILE_HOME = "https://www.izutaiyo.co.jp/sp/"
 MOBILE_SEARCH_RESULTS = "https://www.izutaiyo.co.jp/sp/sa.php"
 
@@ -336,7 +340,7 @@ def scrape_new_arrivals_events(session: requests.Session, max_pages: int = 6) ->
 
             events[hpno] = {"eventTypeJp": et, "eventDate": d_norm}
 
-        time.sleep(0.4)
+        time.sleep(MAPLE_SLEEP_DETAIL)
 
     return events
 
@@ -765,16 +769,21 @@ def _parse_sqm(text: str, key_variants: List[str]) -> Optional[float]:
         return None
 
 def _parse_city(text: str) -> str:
-    """Extract 市/町/村 token from '所在地' lines (e.g., 伊東市八幡野 -> 伊東市)."""
+    """
+    Extract 市/町/村 from the listing's own 所在地 field.
+
+    Important: do NOT fall back to scanning the full page for a city token, because Maple pages
+    include the company's office address (e.g., 伊東市...) in the footer, which would incorrectly
+    label/exclude unrelated listings.
+    """
     t = (text or "")
-    m = re.search(r"所在地\s*[:：]?\s*([^\s　]+)", t)
-    if m:
-        loc = m.group(1)
-        m2 = re.search(r"(.+?(?:市|町|村))", loc)
-        if m2:
-            return m2.group(1)
-    m = re.search(r"([^\s　]+?(?:市|町|村))", t)
-    return m.group(1) if m else ""
+    # Capture a short chunk after 所在地 / 物件所在地
+    m = re.search(r"(?:物件所在地|所在地)\s*[:：]?\s*([^\s　]{1,40})", t)
+    if not m:
+        return ""
+    loc = m.group(1).strip()
+    m2 = re.search(r"(.+?(?:市|町|村))", loc)
+    return m2.group(1) if m2 else ""
 
 def _parse_year_built(text: str) -> Optional[int]:
     t = text or ""
@@ -876,13 +885,24 @@ def _maple_context_text(a_tag) -> str:
     return clean_text(a_tag.get_text(" ", strip=True))
 
 def _maple_is_excluded_area(text: str) -> bool:
+    """
+    Exclude broad Maple "area bucket" regions (e.g., 熱海～網代).
+    Note: this must NOT check cities by naive substring against full page text, because
+    Maple pages include the company's office address in the footer (e.g., 伊東市...), which
+    would incorrectly exclude every listing.
+    """
     t = text or ""
+    return any(a in t for a in MAPLE_EXCLUDE_AREAS)
+
+def _maple_context_is_excluded(card_text: str) -> bool:
+    """Safe exclusion using list-card context (avoids site-wide footer address contamination)."""
+    t = card_text or ""
     return any(a in t for a in MAPLE_EXCLUDE_AREAS) or any(c in t for c in MAPLE_EXCLUDE_CITIES_JP)
 
 def _maple_should_fetch_detail(card_text: str) -> bool:
     """Heuristic prefilter to limit detail page fetches."""
     t = card_text or ""
-    if _maple_is_excluded_area(t):
+    if _maple_context_is_excluded(t):
         return False
     if any(k in t for k in ["眺望", "海", "海岸", "浜", "ビーチ", "徒歩", "オーシャン", "海一望"]):
         return True
@@ -912,6 +932,10 @@ def _maple_collect_detail_links(soup: BeautifulSoup, list_url: str, listing_slug
         if pu.path.rstrip("/") == root_path or pu.path.rstrip("/") == f"{root_path}/page":
             continue
         u = u.split("#", 1)[0]
+
+        # Keep only likely "detail" links: /estate_db/<digits...> or ?p=<digits>
+        if not re.search(r"/estate_db/\d", pu.path) and not re.search(r"(?:^|&)p=\d{3,}(?:&|$)", pu.query):
+            continue
 
         if u in seen:
             continue
@@ -1053,6 +1077,9 @@ def scrape_maple(
     failures: List[str] = []
     filtered_out = 0
 
+    # De-dupe detail pages across Maple categories/types
+    seen_detail_global: Set[str] = set()
+
     for ptype, slug in MAPLE_LISTING_TYPES.items():
         start_url = f"{MAPLE_ROOT}{slug}/"
         print(f"  - Maple: scanning {ptype} ({start_url})")
@@ -1066,8 +1093,6 @@ def scrape_maple(
 
         max_page_detected = _maple_find_max_page(soup0)
         page_limit = min(max_pages_per_type, max_page_detected if max_page_detected > 0 else max_pages_per_type)
-
-        seen_detail: Set[str] = set()
 
         for page in range(1, page_limit + 1):
             list_url = start_url if page == 1 else f"{start_url}page/{page}/"
@@ -1086,12 +1111,12 @@ def scrape_maple(
             filtered_links = [(u, ctx) for (u, ctx) in links if _maple_should_fetch_detail(ctx)]
             if len(filtered_links) < 3:
                 # Keep all non-excluded on that page
-                filtered_links = [(u, ctx) for (u, ctx) in links if not _maple_is_excluded_area(ctx)]
+                filtered_links = [(u, ctx) for (u, ctx) in links if not _maple_context_is_excluded(ctx)]
 
             for detail_url, ctx in filtered_links:
-                if detail_url in seen_detail:
+                if detail_url in seen_detail_global:
                     continue
-                seen_detail.add(detail_url)
+                seen_detail_global.add(detail_url)
 
                 try:
                     item, kept = parse_maple_detail_page(session, detail_url, ptype)
@@ -1110,9 +1135,9 @@ def scrape_maple(
                 except Exception:
                     failures.append(detail_url)
 
-                time.sleep(0.4)
+                time.sleep(MAPLE_SLEEP_DETAIL)
 
-            time.sleep(0.3)
+            time.sleep(MAPLE_SLEEP_PAGE)
 
     return listings, failures, filtered_out
 
