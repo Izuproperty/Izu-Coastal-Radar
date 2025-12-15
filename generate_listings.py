@@ -959,7 +959,12 @@ def _maple_collect_detail_links(soup: BeautifulSoup, list_url: str, listing_slug
     return out
 
 def _maple_find_max_page(soup: BeautifulSoup) -> int:
-    """Best-effort detection of last /page/<n>/ from pagination links."""
+    """Best-effort detection of last page number from pagination links.
+
+    Maple/WordPress can emit either:
+      - /page/<n>/
+      - ?paged=<n>
+    """
     mx = 1
     for a in soup.find_all("a", href=True):
         href = a.get("href") or ""
@@ -969,8 +974,15 @@ def _maple_find_max_page(soup: BeautifulSoup) -> int:
                 mx = max(mx, int(m.group(1)))
             except Exception:
                 pass
-    return mx
+            continue
 
+        m2 = re.search(r"[?&]paged=(\d+)", href)
+        if m2:
+            try:
+                mx = max(mx, int(m2.group(1)))
+            except Exception:
+                pass
+    return mx
 
 def _maple_clean_menu_artifact(s: str) -> str:
     if not s:
@@ -1169,79 +1181,116 @@ def scrape_maple(
     prev_first_seen: Dict[str, str],
     max_pages_per_type: int = 12,
 ) -> Tuple[List[dict], List[str], int]:
-    """Scrape Maple Housing and return (listings, failures, filtered_out_count)."""
+    """Scrape Maple Housing and return (listings, failures, filtered_out_count).
+
+    Notes:
+      - Maple list pagination can be /page/<n>/ or ?paged=<n>.
+      - We keep the scrape bounded via max_pages_per_type and per-page candidate caps.
+    """
     listings: List[dict] = []
     failures: List[str] = []
     filtered_out = 0
+
+    # De-dupe across all Maple types (house/land/mansion)
+    seen_detail_global: Set[str] = set()
+
+    def _fetch_list_soup(list_url: str) -> Optional[BeautifulSoup]:
+        try:
+            r = request(session, list_url, headers=HEADERS_DESKTOP, retries=3, timeout=25)
+            return BeautifulSoup(r.text or "", "html.parser")
+        except Exception:
+            failures.append(list_url)
+            return None
 
     for ptype, slug in MAPLE_LISTING_TYPES.items():
         start_url = f"{MAPLE_ROOT}{slug}/"
         print(f"  - Maple: scanning {ptype} ({start_url})")
 
-        try:
-            r0 = request(session, start_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
-            soup0 = BeautifulSoup(r0.text or "", "html.parser")
-        except Exception:
-            failures.append(start_url)
+        # Fetch page 1 once and reuse (also for pagination detection)
+        soup0 = _fetch_list_soup(start_url)
+        if not soup0:
             continue
 
         max_page_detected = _maple_find_max_page(soup0)
-        page_limit = min(max_pages_per_type, max_page_detected if max_page_detected > 0 else max_pages_per_type)
 
-        seen_detail: Set[str] = set()
+        # If pagination detection fails (mx==1), still probe up to max_pages_per_type.
+        page_limit = max_pages_per_type if max_page_detected <= 1 else min(max_pages_per_type, max_page_detected)
 
         for page in range(1, page_limit + 1):
-            list_url = start_url if page == 1 else f"{start_url}page/{page}/"
-            try:
-                r = request(session, list_url, headers=HEADERS_DESKTOP, retries=3, timeout=25)
-            except Exception:
-                failures.append(list_url)
-                continue
+            if page == 1:
+                soup = soup0
+                list_url_used = start_url
+            else:
+                # Try both pagination schemes.
+                url_candidates = [
+                    f"{start_url}page/{page}/",
+                    f"{start_url}?paged={page}",
+                ]
+                soup = None
+                list_url_used = url_candidates[0]
+                for cand in url_candidates:
+                    s = _fetch_list_soup(cand)
+                    if not s:
+                        continue
+                    # Confirm it contains any detail links; if not, try the other scheme
+                    links_probe = _maple_collect_detail_links(s, cand, slug)
+                    if links_probe:
+                        soup = s
+                        list_url_used = cand
+                        break
+                if not soup:
+                    # No page content found in either scheme -> stop scanning this type
+                    break
 
-            soup = BeautifulSoup(r.text or "", "html.parser")
-            links = _maple_collect_detail_links(soup, list_url, slug)
+            links = _maple_collect_detail_links(soup, list_url_used, slug)
             if not links:
+                # If we are probing beyond detected pagination, stop cleanly.
                 break
 
-            # Prefilter to limit detail fetches; loosen if it gets too strict.
+            # Prefilter to limit detail fetches; fall back to a small sample when cards are sparse.
             filtered_links = [(u, ctx) for (u, ctx) in links if _maple_should_fetch_detail(ctx)]
-            # Cap per-page work to keep the Maple scrape bounded
-            filtered_links = filtered_links[:12]
+            filtered_links = filtered_links[:20]  # increased recall, still bounded
 
-            if len(filtered_links) < 2:
+            if len(filtered_links) < 3:
                 # Keep a small sample of non-excluded links on that page (helps when list cards are sparse)
                 filtered_links = [
                     (u, ctx) for (u, ctx) in links
                     if (not _maple_is_excluded_area(ctx)) and (not any(c in (ctx or "") for c in MAPLE_EXCLUDE_CITIES_JP))
-                ][:10]
+                ][:15]
 
-            for detail_url, ctx in filtered_links:
-                if detail_url in seen_detail:
+            for detail_url, _ctx in filtered_links:
+                if detail_url in seen_detail_global:
                     continue
-                seen_detail.add(detail_url)
+                seen_detail_global.add(detail_url)
 
                 try:
                     item, kept = parse_maple_detail_page(session, detail_url, ptype)
-                    if not kept or not item:
+                    if not kept:
                         filtered_out += 1
                         continue
+                    if not item:
+                        failures.append(detail_url)
+                        continue
 
-                    item_id = item.get("id")
-                    if item_id and item_id in prev_first_seen:
-                        item["firstSeen"] = prev_first_seen[item_id]
-                    else:
-                        item["firstSeen"] = now_iso
+                    # firstSeen / NEW! support
+                    mid = item.get("id")
+                    if isinstance(mid, str) and mid:
+                        if mid in prev_first_seen:
+                            item["firstSeen"] = prev_first_seen[mid]
+                        else:
+                            item["firstSeen"] = now_iso
 
                     listings.append(item)
 
                 except Exception:
                     failures.append(detail_url)
 
-                time.sleep(0.25)
+                time.sleep(0.18)  # polite but slightly faster than 0.25
 
-            time.sleep(0.15)
+            time.sleep(0.10)
 
     return listings, failures, filtered_out
+
 
 # ---------------------------
 # Main
