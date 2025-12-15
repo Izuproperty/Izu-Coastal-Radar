@@ -545,7 +545,8 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
 
     # title
     h1 = soup.find(["h1", "h2"])
-    title = clean_title(h1.get_text(" ", strip=True) if h1 else hpno)
+    detail_title = clean_text(h1.get_text(" ", strip=True) if h1 else hpno)
+    title = clean_title(detail_title)
 
     # city
     city = ""
@@ -1380,8 +1381,10 @@ def main() -> None:
 
             listings.append(item)
 
-        except Exception:
+        except Exception as e:
             failures.append(canonical_detail_url(hpno))
+            if len(failures) <= 3:
+                print(f"  - Failed {hpno}: {e}")
 
         if i % 10 == 0:
             print(f"  ...{i}/{len(hpnos)}")
