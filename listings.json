@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-15T14:38:39Z",
+  "generatedAt": "2025-12-15T18:39:33Z",
   "fxRate": 155,
   "listings": [
     {
@@ -686,6 +686,7 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2023/06/6383-1-1.jpg",
       "highlightTags": [
         "Sea View",
+        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-15T05:34:27Z"
@@ -707,7 +708,8 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/12/6662-1.jpg",
       "highlightTags": [
-        "Sea View"
+        "Sea View",
+        "Onsen"
       ],
       "firstSeen": "2025-12-15T05:56:38Z"
     },
@@ -840,28 +842,6 @@
         "Onsen"
       ],
       "firstSeen": "2025-12-15T11:57:12Z"
-    },
-    {
-      "id": "aoba-99459257",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b1/bknarea-ao22301/room99459257.html",
-      "title": "東伊豆町 マンション No.99459257",
-      "titleEn": "Higashi-Izu Town Mansion No.99459257",
-      "propertyType": "mansion",
-      "city": "東伊豆町",
-      "priceJpy": 2600000,
-      "landSqm": null,
-      "buildingSqm": null,
-      "yearBuilt": 1975,
-      "age": 50,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/99459257_1_500_500_3.jpg?t=1765413872",
-      "highlightTags": [
-        "Sea View",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-15T13:10:36Z"
     },
     {
       "id": "aoba-98691144",
@@ -1017,16 +997,16 @@
     }
   ],
   "stats": {
-    "count": 48,
+    "count": 47,
     "izutaiyoCount": 25,
     "mapleCount": 10,
-    "aobaCount": 13,
+    "aobaCount": 12,
     "tokusenHpnoCount": 14,
     "searchAddedHpnoCount": 26,
     "rawHpnoCount": 40,
     "filteredOutSearchOnly": 15,
     "mapleFilteredOut": 143,
-    "aobaFilteredOut": 254,
+    "aobaFilteredOut": 255,
     "failures": 0
   },
   "failures": []
