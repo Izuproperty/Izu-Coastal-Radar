@@ -21,10 +21,11 @@ from __future__ import annotations
 import json
 import re
 import time
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
-from urllib.parse import parse_qs, urljoin, urlparse
+from urllib.parse import parse_qs, urljoin, urlparse, unquote
 
 import requests
 from bs4 import BeautifulSoup
@@ -336,7 +337,7 @@ def scrape_new_arrivals_events(session: requests.Session, max_pages: int = 6) ->
 
             events[hpno] = {"eventTypeJp": et, "eventDate": d_norm}
 
-        time.sleep(0.4)
+        time.sleep(0.25)
 
     return events
 
@@ -692,6 +693,7 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
         "id": f"izutaiyo-{hpno}",
         "sourceUrl": url,
         "title": title,
+        "detailTitle": detail_title,
         "titleEn": title_en,
         "propertyType": ptype,
         "city": city,
@@ -902,9 +904,13 @@ def _maple_should_fetch_detail(card_text: str) -> bool:
     t = card_text or ""
     if _maple_is_excluded_area(t):
         return False
+    # Quick city exclusion based on listing card text (reduces detail fetches)
+    if any(c in t for c in MAPLE_EXCLUDE_CITIES_JP):
+        return False
     if any(k in t for k in ["眺望", "海", "海岸", "浜", "ビーチ", "徒歩", "オーシャン", "海一望"]):
         return True
     return False
+
 
 def _maple_collect_detail_links(soup: BeautifulSoup, list_url: str, listing_slug: str) -> List[Tuple[str, str]]:
     """Return list of (detail_url, context_text) from a Maple list page."""
@@ -1083,8 +1089,20 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
         stable = re.sub(r"[^a-zA-Z0-9]+", "-", stable).strip("-")
         item_id = f"maple-{stable}" if stable else f"maple-{abs(hash(detail_url))}"
 
-    # Title
-    title = _maple_extract_title(soup, detail_url, page_text, no)
+    # Title (concise card title; preserve verbose headline separately)
+    detail_title = _maple_extract_title(soup, detail_url, page_text, no)
+
+    ptype_jp = {"house": "戸建", "land": "土地", "mansion": "マンション"}.get(property_type, property_type)
+
+    if city and no:
+        title = f"{city} {ptype_jp} No.{no}"
+    elif city:
+        title = f"{city} {ptype_jp}"
+    elif no:
+        title = f"{ptype_jp} No.{no}"
+    else:
+        title = f"{ptype_jp}"
+
     # Price
     price_jpy = None
     m = re.search(r"価格[^0-9]{0,10}([0-9,]+\s*億\s*[0-9,]*\s*万?\s*円|[0-9,]+\s*万\s*円|[0-9,]+\s*万円)", page_text)
@@ -1116,11 +1134,12 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
 
     image_url = _maple_pick_image_url(soup, detail_url)
 
-    title_en = title
-    if city and city in CITY_EN_MAP:
-        title_en = re.sub(re.escape(city), CITY_EN_MAP[city], title_en)
-        if title_en == title:
-            title_en = f"{CITY_EN_MAP[city]} {title}"
+    # English title: do not attempt to translate long Japanese marketing copy;
+    # keep it consistent and readable in EN mode.
+    ptype_en = {"house": "House", "land": "Land", "mansion": "Condo"}.get(property_type, str(property_type).title())
+    city_en = CITY_EN_MAP.get(city, city or "Izu")
+    title_en = f"{city_en} {ptype_en} No.{no}" if no else f"{city_en} {ptype_en}"
+    title_en = clean_text(title_en)
 
     item = {
         "id": item_id,
@@ -1186,9 +1205,15 @@ def scrape_maple(
 
             # Prefilter to limit detail fetches; loosen if it gets too strict.
             filtered_links = [(u, ctx) for (u, ctx) in links if _maple_should_fetch_detail(ctx)]
-            if len(filtered_links) < 3:
-                # Keep all non-excluded on that page
-                filtered_links = [(u, ctx) for (u, ctx) in links if not _maple_is_excluded_area(ctx)]
+            # Cap per-page work to keep the Maple scrape bounded
+            filtered_links = filtered_links[:12]
+
+            if len(filtered_links) < 2:
+                # Keep a small sample of non-excluded links on that page (helps when list cards are sparse)
+                filtered_links = [
+                    (u, ctx) for (u, ctx) in links
+                    if (not _maple_is_excluded_area(ctx)) and (not any(c in (ctx or "") for c in MAPLE_EXCLUDE_CITIES_JP))
+                ][:10]
 
             for detail_url, ctx in filtered_links:
                 if detail_url in seen_detail:
@@ -1212,9 +1237,9 @@ def scrape_maple(
                 except Exception:
                     failures.append(detail_url)
 
-                time.sleep(0.4)
+                time.sleep(0.25)
 
-            time.sleep(0.3)
+            time.sleep(0.15)
 
     return listings, failures, filtered_out
 
@@ -1324,8 +1349,9 @@ def main() -> None:
             prev_first_seen=prev_first_seen,
         )
         print(f"  - Maple: kept {len(maple_listings)} listings (filtered out {maple_filtered_out}).")
-    except Exception:
-        print("  - Warning: Maple scrape failed (continuing with Izu Taiyo only).")
+    except Exception as e:
+        print(f"  - Warning: Maple scrape failed (continuing with Izu Taiyo only): {e}")
+        print(traceback.format_exc())
 
     listings.extend(maple_listings)
     failures.extend(maple_failures)
