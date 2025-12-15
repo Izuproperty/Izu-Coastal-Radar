@@ -848,17 +848,45 @@ def _parse_year_built(text: str) -> Optional[int]:
     return None
 
 def _maple_has_onsen(text: str) -> bool:
+    """Detect onsen availability on Maple Housing detail pages.
+
+    Maple commonly expresses onsen as:
+      - 温泉：有/無
+      - 温泉付 / 温泉付き / 温泉つき
+      - 温泉権
+      - 温泉引込 / 温泉引き込み（済/可/可能）
+    """
     t = text or ""
+
     # Prefer explicit field like 温泉：有/無
     m = re.search(r"温泉\s*[:：]\s*([^\s　]+)", t)
     if m:
         v = m.group(1)
-        if any(x in v for x in ["有", "あり", "○"]):
+        if any(x in v for x in ["有", "あり", "○", "可", "可能", "付", "付き"]):
             return True
-        if any(x in v for x in ["無", "なし", "×"]):
+        if any(x in v for x in ["無", "なし", "×", "不可"]):
             return False
-    # Fallback keyword
-    return "温泉" in t and any(x in t for x in ["あり", "有", "源泉", "かけ流し", "掛け流し"])
+
+    # Strong positives that often appear outside the explicit field
+    strong_pos = [
+        "温泉付", "温泉付き", "温泉つき",
+        "温泉権",
+        "温泉引込", "温泉引き込み", "温泉引込み",
+        "源泉", "かけ流し", "掛け流し",
+    ]
+    if any(k in t for k in strong_pos):
+        # If the page explicitly negates onsen near the keyword, treat as no.
+        if re.search(r"温泉[^\n]{0,12}(?:無|なし|不可|×)", t):
+            return False
+        return True
+
+    # Explicit negatives (guarded so we don't match unrelated “不可”)
+    if re.search(r"温泉[^\n]{0,12}(?:無|なし|不可|×)", t):
+        return False
+
+    # Generic fallback
+    return "温泉" in t and any(x in t for x in ["あり", "有", "○"])
+
 
 def _maple_sea_view_and_walk(text: str) -> Tuple[bool, bool]:
     """Heuristic: (sea_view, walk_to_sea). walk_to_sea if <= 20 min on foot or <=1500m."""
