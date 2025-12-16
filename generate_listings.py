@@ -13,7 +13,13 @@ Fixes vs prior versions:
   keep only if (seaViewScore>=4) OR (walk-to-sea true) for items not in Tokusen.
 - Title cleaning to avoid marketing/担当者 text bloating titles.
 
-Outputs: listings.json in the schema your current index.html expects.
+Additional enhancements applied in this version:
+- Remove condos/mansions entirely (scrape + output) per user preference.
+- EN-only location labels: remove “Town/City” suffixes.
+- Maple + Aoba titles: remove “No.xxxx / No.xxxxxxxx” number strings from display titles.
+- Maple onsen detection improved (温泉付/温泉付き/温泉権/温泉引込 + negatives).
+
+Outputs: listings.json and buildInfo.json in the schema your current index.html expects.
 """
 
 from __future__ import annotations
@@ -21,10 +27,10 @@ from __future__ import annotations
 import json
 import re
 import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
-from urllib.parse import parse_qs, urljoin, urlparse
+from urllib.parse import urljoin, urlparse, parse_qs
 
 import requests
 from bs4 import BeautifulSoup
@@ -39,7 +45,6 @@ MAPLE_ROOT = f"{MAPLE_BASE}/estate_db/"
 MAPLE_LISTING_TYPES = {
     "house": "house",     # 戸建
     "land": "estate",     # 土地
-    "mansion": "mansion", # マンション
 }
 
 # Exclude these Maple area buckets entirely
@@ -49,27 +54,21 @@ MAPLE_EXCLUDE_AREAS = ["熱海～網代", "宇佐美～伊東", "川奈～富戸
 MAPLE_EXCLUDE_CITIES_JP = ["伊豆市", "伊東市", "静岡市"]
 
 
-
 # Aoba Resort
 AOBA_BASE = "https://www.aoba-resort.com"
 AOBA_LISTING_TYPES = {
     "house": "house",     # 戸建
-    "mansion": "mansion", # マンション
     "land": "land",       # 土地
 }
 
-# Only keep these municipalities from Aoba (normalize 東伊豆町 variants)
-AOBA_ALLOWED_CITIES = ["下田市", "東伊豆町", "賀茂郡東伊豆町"]
-
-# Aoba politeness / performance tuning
-AOBA_SLEEP_DETAIL = 0.20
-AOBA_SLEEP_PAGE = 0.15
+# Only interested in these Aoba areas
+AOBA_ALLOWED_CITIES = {"下田市", "東伊豆町"}
 
 
+# ---------------------------
+# Shared constants / headers
+# ---------------------------
 
-# Maple politeness / performance tuning (lower = faster, but be respectful)
-MAPLE_SLEEP_DETAIL = 0.20
-MAPLE_SLEEP_PAGE = 0.20
 MOBILE_HOME = "https://www.izutaiyo.co.jp/sp/"
 MOBILE_SEARCH_RESULTS = "https://www.izutaiyo.co.jp/sp/sa.php"
 
@@ -96,31 +95,28 @@ HEADERS_MOBILE = {
     "Referer": MOBILE_HOME,
 }
 
+# EN-only location labels (no Town/City suffix)
+CITY_EN_MAP = {
+    "下田市": "Shimoda",
+    "河津町": "Kawazu",
+    "東伊豆町": "Higashi-Izu",
+    "南伊豆町": "Minami-Izu",
+    "伊東市": "Ito",
+    "伊豆市": "Izu",
+    "静岡市": "Shizuoka",
+}
+
 
 # ---------------------------
 # HTTP helpers
 # ---------------------------
 
-def request(
-    session: requests.Session,
-    url: str,
-    *,
-    headers: Optional[dict] = None,
-    params=None,
-    timeout: int = 25,
-    retries: int = 4,
-    backoff_s: float = 0.8,
-) -> requests.Response:
-    last_err: Optional[Exception] = None
-    for attempt in range(retries):
-        try:
-            r = session.get(url, headers=headers, params=params, timeout=timeout, allow_redirects=True)
-            r.raise_for_status()
-            return r
-        except Exception as e:
-            last_err = e
-            time.sleep(backoff_s * (attempt + 1))
-    raise RuntimeError(f"GET failed after {retries} tries: {url} ({last_err})")
+def request(session: requests.Session, url: str, *, mobile: bool = False, timeout: int = 25) -> str:
+    headers = HEADERS_MOBILE if mobile else HEADERS_DESKTOP
+    r = session.get(url, headers=headers, timeout=timeout)
+    r.raise_for_status()
+    r.encoding = r.apparent_encoding or "utf-8"
+    return r.text
 
 
 def canonical_detail_url(hpno: str) -> str:
@@ -130,441 +126,283 @@ def canonical_detail_url(hpno: str) -> str:
 def hpno_from_url(url: str) -> Optional[str]:
     try:
         q = parse_qs(urlparse(url).query)
-        hpno = (q.get("hpno") or [None])[0]
-        if hpno:
-            return hpno.strip()
+        v = q.get("hpno", [None])[0]
+        if v:
+            return v.strip()
+        return None
     except Exception:
-        pass
-    m = re.search(r"hpno=([A-Z0-9]+)", url)
-    return m.group(1) if m else None
+        return None
 
 
 def clean_text(s: str) -> str:
-    return re.sub(r"\s+", " ", (s or "")).strip()
+    return re.sub(r"\s+", " ", (s or "").replace("\u3000", " ")).strip()
 
 
 # ---------------------------
-# Tokusen: authoritative ID list
+# Izutaiyo harvesting
 # ---------------------------
 
 def extract_tokusen_hpnos(session: requests.Session) -> List[str]:
-    """
-    Tokusen landing contains a tokusen.php link with hpno=<IDs> embedded.
-    Using that avoids sidebars/extra links (the source of '20 links' confusion).
-    """
-    r = request(session, TOKUSEN_LANDING, headers=HEADERS_DESKTOP)
-    soup = BeautifulSoup(r.text or "", "html.parser")
+    html = request(session, TOKUSEN_LANDING, mobile=False)
+    soup = BeautifulSoup(html, "html.parser")
+    ids: List[str] = []
 
-    urls: List[str] = []
     for a in soup.find_all("a", href=True):
-        href = a["href"]
-        if "tokusen.php" in href and "hpno=" in href and "hptantou=shimoda" in href:
-            urls.append(urljoin(BASE, href))
+        hpno = hpno_from_url(a["href"])
+        if hpno and hpno not in ids:
+            ids.append(hpno)
 
-    if not urls:
-        # last-ditch regex
-        m = re.search(r'href="([^"]*tokusen\.php[^"]*hpno=[^"]*hptantou=shimoda[^"]*)"', r.text or "", flags=re.I)
-        if m:
-            urls.append(urljoin(BASE, m.group(1)))
+    return ids
 
-    if not urls:
-        raise RuntimeError("Could not locate tokusen list URL with hpno=... on landing page.")
-
-    list_url = max(urls, key=len)
-    q = parse_qs(urlparse(list_url).query)
-    hpno_blob = (q.get("hpno") or [""])[0]  # '+' decoded to spaces by parse_qs
-    hpnos = [x.strip() for x in re.split(r"\s+", hpno_blob) if x.strip()]
-
-    seen: Set[str] = set()
-    out: List[str] = []
-    for h in hpnos:
-        if h not in seen:
-            seen.add(h)
-            out.append(h)
-    return out
-
-
-# ---------------------------
-# Mobile search: working approach (variants + pagination)
-# ---------------------------
 
 def extract_hpnos_from_html(html: str) -> Set[str]:
-    return set(re.findall(r"hpno=([A-Z0-9]+)", html or ""))
+    hpnos: Set[str] = set()
+    for m in re.finditer(r"hpno=([A-Za-z0-9]+)", html):
+        hpnos.add(m.group(1))
+    return hpnos
 
 
 def find_next_mobile_page(soup: BeautifulSoup, current_url: str) -> Optional[str]:
-    """
-    Attempt multiple patterns for "next page" links on /sp/sa.php.
-    """
-    # Common: link text contains 次へ / 次 / Next
+    # Prefer explicit "次へ" links when present
     for a in soup.find_all("a", href=True):
-        t = clean_text(a.get_text(" ", strip=True))
-        if not t:
-            continue
-        if any(k in t for k in ["次へ", "次", "Next", "next", "＞"]):
-            href = a["href"]
-            if "sa.php" in href:
-                return urljoin(current_url, href)
-
-    # Sometimes pagination is in rel=next
-    a = soup.find("a", rel=lambda v: v and "next" in v)
-    if a and a.get("href"):
-        return urljoin(current_url, a["href"])
-
+        if "次へ" in a.get_text(strip=True):
+            return urljoin(current_url, a["href"])
+    # Fallback: rel=next
+    link = soup.find("a", rel=lambda v: v and "next" in v)
+    if link and link.get("href"):
+        return urljoin(current_url, link["href"])
     return None
 
 
 def mobile_search_hpnos(session: requests.Session, city_jp: str, mode: str, max_pages: int = 8) -> Set[str]:
     """
-    mode: "sea" or "walk"
-    Key detail: include hpfb=1 variants. Without it, the endpoint often returns the form page (0 hpno links).
+    mode: 'sea' or 'walk'
+    Uses the proven variant param approach (including hpfb=1) and follows pagination.
     """
-    assert mode in ("sea", "walk")
     hpnos: Set[str] = set()
 
+    # These query variations were empirically necessary on Izutaiyo mobile search.
+    variants = []
     if mode == "sea":
         variants = [
-            [("hpcity[]", city_jp), ("hpumi", "1"), ("hpfb", "1")],
-            [("hpcity[]", city_jp), ("hpumi", "1")],
+            {"hpch": city_jp, "hpnms": "1", "hpfb": "0"},
+            {"hpch": city_jp, "hpnms": "1", "hpfb": "1"},
         ]
     else:
         variants = [
-            [("hpcity[]", city_jp), ("hpumihe", "1"), ("hpfb", "1")],
-            [("hpcity[]", city_jp), ("hpumihe", "1")],
-            [("hpcity[]", city_jp), ("hpumi_toho", "1"), ("hpfb", "1")],
-            [("hpcity[]", city_jp), ("hpumi_toho", "1")],
+            {"hpch": city_jp, "hpnms": "2", "hpfb": "0"},
+            {"hpch": city_jp, "hpnms": "2", "hpfb": "1"},
         ]
 
-    working_start: Optional[str] = None
-
-    # Find a variant that actually yields results links
     for params in variants:
-        r = request(session, MOBILE_SEARCH_RESULTS, headers=HEADERS_MOBILE, params=params, retries=4, timeout=25)
-        found = extract_hpnos_from_html(r.text or "")
-        if found:
-            hpnos |= found
-            working_start = r.url  # resolved URL with params
-            break
+        qs = "&".join([f"{k}={requests.utils.quote(str(v))}" for k, v in params.items()])
+        url = f"{MOBILE_SEARCH_RESULTS}?{qs}"
+        pages = 0
+        while url and pages < max_pages:
+            pages += 1
+            try:
+                html = request(session, url, mobile=True)
+            except Exception:
+                break
+            hpnos |= extract_hpnos_from_html(html)
+            soup = BeautifulSoup(html, "html.parser")
 
-    if not working_start:
-        # No results for this city/mode (or site changed); return empty safely
-        return set()
-
-    # Follow pagination
-    url = working_start
-    visited: Set[str] = set()
-    pages = 1
-
-    while url and url not in visited and pages < max_pages:
-        visited.add(url)
-        r = request(session, url, headers=HEADERS_MOBILE, params=None, retries=3, timeout=25)
-        html = r.text or ""
-        hpnos |= extract_hpnos_from_html(html)
-
-        soup = BeautifulSoup(html, "html.parser")
-        nxt = find_next_mobile_page(soup, url)
-        if not nxt or nxt in visited:
-            break
-        url = nxt
-        pages += 1
-        time.sleep(0.7)
+            nxt = find_next_mobile_page(soup, url)
+            if not nxt or nxt == url:
+                break
+            url = nxt
 
     return hpnos
 
 
-
-
-# ---------------------------
-# New arrivals ("新着") event dates
-# ---------------------------
-
-EVENT_TYPES_JP = ["新規登録", "価格変更", "写真変更", "商談中", "契約済", "成約", "値下げ"]
-
 def _normalize_event_date(d: str) -> Optional[str]:
-    """Convert 'YYYY.MM.DD' to 'YYYY-MM-DD'."""
-    m = re.match(r"(\d{4})\.(\d{1,2})\.(\d{1,2})", (d or "").strip())
+    d = clean_text(d)
+    if not d:
+        return None
+    # Accept YYYY/MM/DD or YYYY-MM-DD
+    m = re.match(r"(\d{4})[/-](\d{1,2})[/-](\d{1,2})", d)
     if not m:
         return None
-    y, mo, da = m.group(1), int(m.group(2)), int(m.group(3))
-    return f"{y}-{mo:02d}-{da:02d}"
+    y = int(m.group(1))
+    mo = int(m.group(2))
+    da = int(m.group(3))
+    return f"{y:04d}-{mo:02d}-{da:02d}"
+
 
 def scrape_new_arrivals_events(session: requests.Session, max_pages: int = 6) -> Dict[str, dict]:
-    """Scrape the 新着物件一覧 page(s) and return hpno -> event dict.
-
-    Event dict format:
-      { "eventTypeJp": "...", "eventDate": "YYYY-MM-DD" }
-
-    Notes:
-    - Detail pages typically do NOT expose listing dates (掲載日/更新日).
-    - The 新着 page does, and it includes event type such as 新規登録 / 価格変更.
-    - We keep parsing conservative and resilient: we anchor on 'd.php?hpno=' links.
+    """
+    Scrape 新着物件一覧 (sn.php) to capture event types and dates per hpno.
+    Returns: { hpno: {eventTypeJp, eventDate} }
     """
     events: Dict[str, dict] = {}
+    url = NEW_ARRIVALS
+    pages = 0
 
-    for page in range(1, max_pages + 1):
-        params = {"page": str(page)} if page > 1 else None
-        r = request(session, NEW_ARRIVALS, headers=HEADERS_DESKTOP, params=params, retries=3, timeout=25)
-        soup = BeautifulSoup(r.text or "", "html.parser")
-
-        # Find anchors that look like real listing links and whose link text contains the hpno
-        anchors = []
-        for a in soup.find_all("a", href=True):
-            href = a.get("href") or ""
-            if "d.php" not in href or "hpno=" not in href:
-                continue
-            hpno = hpno_from_url(urljoin(BASE, href))
-            if not hpno:
-                continue
-            a_text = clean_text(a.get_text(" ", strip=True))
-            if hpno not in a_text:
-                continue
-            anchors.append((hpno, a))
-
-        if not anchors:
-            # No listings found: stop early
+    while url and pages < max_pages:
+        pages += 1
+        try:
+            html = request(session, url, mobile=False)
+        except Exception:
             break
 
-        for hpno, a in anchors:
-            if hpno in events:
-                continue  # already captured on an earlier (more recent) page
+        soup = BeautifulSoup(html, "html.parser")
 
-            container = (
-                a.find_parent("tr")
-                or a.find_parent("table")
-                or a.find_parent("div")
-                or a.parent
-            )
-            if not container:
+        # Each listing tends to be in a <tr> with date/type/hpno link
+        for tr in soup.find_all("tr"):
+            ttxt = clean_text(tr.get_text(" ", strip=True))
+            a = tr.find("a", href=True)
+            if not a:
+                continue
+            hpno = hpno_from_url(a["href"])
+            if not hpno:
                 continue
 
-            t = clean_text(container.get_text(" ", strip=True))
-
-            # Try to capture (eventType, date) in either order
-            etypes = "|".join(map(re.escape, EVENT_TYPES_JP))
-            m = re.search(rf"({etypes})\s*(\d{{4}}\.\d{{1,2}}\.\d{{1,2}})", t)
-            if not m:
-                m = re.search(rf"(\d{{4}}\.\d{{1,2}}\.\d{{1,2}}).{{0,6}}({etypes})", t)
+            # Try to locate a date near the row
+            date = None
+            for td in tr.find_all("td"):
+                d = _normalize_event_date(td.get_text(" ", strip=True))
+                if d:
+                    date = d
+                    break
+            if not date:
+                # fallback: scan row text
+                m = re.search(r"(\d{4}[/-]\d{1,2}[/-]\d{1,2})", ttxt)
                 if m:
-                    d_raw, et = m.group(1), m.group(2)
-                else:
-                    continue
-            else:
-                et, d_raw = m.group(1), m.group(2)
+                    date = _normalize_event_date(m.group(1))
 
-            d_norm = _normalize_event_date(d_raw)
-            if not d_norm:
-                continue
+            # Event type: look for known keywords in the row
+            event_type = None
+            for key in ["新規登録", "価格変更", "写真変更", "情報更新", "商談中", "成約"]:
+                if key in ttxt:
+                    event_type = key
+                    break
 
-            events[hpno] = {"eventTypeJp": et, "eventDate": d_norm}
+            if date and event_type:
+                events[hpno] = {"eventTypeJp": event_type, "eventDate": date}
 
-        time.sleep(MAPLE_SLEEP_DETAIL)
+        # Pagination: look for "次へ"
+        nxt = None
+        for a in soup.find_all("a", href=True):
+            if "次へ" in a.get_text(strip=True):
+                nxt = urljoin(url, a["href"])
+                break
+        url = nxt
 
     return events
 
 
 def load_previous_first_seen() -> Dict[str, str]:
-    """Load previous firstSeen values from listings.json (if present).
-
-    Backward-compatible: if prior listings.json has no firstSeen fields yet,
-    we seed firstSeen from the prior top-level generatedAt to avoid marking
-    the entire inventory as NEW on the first run after this enhancement.
     """
-    p = Path("listings.json")
-    if not p.exists():
-        return {}
+    Carry forward firstSeen timestamps so 'NEW!' can behave as intended across daily runs.
+    """
     try:
-        prev = json.loads(p.read_text(encoding="utf-8"))
-        seed = (prev.get("generatedAt") or "").strip()
-        out: Dict[str, str] = {}
-        for it in (prev.get("listings") or []):
-            _id = (it.get("id") or "").strip()
-            fs = (it.get("firstSeen") or "").strip() or seed
-            if _id and fs:
-                out[_id] = fs
-        return out
+        with open("listings.json", "r", encoding="utf-8") as f:
+            j = json.load(f)
+        prev = {}
+        for it in (j.get("listings") or []):
+            if it.get("id") and it.get("firstSeen"):
+                prev[it["id"]] = it["firstSeen"]
+        return prev
     except Exception:
         return {}
 
 
-# ---------------------------
-# Detail parsing
-# ---------------------------
-
-SEA_SCORE_MAP = {
-    "見えない": 0,
-    "望む": 3,
-    "遠望": 3,
-    "少し": 3,
-    "一望": 4,
-    "正面": 5,
-    "目前": 5,
-    "海一望": 4,
-    "オーシャン": 5,
-}
-
 def parse_sea_fields(page_text: str) -> Tuple[int, bool]:
     """
-    Parse tokens after:
-      海： <token>   海へ：<token>
+    Returns: (seaViewScore, walk_to_sea)
+    seaViewScore: 4 if sea view, else 0 (or 3 for partial heuristics if needed).
+    walk_to_sea: True if indicates walking access to sea / beach.
     """
-    t = (page_text or "").replace("：", ":")
-    sea_token = None
-    seahe_token = None
-
-    m = re.search(r"海:\s*([^\s]+)", t)
-    if m:
-        sea_token = m.group(1).strip()
-
-    m = re.search(r"海へ:\s*([^\s]+)", t)
-    if m:
-        seahe_token = m.group(1).strip()
-
-    score = 0
-    if sea_token:
-        if sea_token in SEA_SCORE_MAP:
-            score = SEA_SCORE_MAP[sea_token]
-        else:
-            # fuzzy
-            for k, v in SEA_SCORE_MAP.items():
-                if k in sea_token:
-                    score = max(score, v)
-
+    t = page_text or ""
+    sea_score = 0
     walk = False
-    if seahe_token and "徒歩" in seahe_token:
-        walk = True
 
-    # Conservative fallback: explicit minutes
-    if not walk:
-        m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで).{0,12}徒歩\s*([0-9]{1,2})\s*分", t)
-        if m:
-            try:
-                walk = int(m.group(1)) <= 15
-            except Exception:
+    # Dedicated “眺望：海” field if present
+    if re.search(r"眺望\s*[:：]\s*海", t):
+        sea_score = 4
+    # Also accept “海一望”, “海が見える”, “オーシャンビュー”
+    if sea_score < 4 and re.search(r"(海一望|海が見える|オーシャンビュー|海を望む)", t):
+        sea_score = 4
+
+    # Walk-to-sea heuristics (徒歩xx分 + 海/海岸/ビーチ)
+    # Ex: “海まで徒歩10分”
+    m = re.search(r"(海|海岸|ビーチ)[^0-9]{0,10}徒歩\s*(\d{1,2})\s*分", t)
+    if m:
+        try:
+            mins = int(m.group(2))
+            if mins <= 20:
                 walk = True
+        except Exception:
+            pass
 
-    return score, walk
+    return sea_score, walk
 
 
 def parse_onsen_flag(page_text: str) -> bool:
-    """Return True if the listing explicitly indicates onsen is available.
-
-    IMPORTANT: Do not use a broad '不可' exclusion because other fields
-    (e.g., ペット 不可, 民泊 不可) are common and unrelated.
     """
-    t = (page_text or "").replace("：", ":")
-
-    # Prefer the explicit field "温泉: <value>" (avoid "温泉大浴場: 無" etc.)
-    m = re.search(r"温泉:\s*([^\s]+)", t)
-    if m:
-        v = m.group(1).strip()
-
-        # Negatives must be checked first (e.g., "不可" contains "可")
-        if any(k in v for k in ["不可", "無", "なし", "無し"]):
-            return False
-
-        if any(k in v for k in ["有", "あり", "有り", "引込可", "引込可能", "引込み可", "可能", "可"]):
-            return True
-
-    # Fallback: icon alt-text is often "温泉有"/"温泉無"
-    if "温泉有" in t:
+    Izutaiyo onsen detector (already working for that source).
+    """
+    t = page_text or ""
+    if re.search(r"温泉\s*[:：]\s*(有|あり|○)", t):
         return True
-    if any(k in t for k in ["温泉無", "温泉なし", "温泉無し", "温泉不可"]):
-        return False
-
+    if re.search(r"(温泉引込|温泉付|温泉付き|源泉|かけ流し|掛け流し)", t):
+        return True
     return False
 
 
 def clean_title(h1_text: str) -> str:
     """
-    Avoid bloated titles like:
-      南伊豆 蝶ヶ野（300万円）の土地情報はこちら！下田店 大上 が担当...
-    Keep only: 南伊豆 蝶ヶ野
+    Strip marketing fragments and footer/header bleed (e.g., 担当者/物件詳細/MENU).
+    Keep it conservative to avoid breaking legitimate Japanese titles.
     """
-    s = clean_text(h1_text)
-    s = s.replace("【", "").replace("】", "")
+    t = clean_text(h1_text)
+    if not t:
+        return t
+    # Remove trailing "MENU" artifacts
+    t = re.sub(r"(?:\s*MENU\s*)+$", "", t).strip()
 
-    # take before "の" when it looks like "〜の土地情報はこちら！" etc.
-    m = re.match(r"^(.+?)の", s)
-    if m:
-        s = m.group(1).strip()
-
-    # remove price parentheses
-    s = re.sub(r"（[^）]*?円[^）]*?）", "", s).strip()
-    return s
+    # Remove common boilerplate after separators
+    for sep in ["｜", "|", "】", "）", ")"]:
+        if sep in t and ("担当" in t or "物件" in t or "伊豆" in t):
+            left = t.split(sep, 1)[0].strip()
+            if len(left) >= 6:
+                t = left
+                break
+    return t
 
 
 def guess_primary_image_url(hpno: str) -> str:
-    prefix = hpno[:2].lower()
-    return f"{BASE}bb/{prefix}/{hpno.lower()}a.jpg"
+    """
+    Deterministic fallback used when a direct /bb/... image URL isn't discoverable.
+    """
+    hpno = (hpno or "").strip()
+    if not hpno:
+        return ""
+    pref = hpno[:2].lower()
+    return f"{BASE}bb/{pref}/{hpno.lower()}a.jpg"
 
 
 def extract_image_url(html: str, hpno: str) -> str:
     """
-    Prefer /bb/... images. If none found, use deterministic a.jpg guess.
-    This matches the style that previously worked for you.
+    Prefer any /bb/... jpg in the HTML. Else deterministic fallback.
     """
-    candidates: List[str] = []
-
-    # src/href attributes
-    for m in re.finditer(r'(?:src|href)\s*=\s*["\']([^"\']+)["\']', html or "", flags=re.I):
-        u = (m.group(1) or "").strip().replace("&amp;", "&")
-        if not u:
-            continue
-        if "/bb/" in u or u.startswith("bb/") or "bb/" in u:
-            if re.search(r"\.(jpg|jpeg|png)(\?|$)", u, flags=re.I):
-                candidates.append(u)
-
-    # background-image url(...)
-    for m in re.finditer(r'url\(\s*["\']?([^"\')]+)["\']?\s*\)', html or "", flags=re.I):
-        u = (m.group(1) or "").strip().replace("&amp;", "&")
-        if ("/bb/" in u or u.startswith("bb/") or "bb/" in u) and re.search(r"\.(jpg|jpeg|png)(\?|$)", u, flags=re.I):
-            candidates.append(u)
-
-    def norm(u: str) -> str:
-        if u.startswith("//"):
-            u = "https:" + u
-        if u.startswith("/"):
-            u = urljoin(BASE, u)
-        if u.startswith("bb/"):
-            u = urljoin(BASE, u)
-        u = re.sub(r"^http://", "https://", u)
-        return u
-
-    def rank(u: str) -> Tuple[int, int]:
-        ul = u.lower()
-        s = 0
-        if ul.endswith("a.jpg") or ul.endswith("a.jpeg"):
-            s += 50
-        if "madori" in ul or "floor" in ul:
-            s -= 10
-        if "icon" in ul or "/img/" in ul:
-            s -= 30
-        return (s, -len(u))
-
-    if candidates:
-        uniq: List[str] = []
-        seen: Set[str] = set()
-        for u in candidates:
-            nu = norm(u)
-            if nu not in seen:
-                seen.add(nu)
-                uniq.append(nu)
-        uniq.sort(key=rank, reverse=True)
-        return uniq[0]
-
+    m = re.search(r"(https?://[^\s\"']+/bb/[^\s\"']+?\.jpe?g)", html, flags=re.I)
+    if m:
+        return m.group(1)
+    m = re.search(r"(/bb/[^\s\"']+?\.jpe?g)", html, flags=re.I)
+    if m:
+        return urljoin(BASE, m.group(1))
     return guess_primary_image_url(hpno)
 
 
 def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
     url = canonical_detail_url(hpno)
-    r = request(session, url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
-    html = r.text or ""
+    html = request(session, url, mobile=False)
     soup = BeautifulSoup(html, "html.parser")
-
-    page_text = clean_text(soup.get_text(" ", strip=True))
+    page_text = clean_text(soup.get_text("\n", strip=True))
 
     # title
-    h1 = soup.find(["h1", "h2"])
+    h1 = soup.find("h1")
     title = clean_title(h1.get_text(" ", strip=True) if h1 else hpno)
 
     # city
@@ -601,6 +439,10 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
         elif re.search(r"物件種目[:：\s]*マンション", page_text):
             ptype = "mansion"
 
+    # Exclude condos/mansions entirely (user preference)
+    if ptype == "mansion":
+        return {"__skip__": True}
+
     # price (JPY)
     price_jpy: Optional[int] = None
     # 億 + 万
@@ -609,7 +451,8 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
         oku = int(m.group(1).replace(",", ""))
         man = int((m.group(2) or "0").replace(",", ""))
         price_jpy = oku * 100_000_000 + man * 10_000
-    if price_jpy is None:
+    else:
+        # 万円 only
         m = re.search(r"([0-9,]+)\s*万\s*円", page_text)
         if m:
             price_jpy = int(m.group(1).replace(",", "")) * 10_000
@@ -622,7 +465,6 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
             return None
 
     land_sqm = None
-    # The detail pages frequently use the '㎡' symbol rather than spelling out 平方メートル.
     m = re.search(
         r"(?:敷地面積|土地面積|地積|地目|土地)\s*[:：]?\s*([0-9,\.]+)\s*(?:㎡|m²|m2|平方メートル)",
         page_text,
@@ -632,45 +474,28 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
 
     building_sqm = None
     m = re.search(
-        r"(?:床面積|延床面積|建物面積|専有面積)\s*[:：]?[^0-9]{0,20}([0-9,\.]+)\s*(?:㎡|m²|m2|平方メートル)",
+        r"(?:建物面積|延床面積|床面積|専有面積)\s*[:：]?\s*([0-9,\.]+)\s*(?:㎡|m²|m2|平方メートル)",
         page_text,
     )
     if m:
         building_sqm = to_float(m.group(1))
 
-    # sea fields
+    # sea view / walk to sea
     sea_score, walk_bool = parse_sea_fields(page_text)
 
-    # year built / age
+    # age / year built
     year_built: Optional[int] = None
-    age = 0.0
-
-    now_year = datetime.now().year
-
-    # Western year formats (e.g., 築年月：1998年4月)
-    m = re.search(r"(?:築年月|築年|建築年月|建築年|完成年月|完成年)\s*[:：]?\s*([12]\d{3})\s*年", page_text)
+    m = re.search(r"(?:築年数|築年月|築)\s*[:：]?\s*(\d{4})\s*年", page_text)
     if m:
         try:
             year_built = int(m.group(1))
         except Exception:
             year_built = None
 
-    # Japanese era formats (e.g., 平成21年3月 / 昭和63年)
-    if year_built is None:
-        m = re.search(r"(令和|平成|昭和)\s*(元|\d{1,2})\s*年", page_text)
-        if m:
-            era = m.group(1)
-            n_raw = m.group(2)
-            try:
-                n = 1 if n_raw == "元" else int(n_raw)
-                base = {"令和": 2019, "平成": 1989, "昭和": 1926}.get(era)
-                if base:
-                    year_built = base + n - 1
-            except Exception:
-                year_built = None
-
-    # Age / years-since-built formats (e.g., 築年数：40.9年)
-    m = re.search(r"築年数\s*[:：]?\s*([0-9]{1,3}(?:\.[0-9]+)?)\s*年", page_text)
+    # If year built not directly, attempt to compute from 築xx年
+    age = 0.0
+    now_year = datetime.now().year
+    m = re.search(r"築\s*(\d{1,3})\s*年", page_text)
     if m:
         try:
             age = float(m.group(1))
@@ -681,7 +506,6 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
     if year_built and age <= 0:
         age = max(0.0, now_year - year_built)
     elif (year_built is None) and age > 0:
-        # Round down to avoid overstating recency
         year_built = max(1800, now_year - int(age))
 
     tags: List[str] = []
@@ -696,16 +520,15 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
 
     # minimal EN title: translate only the city token (no external translation)
     city_en_map = {
-        "下田市": "Shimoda City",
-        "河津町": "Kawazu Town",
-        "東伊豆町": "Higashi-Izu Town",
-        "南伊豆町": "Minami-Izu Town",
-        "伊東市": "Ito City",
+        "下田市": "Shimoda",
+        "河津町": "Kawazu",
+        "東伊豆町": "Higashi-Izu",
+        "南伊豆町": "Minami-Izu",
+        "伊東市": "Ito",
     }
     title_en = title
     if city in city_en_map:
         title_en = re.sub(re.escape(city), city_en_map[city], title_en)
-        # If the city token isn't present in the (cleaned) title, prepend it.
         if title_en == title:
             title_en = f"{city_en_map[city]} {title}"
 
@@ -731,121 +554,6 @@ def parse_detail_page(session: requests.Session, hpno: str) -> Optional[dict]:
 # ---------------------------
 # Maple Housing scraping
 # ---------------------------
-
-CITY_EN_MAP = {
-    "下田市": "Shimoda City",
-    "河津町": "Kawazu Town",
-    "東伊豆町": "Higashi-Izu Town",
-    "南伊豆町": "Minami-Izu Town",
-    "伊東市": "Ito City",
-    "熱海市": "Atami City",
-    "伊豆市": "Izu City",
-    "伊豆の国市": "Izu-no-Kuni City",
-    "函南町": "Kannami Town",
-}
-
-def _abs_url(base: str, href: str) -> str:
-    href = (href or "").strip()
-    if not href:
-        return ""
-    if href.startswith("//"):
-        return "https:" + href
-    if href.startswith("http://") or href.startswith("https://"):
-        return href
-    return urljoin(base, href)
-
-def _parse_price_jpy(text: str) -> Optional[int]:
-    """Parse Japanese price strings like '4,800万円', '1億2,500万円', '価格 980 万円'."""
-    t = (text or "").replace(",", "").replace(" ", "")
-    m = re.search(r"([0-9]+)億([0-9]+)?万?円", t)
-    if m:
-        oku = int(m.group(1))
-        man = int(m.group(2) or "0")
-        return oku * 100_000_000 + man * 10_000
-
-    m = re.search(r"([0-9]+)万円", t)
-    if m:
-        return int(m.group(1)) * 10_000
-
-    # Sometimes: 価格 980 万円
-    m = re.search(r"([0-9]+)万?円", t)
-    if m and "万" in t:
-        return int(m.group(1)) * 10_000
-
-    return None
-
-def _parse_sqm(text: str, key_variants: List[str]) -> Optional[float]:
-    t = (text or "").replace(",", "")
-    keys = "|".join(map(re.escape, key_variants))
-    m = re.search(rf"(?:{keys})\s*[:：]?\s*([0-9]+(?:\.[0-9]+)?)\s*(?:㎡|m²|m2)", t)
-    if not m:
-        return None
-    try:
-        return float(m.group(1))
-    except Exception:
-        return None
-
-def _parse_city(text: str) -> str:
-    """
-    Extract 市/町/村 from the listing's own 所在地 field.
-
-    Important: do NOT fall back to scanning the full page for a city token, because Maple pages
-    can include the company's office address (e.g., 伊東市...) in the footer, which would incorrectly
-    label/exclude unrelated listings.
-
-    Normalization:
-    - Treat 「賀茂郡東伊豆町」等 as the same city key as Izutaiyo uses (e.g., 「東伊豆町」).
-    """
-    t = (text or "")
-    # Capture a short chunk after 所在地 / 物件所在地
-    m = re.search(r"(?:物件所在地|所在地)\s*[:：]?\s*([^\s　]{1,60})", t)
-    if not m:
-        return ""
-    loc = m.group(1).strip()
-
-    # Try to capture up to 市/町/村, allowing 郡 prefix
-    m2 = re.search(r"(.+?(?:市|町|村))", loc)
-    if not m2:
-        # Sometimes romanized / odd formatting leaks in; handle the one we know
-        ll = loc.lower()
-        if "kamogun" in ll and "higashi" in ll and "izu" in ll:
-            return "東伊豆町"
-        return ""
-    city = m2.group(1).strip()
-
-    # Normalize county-prefixed towns (賀茂郡東伊豆町 -> 東伊豆町, etc.)
-    city = re.sub(r"^賀茂郡", "", city)
-
-    # Defensive: normalize any lingering romanization variant
-    if "kamogun" in city.lower() and "higashi" in city.lower() and "izu" in city.lower():
-        city = "東伊豆町"
-
-    return city
-
-def _parse_year_built(text: str) -> Optional[int]:
-    t = text or ""
-    # Western year
-    m = re.search(r"(?:築年月|築年|建築年月|建築年|完成年月|完成年)\s*[:：]?\s*([12]\d{3})\s*年", t)
-    if m:
-        try:
-            y = int(m.group(1))
-            if 1800 <= y <= datetime.now().year + 1:
-                return y
-        except Exception:
-            pass
-
-    # Japanese era
-    era_map = {"令和": 2018, "平成": 1988, "昭和": 1925, "大正": 1911, "明治": 1867}
-    m = re.search(r"(令和|平成|昭和|大正|明治)\s*([0-9]{1,2})\s*年", t)
-    if m:
-        era, n = m.group(1), int(m.group(2))
-        base = era_map.get(era)
-        if base:
-            y = base + n
-            if 1800 <= y <= datetime.now().year + 1:
-                return y
-
-    return None
 
 def _maple_has_onsen(text: str) -> bool:
     """Detect onsen availability on Maple Housing detail pages.
@@ -891,63 +599,68 @@ def _maple_has_onsen(text: str) -> bool:
 def _maple_sea_view_and_walk(text: str) -> Tuple[bool, bool]:
     """Heuristic: (sea_view, walk_to_sea). walk_to_sea if <= 20 min on foot or <=1500m."""
     t = text or ""
-    sea_view = any(k in t for k in ["海一望", "海が見える", "オーシャンビュー", "海眺望", "海を望む"])
-    if not sea_view and ("眺望" in t and "海" in t):
-        sea_view = True
+    sea = False
+    walk = False
 
-    walk_to_sea = False
+    if re.search(r"(眺望|景観)\s*[:：]?\s*海", t):
+        sea = True
+    if re.search(r"(海一望|海が見える|オーシャンビュー|海を望む|伊豆諸島|大島)", t):
+        sea = True
 
-    # 徒歩-based
-    m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで)?[^\n]{0,24}?徒歩\s*([0-9]{1,2})\s*分", t)
+    # Walk: “海まで徒歩xx分”, “海岸まで徒歩xx分”
+    m = re.search(r"(海|海岸|ビーチ)[^0-9]{0,12}徒歩\s*(\d{1,2})\s*分", t)
     if m:
         try:
-            walk_to_sea = int(m.group(1)) <= 20
+            mins = int(m.group(2))
+            if mins <= 20:
+                walk = True
         except Exception:
-            walk_to_sea = True
+            pass
 
-    # Meter-based
-    if not walk_to_sea:
-        m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで)?[^\n]{0,24}?約\s*([0-9]{1,4})\s*m", t)
-        if m:
-            try:
-                walk_to_sea = int(m.group(1)) <= 1500
-            except Exception:
-                walk_to_sea = True
+    # Walk: “海までxxxm”
+    m = re.search(r"(海|海岸|ビーチ)[^0-9]{0,12}(\d{3,4})\s*m", t)
+    if m:
+        try:
+            meters = int(m.group(2))
+            if meters <= 1500:
+                walk = True
+        except Exception:
+            pass
 
-    # Qualitative
-    if not walk_to_sea and any(k in t for k in ["海まで徒歩圏", "海まで徒歩圏内"]):
-        walk_to_sea = True
+    return sea, walk
 
-    return sea_view, walk_to_sea
 
-def _maple_pick_image_url(soup: BeautifulSoup, page_url: str) -> Optional[str]:
-    imgs = soup.find_all("img")
-    candidates: List[str] = []
-    for img in imgs:
-        src = (img.get("src") or "").strip()
+def _maple_pick_image_url(soup: BeautifulSoup, detail_url: str) -> Optional[str]:
+    # Prefer og:image
+    og = soup.find("meta", property="og:image")
+    if og and og.get("content"):
+        return urljoin(detail_url, og["content"])
+    # Otherwise first meaningful image
+    for img in soup.find_all("img"):
+        src = img.get("src") or img.get("data-src")
         if not src:
             continue
-        u = _abs_url(page_url, src)
-        ul = u.lower()
-        if "wp-content/uploads" not in ul:
+        src = src.strip()
+        if not src:
             continue
-        if any(bad in ul for bad in ["logo", "icon", "sprite", "banner", "header", "footer"]):
+        if any(x in src.lower() for x in ["logo", "icon", "common", "spacer", "blank"]):
             continue
-        candidates.append(u)
-    return candidates[0] if candidates else None
+        return urljoin(detail_url, src)
+    return None
 
-def _maple_context_text(a_tag) -> str:
-    """Get a reasonably localized card/row text for a listing link."""
-    if not a_tag:
-        return ""
-    node = a_tag
-    for _ in range(5):
-        if not node:
-            break
-        if getattr(node, "name", None) in {"article", "li", "tr"}:
-            return clean_text(node.get_text(" ", strip=True))
-        node = node.parent
-    return clean_text(a_tag.get_text(" ", strip=True))
+
+def _parse_city(text: str) -> str:
+    """
+    Normalize “賀茂郡東伊豆町” to “東伊豆町” etc.
+    """
+    t = text or ""
+    if "賀茂郡東伊豆町" in t:
+        return "東伊豆町"
+    for c in ["下田市", "河津町", "東伊豆町", "南伊豆町", "伊東市", "伊豆市", "静岡市"]:
+        if c in t:
+            return c
+    return ""
+
 
 def _maple_is_excluded_area(text: str) -> bool:
     """
@@ -957,81 +670,90 @@ def _maple_is_excluded_area(text: str) -> bool:
     would incorrectly exclude every listing.
     """
     t = text or ""
-    return any(a in t for a in MAPLE_EXCLUDE_AREAS)
-
-def _maple_context_is_excluded(card_text: str) -> bool:
-    """Safe exclusion using list-card context (avoids site-wide footer address contamination)."""
-    t = card_text or ""
-    return any(a in t for a in MAPLE_EXCLUDE_AREAS) or any(c in t for c in MAPLE_EXCLUDE_CITIES_JP)
-
-def _maple_should_fetch_detail(card_text: str) -> bool:
-    """Heuristic prefilter to limit detail page fetches."""
-    t = card_text or ""
-    if _maple_context_is_excluded(t):
-        return False
-    if any(k in t for k in ["眺望", "海", "海岸", "浜", "ビーチ", "徒歩", "オーシャン", "海一望"]):
-        return True
+    for a in MAPLE_EXCLUDE_AREAS:
+        if a and a in t:
+            return True
     return False
 
-def _maple_collect_detail_links(soup: BeautifulSoup, list_url: str, listing_slug: str) -> List[Tuple[str, str]]:
-    """Return list of (detail_url, context_text) from a Maple list page."""
-    out: List[Tuple[str, str]] = []
-    seen: Set[str] = set()
 
-    root_path = f"/estate_db/{listing_slug}".rstrip("/")
-    for a in soup.find_all("a", href=True):
-        href = a.get("href")
-        if not href:
-            continue
-        u = _abs_url(list_url, href)
-        if not u:
-            continue
+def _maple_extract_title_near_link(a_tag) -> str:
+    """
+    Extract a compact heading for a listing card from list pages.
+    """
+    # Prefer closest containing element
+    node = a_tag
+    for _ in range(5):
+        if not node:
+            break
+        if getattr(node, "name", None) in {"article", "li", "tr"}:
+            return clean_text(node.get_text(" ", strip=True))
+        node = node.parent
+    return clean_text(a_tag.get_text(" ", strip=True))
 
-        pu = urlparse(u)
-        if pu.netloc and "maple-h.co.jp" not in pu.netloc:
-            continue
-        if "/estate_db/" not in pu.path:
-            continue
-        if "/page/" in pu.path:
-            continue
-        if pu.path.rstrip("/") == root_path or pu.path.rstrip("/") == f"{root_path}/page":
-            continue
-        u = u.split("#", 1)[0]
 
-        # Keep only likely "detail" links: /estate_db/<digits...> or ?p=<digits>
-        if not re.search(r"/estate_db/\d", pu.path) and not re.search(r"(?:^|&)p=\d{3,}(?:&|$)", pu.query):
-            continue
+def _parse_price_jpy(s: str) -> Optional[int]:
+    t = clean_text(s)
+    if not t:
+        return None
+    # e.g. "1億2,300万円" or "2,980万円" or "980万"
+    m = re.search(r"([0-9,]+)\s*億\s*([0-9,]+)?\s*万?\s*円?", t)
+    if m:
+        oku = int(m.group(1).replace(",", ""))
+        man = int((m.group(2) or "0").replace(",", ""))
+        return oku * 100_000_000 + man * 10_000
+    m = re.search(r"([0-9,]+)\s*万\s*円?", t)
+    if m:
+        return int(m.group(1).replace(",", "")) * 10_000
+    m = re.search(r"([0-9,]+)\s*万円", t)
+    if m:
+        return int(m.group(1).replace(",", "")) * 10_000
+    return None
 
-        if u in seen:
-            continue
-        seen.add(u)
 
-        ctx = _maple_context_text(a)
-        out.append((u, ctx))
-
-    return out
-
-def _maple_find_max_page(soup: BeautifulSoup) -> int:
-    """Best-effort detection of last /page/<n>/ from pagination links."""
-    mx = 1
-    for a in soup.find_all("a", href=True):
-        href = a.get("href") or ""
-        m = re.search(r"/page/(\d+)/", href)
+def _parse_sqm(text: str, keys: List[str]) -> Optional[float]:
+    t = text or ""
+    for k in keys:
+        m = re.search(rf"{re.escape(k)}\s*[:：]?\s*([0-9,\.]+)\s*(?:㎡|m²|m2)", t)
         if m:
             try:
-                mx = max(mx, int(m.group(1)))
+                return float(m.group(1).replace(",", ""))
             except Exception:
                 pass
-    return mx
+    return None
 
-def parse_maple_detail_page(session: requests.Session, detail_url: str, property_type: str) -> Tuple[Optional[dict], bool]:
-    """Return (item, kept_flag). kept_flag indicates whether it passed the sea/walk + exclusion rules."""
-    r = request(session, detail_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
-    html = r.text or ""
+
+def _parse_year_built(text: str) -> Optional[int]:
+    t = text or ""
+    m = re.search(r"(築年月|築年数|築)\s*[:：]?\s*(\d{4})\s*年", t)
+    if m:
+        try:
+            return int(m.group(2))
+        except Exception:
+            return None
+    return None
+
+
+def _maple_parse_detail(
+    session: requests.Session,
+    detail_url: str,
+    property_type: str,
+    *,
+    now_iso: str,
+    prev_first_seen: Dict[str, str],
+) -> Tuple[Optional[dict], bool]:
+    """
+    Returns (item, kept_bool). kept_bool indicates whether it passed *qualification* filters.
+    item=None indicates fetch/parse failure.
+    """
+    try:
+        html = request(session, detail_url, mobile=False)
+    except Exception:
+        return None, False
+
     soup = BeautifulSoup(html, "html.parser")
-    page_text = clean_text(soup.get_text(" ", strip=True))
+    page_text = clean_text(soup.get_text("\n", strip=True))
 
-    # Exclusion buckets (enforce on detail too)
+    # Exclude entire area buckets
     if _maple_is_excluded_area(page_text):
         return None, False
 
@@ -1045,40 +767,32 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
     if not (sea_view or walk_to_sea):
         return None, False
 
-    # Listing number
+    # Listing number (keep for ID uniqueness, but do NOT show in title)
     no = None
     m = re.search(r"No\.?\s*([0-9]{3,})", page_text)
     if m:
         no = m.group(1)
     if not no:
         q = parse_qs(urlparse(detail_url).query)
-        p = (q.get("p") or [None])[0]
-        if p and str(p).isdigit():
-            no = str(p)
-    if not no:
-        m = re.search(r"(\d{3,})", urlparse(detail_url).path)
-        if m:
-            no = m.group(1)
+        cand = q.get("p", [None])[0]
+        if cand and re.match(r"^\d{3,}$", cand):
+            no = cand
 
-    if no:
-        item_id = f"maple-{no}"
-    else:
-        pu = urlparse(detail_url)
-        stable = (pu.path + ("?" + pu.query if pu.query else "")).strip()
-        stable = re.sub(r"[^a-zA-Z0-9]+", "-", stable).strip("-")
-        item_id = f"maple-{stable}" if stable else f"maple-{abs(hash(detail_url))}"
+    item_id = f"maple-{no or abs(hash(detail_url))}"
 
-    # Title
-    # Maple pages often render a global NAV heading (e.g., "MENU") as the first <h1>/<h2>.
-    # To keep the UI consistent (and translation-friendly), synthesize a compact title.
-    type_jp = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, "物件")
-    type_en = {"house": "House", "mansion": "Mansion", "land": "Land"}.get(property_type, "Listing")
-    no_part = f"No.{no}" if no else "No."
-    title_city = city or "Maple"
-    title = f"{title_city} {type_jp} {no_part}".strip()
+    # Titles (clean + compact; do not include No.)
+    type_jp = "戸建" if property_type == "house" else "土地"
+    # Exclude condos/mansions entirely (user preference)
+    if property_type == "mansion":
+        return None, False
+
+    type_en = "House" if property_type == "house" else "Land"
+
+    title_city = city or "伊豆"
+    title = f"{title_city} {type_jp}".strip()
 
     title_en_city = CITY_EN_MAP.get(city, city) if city else "Maple"
-    title_en = f"{title_en_city} {type_en} {no_part}".strip()
+    title_en = f"{title_en_city} {type_en}".strip()
 
     # Price
     price_jpy = None
@@ -1110,7 +824,6 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
 
     image_url = _maple_pick_image_url(soup, detail_url)
 
-
     item = {
         "id": item_id,
         "source": "Maple Housing",
@@ -1130,7 +843,11 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
         "highlightTags": tags,
     }
 
+    # firstSeen
+    item["firstSeen"] = prev_first_seen.get(item_id, now_iso)
+
     return item, True
+
 
 def scrape_maple(
     session: requests.Session,
@@ -1144,67 +861,75 @@ def scrape_maple(
     failures: List[str] = []
     filtered_out = 0
 
-    # De-dupe detail pages across Maple categories/types
-    seen_detail_global: Set[str] = set()
+    seen_detail_urls: Set[str] = set()
 
     for ptype, slug in MAPLE_LISTING_TYPES.items():
-        start_url = f"{MAPLE_ROOT}{slug}/"
-        print(f"  - Maple: scanning {ptype} ({start_url})")
+        root_url = f"{MAPLE_ROOT}{slug}/"
+        print(f"  - Maple: scanning {ptype} ({root_url})")
 
-        try:
-            r0 = request(session, start_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
-            soup0 = BeautifulSoup(r0.text or "", "html.parser")
-        except Exception:
-            failures.append(start_url)
-            continue
-
-        max_page_detected = _maple_find_max_page(soup0)
-        page_limit = min(max_pages_per_type, max_page_detected if max_page_detected > 0 else max_pages_per_type)
-
-        for page in range(1, page_limit + 1):
-            list_url = start_url if page == 1 else f"{start_url}page/{page}/"
+        # Pagination format: /estate_db/house/page/2/
+        for page in range(1, max_pages_per_type + 1):
+            page_url = root_url if page == 1 else f"{root_url}page/{page}/"
             try:
-                r = request(session, list_url, headers=HEADERS_DESKTOP, retries=3, timeout=25)
+                html = request(session, page_url, mobile=False)
             except Exception:
-                failures.append(list_url)
-                continue
-
-            soup = BeautifulSoup(r.text or "", "html.parser")
-            links = _maple_collect_detail_links(soup, list_url, slug)
-            if not links:
+                # Stop if pages start failing for this type
+                if page == 1:
+                    failures.append(page_url)
                 break
 
-            # Prefilter to limit detail fetches; loosen if it gets too strict.
-            filtered_links = [(u, ctx) for (u, ctx) in links if _maple_should_fetch_detail(ctx)]
-            if len(filtered_links) < 3:
-                # Keep all non-excluded on that page
-                filtered_links = [(u, ctx) for (u, ctx) in links if not _maple_context_is_excluded(ctx)]
+            soup = BeautifulSoup(html, "html.parser")
 
-            for detail_url, ctx in filtered_links:
-                if detail_url in seen_detail_global:
+            # Collect candidate detail URLs
+            links = []
+            for a in soup.find_all("a", href=True):
+                u = urljoin(page_url, a["href"])
+                pu = urlparse(u)
+
+                # Keep Maple internal estate_db detail links (avoid pagination links)
+                if pu.netloc and "maple-h.co.jp" not in pu.netloc:
                     continue
-                seen_detail_global.add(detail_url)
+                if "/estate_db/" not in pu.path:
+                    continue
+                if "/page/" in pu.path:
+                    continue
+
+                # remove anchors
+                u = u.split("#", 1)[0]
+
+                # Skip list roots
+                root_path = urlparse(root_url).path.rstrip("/")
+                if pu.path.rstrip("/") == root_path:
+                    continue
+
+                # Keep only likely "detail" links: /estate_db/<digits...> or ?p=<digits>
+                if not re.search(r"/estate_db/\d", pu.path) and not re.search(r"(?:^|&)p=\d{3,}(?:&|$)", pu.query):
+                    continue
+
+                links.append(u)
+
+            # De-dupe per page
+            for u in dict.fromkeys(links).keys():
+                if u in seen_detail_urls:
+                    continue
+                seen_detail_urls.add(u)
 
                 try:
-                    item, kept = parse_maple_detail_page(session, detail_url, ptype)
-                    if not kept or not item:
-                        filtered_out += 1
-                        continue
-
-                    item_id = item.get("id")
-                    if item_id and item_id in prev_first_seen:
-                        item["firstSeen"] = prev_first_seen[item_id]
-                    else:
-                        item["firstSeen"] = now_iso
-
-                    listings.append(item)
-
+                    item, kept = _maple_parse_detail(
+                        session, u, ptype,
+                        now_iso=now_iso,
+                        prev_first_seen=prev_first_seen,
+                    )
                 except Exception:
-                    failures.append(detail_url)
+                    item, kept = None, False
 
-                time.sleep(MAPLE_SLEEP_DETAIL)
-
-            time.sleep(MAPLE_SLEEP_PAGE)
+                if item is None:
+                    failures.append(u)
+                    continue
+                if not kept:
+                    filtered_out += 1
+                    continue
+                listings.append(item)
 
     return listings, failures, filtered_out
 
@@ -1213,356 +938,139 @@ def scrape_maple(
 # Aoba Resort scraping
 # ---------------------------
 
-AOBA_CITY_NORMALIZE = {
-    "下田市": "下田市",
-    "東伊豆町": "東伊豆町",
-    "賀茂郡東伊豆町": "東伊豆町",
-}
-
-AOBA_BKNAREA_TO_CITY = {
-    "22219": "下田市",  # Shimoda City
-    "22301": "東伊豆町", # Higashi-Izu Town
-}
-
-AOBA_SEA_KEYWORDS = [
-    "オーシャンビュー",
-    "海一望",
-    "海を望む",
-    "海望む",
-    "海が見える",
-    "海の見える",
-    "相模湾",
-    "伊豆諸島",
-    "大島",
-    "利島",
-    "新島",
-    "神津島",
-    "三宅島",
-    "御蔵島",
-    "八丈島",
-    "初島",
-]
-
-AOBA_WALK_KEYWORDS = [
-    "海が近い",
-    "海まで徒歩圏",
-    "海まで徒歩圏内",
-]
-
-
-def _aoba_find_listing_container(a_tag):
-    """Walk up the DOM to find a reasonable per-listing container."""
-    node = a_tag
-    best = None
-    for _ in range(8):
-        if not node:
-            break
-        if getattr(node, "name", None) in {"article", "li", "tr", "div", "section"}:
-            t = clean_text(node.get_text(" ", strip=True))
-            # Prefer containers that include a price and a prefecture/city marker
-            if ("円" in t or "万円" in t) and ("静岡県" in t):
-                return node
-            if best is None and ("円" in t or "万円" in t):
-                best = node
-        node = node.parent
-    return best
-
-
-def _aoba_find_max_page(soup: BeautifulSoup) -> int:
-    """Best-effort detection of the last pg=N in pagination links."""
-    mx = 1
-    for a in soup.find_all("a", href=True):
-        href = a.get("href") or ""
-        m = re.search(r"[?&]pg=(\d+)", href)
-        if m:
-            try:
-                mx = max(mx, int(m.group(1)))
-            except Exception:
-                pass
-    return mx
-
-
-def _aoba_extract_city_from_text(text: str) -> str:
-    """Best-effort city extraction from *local* text (e.g., listing card).
-    Do NOT use this on full-page text (it can pick up unrelated 'recommended' items).
-    """
+def _aoba_city_from_text(text: str) -> str:
     t = text or ""
+    if "賀茂郡東伊豆町" in t:
+        return "東伊豆町"
     if "下田市" in t:
         return "下田市"
-    if "賀茂郡東伊豆町" in t or "東伊豆町" in t:
+    if "東伊豆町" in t:
         return "東伊豆町"
     return ""
 
 
-def _aoba_extract_address(soup: BeautifulSoup, scope: Optional[BeautifulSoup] = None) -> str:
-    """Extract the listing's own address/location string from the detail page."""
-    search_scopes = [scope, soup] if scope is not None else [soup]
+def _aoba_has_sea_or_walk(text: str) -> Tuple[bool, bool]:
+    t = text or ""
+    sea = False
+    walk = False
 
-    # Common patterns: table rows (th/td) or definition lists (dt/dd)
-    for sc in search_scopes:
-        if sc is None:
-            continue
+    if re.search(r"(海一望|海が見える|オーシャンビュー|海を望む|伊豆諸島|大島)", t):
+        sea = True
+    if re.search(r"(眺望|景観)\s*[:：]?\s*海", t):
+        sea = True
 
-        # Table / DL label matching
-        for label in ("所在地", "住所"):
-            # th/td
-            for th in sc.find_all("th"):
-                th_txt = clean_text(th.get_text(" ", strip=True))
-                if label in th_txt:
-                    td = th.find_next_sibling("td")
-                    if td:
-                        return clean_text(td.get_text(" ", strip=True))
-
-            # dt/dd
-            for dt in sc.find_all("dt"):
-                dt_txt = clean_text(dt.get_text(" ", strip=True))
-                if label in dt_txt:
-                    dd = dt.find_next_sibling("dd")
-                    if dd:
-                        return clean_text(dd.get_text(" ", strip=True))
-
-        # Some themes use <span class="label">所在地</span><span class="value">...</span>
-        for lab in sc.find_all(string=re.compile(r"(所在地|住所)")):
-            try:
-                parent = lab.parent
-                # Look for next element that isn't the label itself
-                nxt = parent.find_next()
-                if nxt and nxt != parent:
-                    cand = clean_text(nxt.get_text(" ", strip=True))
-                    if cand and cand != clean_text(str(lab)):
-                        # Avoid catching the whole page; require some address-like token
-                        if any(tok in cand for tok in ("市", "郡", "町", "村", "区", "丁目", "番")):
-                            return cand
-            except Exception:
-                pass
-
-    return ""
-
-
-def _aoba_city_from_address(addr: str) -> str:
-    a = addr or ""
-    if "下田市" in a:
-        return "下田市"
-    if "賀茂郡東伊豆町" in a or "東伊豆町" in a:
-        return "東伊豆町"
-    return ""
-
-
-
-def _aoba_sea_view_and_walk(text: str) -> Tuple[bool, bool]:
-    t = (text or "")
-
-    sea_view = any(k in t for k in AOBA_SEA_KEYWORDS)
-    if not sea_view:
-        if re.search(r"(海|相模湾).{0,10}(望|眺望|見え)", t):
-            sea_view = True
-
-    walk_to_sea = False
-
-    m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで)?[^\n]{0,30}?徒歩\s*([0-9]{1,2})\s*分", t)
+    m = re.search(r"(海|海岸|ビーチ)[^0-9]{0,12}徒歩\s*(\d{1,2})\s*分", t)
     if m:
         try:
-            walk_to_sea = int(m.group(1)) <= 20
+            mins = int(m.group(2))
+            if mins <= 20:
+                walk = True
         except Exception:
-            walk_to_sea = True
+            pass
 
-    if not walk_to_sea:
-        m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで)?[^\n]{0,30}?約\s*([0-9]{1,2})\s*分", t)
-        if m:
-            try:
-                walk_to_sea = int(m.group(1)) <= 20
-            except Exception:
-                walk_to_sea = True
-
-    if not walk_to_sea:
-        m = re.search(r"(?:海|海岸|浜|ビーチ)(?:へ|まで)?[^\n]{0,30}?約\s*([0-9]{1,4})\s*m", t)
-        if m:
-            try:
-                walk_to_sea = int(m.group(1)) <= 1500
-            except Exception:
-                walk_to_sea = True
-
-    if not walk_to_sea and any(k in t for k in AOBA_WALK_KEYWORDS):
-        walk_to_sea = True
-
-    return sea_view, walk_to_sea
-
-
-def _aoba_has_onsen(text: str) -> bool:
-    t = (text or "").replace("：", ":")
-
-    m = re.search(r"温泉\s*[:：]?\s*([^\s]+)", t)
+    m = re.search(r"(海|海岸|ビーチ)[^0-9]{0,12}(\d{3,4})\s*m", t)
     if m:
-        v = m.group(1).strip()
-        if any(k in v for k in ["-", "無", "なし", "無し", "不可"]):
-            return False
-        if any(k in v for k in ["有", "あり", "有り", "付", "引込", "権利", "可能", "可"]):
-            return True
+        try:
+            meters = int(m.group(2))
+            if meters <= 1500:
+                walk = True
+        except Exception:
+            pass
 
-    if any(k in t for k in ["温泉付", "温泉付き", "温泉引込", "温泉引き込み", "温泉権利", "温泉有"]):
-        return True
-    if any(k in t for k in ["温泉無", "温泉なし", "温泉無し", "温泉不可"]):
-        return False
-
-    return False
+    return sea, walk
 
 
-def _aoba_pick_image_url(
-    scope: BeautifulSoup,
-    page_url: str,
-    *,
-    room_id: Optional[str] = None,
-    og_image: Optional[str] = None,
-) -> Optional[str]:
-    """Pick a representative image for an Aoba listing.
-
-    Key fixes:
-    - Prefer og:image when it looks like a listing photo.
-    - If we know the room_id, only accept images that match that room_id to avoid
-      accidentally picking thumbnails from 'recommended listings' blocks.
-    """
-
-    def _looks_like_listing_photo(u: str) -> bool:
-        ul = (u or "").lower()
-        if not ul:
-            return False
-        if any(bad in ul for bad in ["page_top", "noimage", "loading", "logo", "icon", "sprite", "common/", "/common", "header", "footer", "btn"]):
-            return False
-        if not re.search(r"\.(jpg|jpeg|png|webp)(\?|$)", ul):
-            return False
-        # Aoba listing photos typically live on this CDN path
-        if "img-asp.jp/bkn/" in ul:
-            return True
-        return True
-
-    # 1) og:image (often the cleanest single representative photo)
-    if og_image:
-        u = _abs_url(page_url, og_image.strip())
-        if _looks_like_listing_photo(u):
-            if room_id:
-                if re.search(rf"/bkn/{re.escape(room_id)}[_-]", u):
-                    return u
-            else:
-                return u
-
-    # 2) Gather <img> candidates from the chosen scope
-    candidates: List[str] = []
-    for img in scope.find_all("img"):
-        src = (img.get("data-src") or img.get("data-lazy-src") or img.get("src") or "").strip()
+def _aoba_pick_image_url(soup: BeautifulSoup, detail_url: str) -> Optional[str]:
+    og = soup.find("meta", property="og:image")
+    if og and og.get("content"):
+        return urljoin(detail_url, og["content"])
+    for img in soup.find_all("img"):
+        src = img.get("data-original") or img.get("data-src") or img.get("src")
         if not src:
             continue
-        u = _abs_url(page_url, src)
-        if not _looks_like_listing_photo(u):
+        src = src.strip()
+        if not src:
             continue
-        candidates.append(u)
+        if any(x in src.lower() for x in ["logo", "icon", "common", "spacer", "blank"]):
+            continue
+        return urljoin(detail_url, src)
+    return None
 
-    if not candidates:
-        return None
 
-    # De-dupe preserving order
-    candidates = list(dict.fromkeys(candidates))
+def _aoba_parse_detail(
+    session: requests.Session,
+    detail_url: str,
+    property_type: str,
+    *,
+    now_iso: str,
+    prev_first_seen: Dict[str, str],
+) -> Tuple[Optional[dict], bool]:
+    """Return (item, kept). kept False means filtered out by criteria."""
+    # Property type (passed in)
+    if property_type == "mansion":
+        return None, False
+    try:
+        html = request(session, detail_url, mobile=False)
+    except Exception:
+        return None, False
 
-    # If we know room_id, keep only images for that room_id when possible
-    if room_id:
-        rid_re = re.compile(rf"/bkn/{re.escape(room_id)}[_-]")
-        exact = [u for u in candidates if rid_re.search(u)]
-        if exact:
-            candidates = exact
-
-    def rank(u: str) -> Tuple[int, int, int]:
-        ul = u.lower()
-        s = 0
-        if "img-asp.jp/bkn/" in ul:
-            s += 60
-        if room_id and re.search(rf"/bkn/{re.escape(room_id)}[_-]", ul):
-            s += 80
-        if "upload" in ul or "uploads" in ul:
-            s += 10
-        # Avoid picking floorplans as the main photo
-        if any(k in ul for k in ["madori", "floor", "plan"]):
-            s -= 15
-        # Prefer shorter URLs if tie (often the primary)
-        return (s, -len(ul), 0)
-
-    candidates.sort(key=rank, reverse=True)
-    return candidates[0]
-
-def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_type: str) -> Tuple[Optional[dict], bool]:
-    r = request(session, detail_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
-    html = r.text or ""
     soup = BeautifulSoup(html, "html.parser")
+    text = clean_text(soup.get_text("\n", strip=True))
 
-    # Try to focus on the main content area (avoid nav/footer/recommended contamination where possible)
-    def _pick_detail_scope(s: BeautifulSoup) -> BeautifulSoup:
-        candidates = []
-        for sel in ("main", "article", "div#main", "div#content", "div#contents", "div.entry-content", "div.l-main", "div.container"):
-            el = s.select_one(sel)
-            if el:
-                t = clean_text(el.get_text(" ", strip=True))
-                if len(t) > 400:
-                    candidates.append((len(t), el))
-        if candidates:
-            candidates.sort(key=lambda x: x[0], reverse=True)
-            return candidates[0][1]
-        return s
-
-    scope = _pick_detail_scope(soup)
-    scope_text = clean_text(scope.get_text(" ", strip=True))
-
-    addr = _aoba_extract_address(soup, scope)
-    city = _aoba_city_from_address(addr)
-
-    # Strict: only keep allowed cities confirmed from the listing's own address field.
-    if city not in {"下田市", "東伊豆町"}:
+    city = _aoba_city_from_text(text)
+    if city not in AOBA_ALLOWED_CITIES:
         return None, False
 
-    sea_view, walk_to_sea = _aoba_sea_view_and_walk(scope_text)
-    if not (sea_view or walk_to_sea):
+    sea, walk = _aoba_has_sea_or_walk(text)
+    if not (sea or walk):
         return None, False
 
+    # Room ID from URL: .../room98036165.html
     room_id = None
-    m = re.search(r"room(\d+)\.html", urlparse(detail_url).path)
+    m = re.search(r"room(\d+)\.html", detail_url)
     if m:
         room_id = m.group(1)
 
-    # Price (JPY)
+    item_id = f"aoba-{room_id or abs(hash(detail_url))}"
+
+    type_jp = "戸建" if property_type == "house" else "土地"
+    title = f"{city} {type_jp}".strip()
+
+    title_en_city = {"下田市": "Shimoda", "東伊豆町": "Higashi-Izu"}.get(city, city)
+    if property_type == "house":
+        title_en = f"{title_en_city} House".strip()
+    else:
+        title_en = f"{title_en_city} Land".strip()
+
+    # Price
     price_jpy = None
-    m = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*万円", scope_text)
+    m = re.search(r"(価格|販売価格)\s*[:：]?\s*([0-9,]+)\s*万\s*円", text)
     if m:
         try:
-            price_jpy = int(m.group(1).replace(",", "")) * 10000
+            price_jpy = int(m.group(2).replace(",", "")) * 10_000
         except Exception:
             price_jpy = None
-    if price_jpy is None:
-        m = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*円", scope_text)
-        if m:
-            try:
-                price_jpy = int(m.group(1).replace(",", ""))
-            except Exception:
-                price_jpy = None
 
     # Areas
     land_sqm = None
-    building_sqm = None
-
-    # Prefer table-derived values when possible
-    m = re.search(r"(土地面積|敷地面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", scope_text)
+    m = re.search(r"(土地面積|敷地面積)\s*[:：]?\s*([0-9,\.]+)\s*(㎡|m²|m2)", text)
     if m:
         try:
-            land_sqm = float(m.group(2))
+            land_sqm = float(m.group(2).replace(",", ""))
         except Exception:
             land_sqm = None
 
-    m = re.search(r"(建物面積|延床面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", scope_text)
+    building_sqm = None
+    m = re.search(r"(建物面積|延床面積)\s*[:：]?\s*([0-9,\.]+)\s*(㎡|m²|m2)", text)
     if m:
         try:
-            building_sqm = float(m.group(2))
+            building_sqm = float(m.group(2).replace(",", ""))
         except Exception:
             building_sqm = None
 
     # Year built
     year_built = None
-    m = re.search(r"(築年数|築年月|築)\s*[:：]?\s*(\d{4})\s*年", scope_text)
+    m = re.search(r"(築年数|築年月|築)\s*[:：]?\s*(\d{4})\s*年", text)
     if m:
         try:
             year_built = int(m.group(2))
@@ -1570,62 +1078,22 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
             year_built = None
 
     # Age
-    age = None
+    age = 0.0
+    now_year = datetime.now().year
     if year_built:
-        try:
-            age = datetime.now(timezone.utc).year - year_built
-        except Exception:
-            age = None
+        age = max(0.0, now_year - year_built)
 
-    # Tags
     tags: List[str] = []
-    if sea_view:
+    sea_score = 4 if sea else (3 if walk else 0)
+    if sea:
         tags.append("Sea View")
-    if walk_to_sea:
+    if walk:
         tags.append("Walk to Sea")
-    if _aoba_has_onsen(scope_text):
-        tags.append("Onsen")
 
-    sea_score = 4 if sea_view else (3 if walk_to_sea else 0)
-
-        # Image: prefer og:image; otherwise pick from the main scope.
-    og_image = None
-    try:
-        mtag = soup.find("meta", property="og:image")
-        if mtag and mtag.get("content"):
-            og_image = mtag.get("content")
-    except Exception:
-        og_image = None
-
-    image_url = (
-        _aoba_pick_image_url(scope, detail_url, room_id=room_id, og_image=og_image)
-        or _aoba_pick_image_url(soup, detail_url, room_id=room_id, og_image=og_image)
-    )
-
-    # Drop obvious chrome/placeholder or mismatched IDs
-    if image_url:
-        ul = image_url.lower()
-        if any(bad in ul for bad in ["page_top", "logo", "icon", "sprite", "noimage", "loading"]):
-            image_url = None
-        if room_id and image_url and ("img-asp.jp/bkn/" in ul) and (not re.search(rf"/bkn/{re.escape(room_id)}[_-]", ul)):
-            image_url = None
-
-# Titles (keep simple and consistent with other sources)
-    type_jp = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, "物件")
-    no_part = f"No.{room_id}" if room_id else "No."
-    title = f"{city} {type_jp} {no_part}".strip()
-    title_en_city = {"下田市": "Shimoda City", "東伊豆町": "Higashi-Izu Town"}.get(city, city)
-    title_en = f"{title_en_city} {type_jp if property_type!='mansion' else 'Mansion'} {no_part}".strip()
-    # Normalize EN type label
-    if property_type == "house":
-        title_en = f"{title_en_city} House {no_part}".strip()
-    elif property_type == "land":
-        title_en = f"{title_en_city} Land {no_part}".strip()
-    elif property_type == "mansion":
-        title_en = f"{title_en_city} Mansion {no_part}".strip()
+    image_url = _aoba_pick_image_url(soup, detail_url)
 
     item = {
-        "id": f"aoba-{room_id}" if room_id else f"aoba-{hash(detail_url)}",
+        "id": item_id,
         "source": "Aoba Resort",
         "sourceUrl": detail_url,
         "title": title,
@@ -1643,6 +1111,8 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
         "highlightTags": tags,
     }
 
+    item["firstSeen"] = prev_first_seen.get(item_id, now_iso)
+
     return item, True
 
 
@@ -1659,79 +1129,54 @@ def scrape_aoba(
     filtered_out = 0
 
     for ptype, slug in AOBA_LISTING_TYPES.items():
-        base_url = f"{AOBA_BASE}/{slug}/"
-        print(f"  - Aoba: scanning {ptype} ({base_url})")
+        root_url = f"{AOBA_BASE}/{slug}/"
+        print(f"  - Aoba: scanning {ptype} ({root_url})")
 
-        try:
-            r0 = request(session, base_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
-            soup0 = BeautifulSoup(r0.text or "", "html.parser")
-        except Exception:
-            failures.append(base_url)
-            continue
-
-        max_page_detected = _aoba_find_max_page(soup0)
-        page_limit = min(max_pages_per_type, max_page_detected if max_page_detected > 0 else max_pages_per_type)
-
-        seen_detail: Set[str] = set()
-
-        for page in range(1, page_limit + 1):
+        for page in range(1, max_pages_per_type + 1):
+            page_url = root_url if page == 1 else f"{root_url}?pg={page}"
             try:
-                params = {"lmt": "", "orderby": "", "pg": str(page)} if page > 1 else None
-                r = request(session, base_url, headers=HEADERS_DESKTOP, params=params, retries=3, timeout=25)
+                html = request(session, page_url, mobile=False)
             except Exception:
-                failures.append(f"{base_url}?pg={page}")
-                continue
-
-            soup = BeautifulSoup(r.text or "", "html.parser")
-
-            anchors = soup.select("a[href*='room'][href$='.html']")
-            if not anchors:
-                anchors = [
-                    a for a in soup.find_all("a", href=True)
-                    if "room" in (a.get("href") or "") and (a.get("href") or "").endswith(".html")
-                ]
-            if not anchors:
+                if page == 1:
+                    failures.append(page_url)
                 break
 
-            for a in anchors:
-                href = a.get("href") or ""
-                detail_url = _abs_url(base_url, href)
-                if not detail_url or AOBA_BASE not in detail_url:
+            soup = BeautifulSoup(html, "html.parser")
+
+            links = []
+            for a in soup.find_all("a", href=True):
+                href = a["href"]
+                if not href:
                     continue
-                detail_url = detail_url.split("#", 1)[0]
-
-                if detail_url in seen_detail:
+                u = urljoin(page_url, href)
+                pu = urlparse(u)
+                if pu.netloc and "aoba-resort.com" not in pu.netloc:
                     continue
-
-                container = _aoba_find_listing_container(a)
-                ctx_text = clean_text(container.get_text(" ", strip=True) if container else a.get_text(" ", strip=True))
-
-                city = _aoba_extract_city_from_text(ctx_text)
-                if city not in {"下田市", "東伊豆町"}:
+                if not pu.path.endswith(".html"):
                     continue
+                if "/room" not in pu.path:
+                    continue
+                u = u.split("#", 1)[0]
+                links.append(u)
 
-                seen_detail.add(detail_url)
-
+            # De-dupe
+            for u in dict.fromkeys(links).keys():
                 try:
-                    item, kept = parse_aoba_detail_page(session, detail_url, ptype)
-                    if not kept or not item:
-                        filtered_out += 1
-                        continue
-
-                    item_id = item.get("id")
-                    if item_id and item_id in prev_first_seen:
-                        item["firstSeen"] = prev_first_seen[item_id]
-                    else:
-                        item["firstSeen"] = now_iso
-
-                    listings.append(item)
-
+                    item, kept = _aoba_parse_detail(
+                        session, u, ptype,
+                        now_iso=now_iso,
+                        prev_first_seen=prev_first_seen,
+                    )
                 except Exception:
-                    failures.append(detail_url)
+                    item, kept = None, False
 
-                time.sleep(AOBA_SLEEP_DETAIL)
-
-            time.sleep(AOBA_SLEEP_PAGE)
+                if item is None:
+                    failures.append(u)
+                    continue
+                if not kept:
+                    filtered_out += 1
+                    continue
+                listings.append(item)
 
     return listings, failures, filtered_out
 
@@ -1741,52 +1186,39 @@ def scrape_aoba(
 # ---------------------------
 
 def main() -> None:
-    session = requests.Session()
-
-    # Warm-up: establish cookies for /sp/ (helps avoid returning the form page)
-    try:
-        request(session, MOBILE_HOME, headers=HEADERS_MOBILE, retries=2, timeout=15)
-    except Exception:
-        pass
-
-    now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
+    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
     prev_first_seen = load_previous_first_seen()
 
+    session = requests.Session()
+
+    # Step 0: event dates
     print("Step 0: Scraping 新着物件一覧 for event dates...")
-    try:
-        events_map = scrape_new_arrivals_events(session)
-        print(f"  - Captured {len(events_map)} event records.")
-    except Exception:
-        events_map = {}
-        print("  - Warning: could not scrape 新着物件一覧 (continuing without event dates).")
+    events = scrape_new_arrivals_events(session, max_pages=6)
+    print(f"  - Captured {len(events)} event records.")
 
+    # Step 1: tokusen
     print("Step 1: Extracting Tokusen IDs...")
-    tokusen_hpnos = extract_tokusen_hpnos(session)
-    print(f"  - Found {len(tokusen_hpnos)} IDs in URL query.")
+    tokusen = extract_tokusen_hpnos(session)
+    tokusen_set = set(tokusen)
+    print(f"  - Found {len(tokusen)} IDs in URL query.")
 
-    hpnos: Set[str] = set(tokusen_hpnos)
-    tokusen_set: Set[str] = set(tokusen_hpnos)
-    search_set: Set[str] = set()
-
+    # Step 2: mobile search
     print("Step 2: Scanning Mobile Search...")
+    search_set: Set[str] = set()
     for city in TARGET_CITIES_JP:
         print(f"  - Searching {city} (sea view)...")
-        sea = mobile_search_hpnos(session, city, "sea")
-        new_sea = sea - hpnos
-        hpnos |= new_sea
-        search_set |= new_sea
-        print(f"    -> Added {len(new_sea)} new properties.")
-
+        before = len(search_set)
+        search_set |= mobile_search_hpnos(session, city, "sea", max_pages=8)
+        print(f"    -> Added {len(search_set)-before} new properties.")
         print(f"  - Searching {city} (walk-to-sea)...")
-        walk = mobile_search_hpnos(session, city, "walk")
-        new_walk = walk - hpnos
-        hpnos |= new_walk
-        search_set |= new_walk
-        print(f"    -> Added {len(new_walk)} new properties.")
+        before = len(search_set)
+        search_set |= mobile_search_hpnos(session, city, "walk", max_pages=8)
+        print(f"    -> Added {len(search_set)-before} new properties.")
 
-    # Guardrail: keep only sale listing suffixes (H/M/G)
-    hpnos = {h for h in hpnos if len(h) >= 3 and h[-1] in {"H", "M", "G"}}
+    # Combine
+    hpnos = tokusen_set | search_set
 
+    # Step 3: detail scrape
     print(f"Step 3: Scraping {len(hpnos)} properties...")
     listings: List[dict] = []
     failures: List[str] = []
@@ -1795,6 +1227,11 @@ def main() -> None:
     for i, hpno in enumerate(sorted(hpnos), start=1):
         try:
             item = parse_detail_page(session, hpno)
+
+            if item and isinstance(item, dict) and item.get("__skip__"):
+                # Skip (e.g., condo/mansion) without treating as a failure
+                continue
+
             if not item:
                 failures.append(canonical_detail_url(hpno))
                 continue
@@ -1807,95 +1244,79 @@ def main() -> None:
                     filtered_out += 1
                     continue
 
-            # Persist firstSeen across runs (Pattern A)
-            item_id = item.get("id")
-            if item_id and item_id in prev_first_seen:
-                item["firstSeen"] = prev_first_seen[item_id]
-            else:
-                item["firstSeen"] = now_iso
+            # Attach event info if present
+            ev = events.get(hpno)
+            if ev:
+                item["eventTypeJp"] = ev.get("eventTypeJp")
+                item["eventDate"] = ev.get("eventDate")
 
-            # Attach most-recent event type/date from 新着物件一覧 (if available)
-            try:
-                hpno = (item.get("id") or "").split("izutaiyo-", 1)[-1]
-                if hpno and hpno in events_map:
-                    item.update(events_map[hpno])
-            except Exception:
-                pass
+            # firstSeen
+            if item.get("id"):
+                item["firstSeen"] = prev_first_seen.get(item["id"], now_iso)
 
+            item["source"] = "Izu Taiyo"
             listings.append(item)
-
         except Exception:
             failures.append(canonical_detail_url(hpno))
 
         if i % 10 == 0:
             print(f"  ...{i}/{len(hpnos)}")
+        time.sleep(0.12)
 
-    
+    # Step 4: Maple
     print("Step 4: Scraping Maple Housing...")
-    maple_listings: List[dict] = []
     maple_failures: List[str] = []
-    maple_filtered_out = 0
     try:
         maple_listings, maple_failures, maple_filtered_out = scrape_maple(
             session,
             now_iso=now_iso,
             prev_first_seen=prev_first_seen,
+            max_pages_per_type=12,
         )
         print(f"  - Maple: kept {len(maple_listings)} listings (filtered out {maple_filtered_out}).")
+        listings.extend(maple_listings)
+        filtered_out += maple_filtered_out
     except Exception:
         print("  - Warning: Maple scrape failed (continuing with Izu Taiyo only).")
 
-    listings.extend(maple_listings)
-    failures.extend(maple_failures)
-
+    # Step 5: Aoba
     print("Step 5: Scraping Aoba Resort...")
-    aoba_listings: List[dict] = []
     aoba_failures: List[str] = []
-    aoba_filtered_out = 0
     try:
         aoba_listings, aoba_failures, aoba_filtered_out = scrape_aoba(
             session,
             now_iso=now_iso,
             prev_first_seen=prev_first_seen,
+            max_pages_per_type=20,
         )
         print(f"  - Aoba: kept {len(aoba_listings)} listings (filtered out {aoba_filtered_out}).")
+        listings.extend(aoba_listings)
+        filtered_out += aoba_filtered_out
     except Exception:
-        print("  - Warning: Aoba scrape failed (continuing without Aoba).")
+        print("  - Warning: Aoba scrape failed (continuing).")
 
-    listings.extend(aoba_listings)
-    failures.extend(aoba_failures)
+    # Final sort: price desc by default in UI, but keep deterministic output
+    listings.sort(key=lambda x: (x.get("priceJpy") or 0), reverse=True)
 
+    # FX (manual defaults; UI can override)
     out = {
         "generatedAt": now_iso,
-        "fxRate": 155,
+        "fxRateUsd": 155,
+        "fxRateCny": 20,
+        "fxSource": "Manual",
         "listings": listings,
-        "stats": {
-            "count": len(listings),
-            "izutaiyoCount": len(listings) - len(maple_listings) - len(aoba_listings),
-            "mapleCount": len(maple_listings),
-            "aobaCount": len(aoba_listings),
-            "tokusenHpnoCount": len(tokusen_set),
-            "searchAddedHpnoCount": len(search_set),
-            "rawHpnoCount": len(hpnos),
-            "filteredOutSearchOnly": filtered_out,
-            "mapleFilteredOut": maple_filtered_out,
-            "aobaFilteredOut": aoba_filtered_out,
-            "failures": len(failures),
-        },
-        "failures": failures,
     }
 
-    Path("listings.json").write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
-    Path("buildInfo.json").write_text(json.dumps({"generatedAt": now_iso}, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(
-        f"Done. Saved {len(listings)} valid listings. "
-        f"(filtered out {filtered_out} Izutaiyo search-only false positives; "
-        f"filtered out {maple_filtered_out} Maple non-qualifiers; "
-        f"filtered out {aoba_filtered_out} Aoba non-qualifiers)"
-    )
-    if failures:
-        print(f"Note: {len(failures)} pages failed.")
+    with open("listings.json", "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, indent=2)
 
+    with open("buildInfo.json", "w", encoding="utf-8") as f:
+        json.dump({"generatedAt": now_iso}, f, ensure_ascii=False, indent=2)
+
+    print(f"Done. Saved {len(listings)} valid listings. (filtered out {filtered_out} total)")
+    if failures or maple_failures or aoba_failures:
+        all_fail = failures + maple_failures + aoba_failures
+        print(f"Note: {len(all_fail)} pages failed.")
 
 if __name__ == "__main__":
     main()
