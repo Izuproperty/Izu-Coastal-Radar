@@ -191,10 +191,10 @@
 
     <select id="source-select" onchange="applyFilters()"></select>
 
+    <!-- Condos removed -->
     <select id="type-select" onchange="applyFilters()">
       <option value="all">All Types</option>
       <option value="house">House</option>
-      <option value="mansion">Condo</option>
       <option value="land">Land</option>
     </select>
 
@@ -246,12 +246,13 @@
 
   const PROXY = "https://corsproxy.io/?";
 
+  // EN-only: remove “Town/City” suffixes
   const LOC_MAP_EN = {
-    "下田市": "Shimoda City",
-    "河津町": "Kawazu Town",
-    "東伊豆町": "Higashi-Izu Town",
-    "南伊豆町": "Minami-Izu Town",
-    "伊東市": "Ito City",
+    "下田市": "Shimoda",
+    "河津町": "Kawazu",
+    "東伊豆町": "Higashi-Izu",
+    "南伊豆町": "Minami-Izu",
+    "伊東市": "Ito",
   };
 
   const LOC_MAP_CN = {
@@ -328,10 +329,11 @@
     }
   };
 
+  // Condos removed
   const TYPE_LABELS = {
-    EN: { house: "House", mansion: "Condo", land: "Land" },
-    JP: { house: "戸建", mansion: "マンション", land: "土地" },
-    CN: { house: "独栋", mansion: "公寓", land: "土地" }
+    EN: { house: "House", land: "Land" },
+    JP: { house: "戸建", land: "土地" },
+    CN: { house: "独栋", land: "土地" }
   };
 
   const EVENT_TYPE_MAP = {
@@ -433,12 +435,11 @@
 
     document.getElementById('useful-links').innerText = t.usefulLinks;
 
-    // Update select static option labels
+    // Update select static option labels (condos removed)
     const typeSel = document.getElementById('type-select');
     typeSel.options[0].text = t.allTypes;
     typeSel.options[1].text = TYPE_LABELS[STATE.lang].house;
-    typeSel.options[2].text = TYPE_LABELS[STATE.lang].mansion;
-    typeSel.options[3].text = TYPE_LABELS[STATE.lang].land;
+    typeSel.options[2].text = TYPE_LABELS[STATE.lang].land;
 
     const viewSel = document.getElementById('seaview-select');
     viewSel.options[0].text = t.anyView;
@@ -631,7 +632,6 @@
     const d = formatEventDate(listing.eventDate);
     if (!d) return "";
 
-    // e.g., "Update: Price change • 2025-12-14"
     return `<strong>${t.eventLabel}:</strong> ${label} • ${d}`;
   }
 
@@ -705,7 +705,6 @@
     const gen = DATA.generatedAt ? new Date(DATA.generatedAt) : null;
     const genStr = gen ? gen.toLocaleString() : "-";
 
-    // Display as: USD/JPY and CNY/JPY (JPY per unit)
     const usd = Number(DATA.fxUsdJpy || 0);
     const cny = Number(DATA.fxCnyJpy || 0);
 
