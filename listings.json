@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-16T18:39:33Z",
+  "generatedAt": "2025-12-17T18:40:19Z",
   "fxRate": 155,
   "listings": [
     {
@@ -407,6 +407,7 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/10/6780-1.jpg",
       "highlightTags": [
         "Sea View",
+        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
@@ -558,7 +559,8 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/12/6662-1.jpg",
       "highlightTags": [
-        "Sea View"
+        "Sea View",
+        "Onsen"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
     }
@@ -573,8 +575,8 @@
     "rawHpnoCount": 39,
     "filteredOutSearchOnly": 14,
     "mapleFilteredOut": 132,
-    "aobaFilteredOut": 203,
-    "failures": 14
+    "aobaFilteredOut": 0,
+    "failures": 9
   },
   "failures": [
     "https://www.izutaiyo.co.jp/d.php?hpno=MIB289M",
@@ -584,12 +586,7 @@
     "https://www.izutaiyo.co.jp/d.php?hpno=SM2013M",
     "https://www.izutaiyo.co.jp/d.php?hpno=SMB407M",
     "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
-    "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room99255589.html",
-    "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
-    "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
-    "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
-    "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94642399.html",
-    "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room93233048.html",
-    "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room83802693.html"
+    "https://www.aoba-resort.com/house/",
+    "https://www.aoba-resort.com/land/"
   ]
 }
