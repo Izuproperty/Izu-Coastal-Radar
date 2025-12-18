@@ -1211,12 +1211,26 @@ AOBA_SEA_KEYWORDS = [
     "御蔵島",
     "八丈島",
     "初島",
+    "伊豆七島",
+    "水平線",
+    "駿河湾",
+    "須崎湾",
+    "オーシャン",
+    "シービュー",
+    "海景",
+    "海眺望",
+    "オーシャンフロント",
 ]
 
 AOBA_WALK_KEYWORDS = [
     "海が近い",
     "海まで徒歩圏",
     "海まで徒歩圏内",
+    "海岸まで徒歩",
+    "ビーチまで徒歩",
+    "海水浴場まで徒歩",
+    "徒歩圏内で海",
+    "徒歩圏内 海",
 ]
 
 
@@ -1457,54 +1471,181 @@ def _aoba_pick_image_url(
     candidates.sort(key=rank, reverse=True)
     return candidates[0]
 
-def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_type: str) -> Tuple[Optional[dict], bool]:
-    r = request(session, detail_url, headers=HEADERS_DESKTOP, retries=4, timeout=25)
+def _aoba_looks_blocked(html: str) -> bool:
+    """Heuristic detection for bot-block/JS-required interstitial pages that still return HTTP 200."""
+    if not html:
+        return True
+    h = html.lower()
+    # Common bot / JS-required markers
+    markers = [
+        "just a moment", "checking your browser", "cloudflare",
+        "access denied", "forbidden", "attention required",
+        "enable javascript", "please enable javascript",
+        "are you a human", "captcha",
+    ]
+    if any(m in h for m in markers):
+        return True
+    # Too-short HTML is almost never a real detail page
+    if len(html) < 1500:
+        return True
+    return False
+
+
+def _aoba_request_detail(session: requests.Session, detail_url: str) -> str:
+    """
+    Fetch Aoba detail HTML.
+    Aoba sometimes serves JS/anti-bot pages that look like HTTP 200 but contain no listing data.
+    We try:
+      1) Direct desktop request
+      2) Direct mobile host (m.aoba-resort.com)
+      3) Jina Reader fallback: https://r.jina.ai/<url>
+    """
+    # 1) Desktop
+    r = request(session, detail_url, headers=HEADERS_DESKTOP, retries=3, timeout=25)
     html = r.text or ""
-    soup = BeautifulSoup(html, "html.parser")
+    if not _aoba_looks_blocked(html):
+        return html
 
-    # Try to focus on the main content area (avoid nav/footer/recommended contamination where possible)
-    def _pick_detail_scope(s: BeautifulSoup) -> BeautifulSoup:
-        candidates = []
-        for sel in ("main", "article", "div#main", "div#content", "div#contents", "div.entry-content", "div.l-main", "div.container"):
-            el = s.select_one(sel)
-            if el:
-                t = clean_text(el.get_text(" ", strip=True))
-                if len(t) > 400:
-                    candidates.append((len(t), el))
-        if candidates:
-            candidates.sort(key=lambda x: x[0], reverse=True)
-            return candidates[0][1]
-        return s
+    # 2) Mobile host fallback
+    try:
+        mobile_url = detail_url.replace("https://www.aoba-resort.com/", "https://m.aoba-resort.com/")
+        r2 = request(session, mobile_url, headers=HEADERS_MOBILE, retries=2, timeout=25)
+        html2 = r2.text or ""
+        if not _aoba_looks_blocked(html2):
+            return html2
+    except Exception:
+        pass
 
-    scope = _pick_detail_scope(soup)
-    scope_text = clean_text(scope.get_text(" ", strip=True))
+    # 3) Jina Reader fallback (often bypasses blocking / JS issues)
+    jina_url = "https://r.jina.ai/" + detail_url
+    r3 = request(session, jina_url, headers={"User-Agent": HEADERS_DESKTOP.get("User-Agent", "")}, retries=2, timeout=30)
+    return r3.text or ""
 
+
+def _aoba_build_signal_text(soup: BeautifulSoup, scope: Optional[BeautifulSoup] = None) -> str:
+    """
+    Build a robust text blob for city + view/walk detection.
+    Aoba often hides the useful strings in meta tags / JSON-LD / attribute values.
+    """
+    parts: List[str] = []
+
+    try:
+        # Title/meta
+        title = soup.title.get_text(" ", strip=True) if soup.title else ""
+        if title:
+            parts.append(title)
+        for prop in ["og:title", "og:description", "description"]:
+            tag = soup.find("meta", attrs={"property": prop}) or soup.find("meta", attrs={"name": prop})
+            if tag and tag.get("content"):
+                parts.append(str(tag.get("content")))
+    except Exception:
+        pass
+
+    try:
+        # JSON-LD
+        for s in soup.find_all("script", type=re.compile(r"application/ld\+json", re.I)):
+            txt = (s.string or s.get_text() or "").strip()
+            if txt:
+                parts.append(txt)
+    except Exception:
+        pass
+
+    try:
+        # Full text + attribute values (attrs often contain address/area)
+        if scope is None:
+            scope = soup
+        parts.append(scope.get_text(" ", strip=True))
+        for el in scope.find_all(True):
+            for v in el.attrs.values():
+                if isinstance(v, str):
+                    parts.append(v)
+                elif isinstance(v, (list, tuple)):
+                    parts.extend([str(x) for x in v if isinstance(x, str)])
+    except Exception:
+        pass
+
+    return clean_text(" ".join([p for p in parts if p]))
+
+
+def _aoba_city_from_any(addr: str, signal_text: str, detail_url: str, ctx_text: str = "") -> str:
+    """
+    Determine city for Aoba.
+    Priority: explicit address -> signal text -> ctx text -> bknarea mapping.
+    """
+    # 1) From address (most reliable when present)
+    if addr:
+        c = _aoba_city_from_address(addr)
+        if c:
+            return c
+
+    # 2) From signal text (fallback when address table not present / JS-loaded)
+    for txt in [signal_text, ctx_text]:
+        if not txt:
+            continue
+        c = _aoba_extract_city_from_text(txt)
+        if c:
+            return c
+
+    # 3) From bknarea code in URL
+    bkn = None
+    m = re.search(r"bknarea-ao(\d+)", detail_url)
+    if m:
+        bkn = m.group(1)
+    if bkn and bkn in AOBA_BKNAREA_TO_CITY:
+        return AOBA_BKNAREA_TO_CITY[bkn]
+
+    return ""
+
+
+def parse_aoba_detail_page(
+    session: requests.Session,
+    detail_url: str,
+    property_type: str,
+    ctx_text: str = "",
+) -> Tuple[Optional[dict], bool]:
+    """
+    Parse Aoba detail page.
+
+    Important: do NOT require the address table to exist.
+    Aoba frequently renders key fields via JS; in that case, we fall back to signal-text parsing
+    (meta/JSON-LD/attributes) and/or the bknarea->city mapping.
+    """
+    html = _aoba_request_detail(session, detail_url)
+    soup = BeautifulSoup(html or "", "html.parser")
+
+    # Try to focus on the main listing scope
+    scope = soup.find("main") or soup.find("article") or soup
+
+    signal_text = _aoba_build_signal_text(soup, scope=scope)
+
+    # Address + city
     addr = _aoba_extract_address(soup, scope)
-    city = _aoba_city_from_address(addr)
+    city = _aoba_city_from_any(addr, signal_text, detail_url, ctx_text=ctx_text)
 
-    # Strict: only keep allowed cities confirmed from the listing's own address field.
     if city not in {"下田市", "東伊豆町"}:
         return None, False
 
-    sea_view, walk_to_sea = _aoba_sea_view_and_walk(scope_text)
-    if not (sea_view or walk_to_sea):
+    # View / walk detection (Aoba often uses 伊豆大島 / 伊豆七島 / 相模湾 etc)
+    sea_view, walk_to_sea = _aoba_sea_view_and_walk(signal_text)
+    if not sea_view and not walk_to_sea:
         return None, False
 
+    # Room ID (for stable IDs)
     room_id = None
-    m = re.search(r"room(\d+)\.html", urlparse(detail_url).path)
+    m = re.search(r"room(\d+)\.html", detail_url)
     if m:
         room_id = m.group(1)
 
-    # Price (JPY)
+    # Price
     price_jpy = None
-    m = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*万円", scope_text)
-    if m:
-        try:
-            price_jpy = int(m.group(1).replace(",", "")) * 10000
-        except Exception:
-            price_jpy = None
+    try:
+        m = re.search(r"([0-9,]+)\s*万円", signal_text)
+        if m:
+            price_jpy = int(float(m.group(1).replace(",", "")) * 10000)
+    except Exception:
+        price_jpy = None
     if price_jpy is None:
-        m = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*円", scope_text)
+        m = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*円", signal_text)
         if m:
             try:
                 price_jpy = int(m.group(1).replace(",", ""))
@@ -1514,16 +1655,13 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
     # Areas
     land_sqm = None
     building_sqm = None
-
-    # Prefer table-derived values when possible
-    m = re.search(r"(土地面積|敷地面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", scope_text)
+    m = re.search(r"(土地面積|敷地面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", signal_text)
     if m:
         try:
             land_sqm = float(m.group(2))
         except Exception:
             land_sqm = None
-
-    m = re.search(r"(建物面積|延床面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", scope_text)
+    m = re.search(r"(建物面積|延床面積)[^0-9]{0,6}(\d+(?:\.\d+)?)\s*㎡", signal_text)
     if m:
         try:
             building_sqm = float(m.group(2))
@@ -1532,20 +1670,19 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
 
     # Year built
     year_built = None
-    m = re.search(r"(築年数|築年月|築)\s*[:：]?\s*(\d{4})\s*年", scope_text)
+    m = re.search(r"(築年数|築年月|築)\s*[:：]?\s*(\d{4})\s*年", signal_text)
     if m:
         try:
             year_built = int(m.group(2))
         except Exception:
             year_built = None
 
-    # Age
-    age = None
+    age = 0
     if year_built:
         try:
-            age = datetime.now(timezone.utc).year - year_built
+            age = round(datetime.now(timezone.utc).year - year_built, 1)
         except Exception:
-            age = None
+            age = 0
 
     # Tags
     tags: List[str] = []
@@ -1553,12 +1690,12 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
         tags.append("Sea View")
     if walk_to_sea:
         tags.append("Walk to Sea")
-    if _aoba_has_onsen(scope_text):
+    if _aoba_has_onsen(signal_text):
         tags.append("Onsen")
 
     sea_score = 4 if sea_view else (3 if walk_to_sea else 0)
 
-        # Image: prefer og:image; otherwise pick from the main scope.
+    # Image (best-effort). If we used Jina fallback, image extraction may fail; that's OK.
     og_image = None
     try:
         mtag = soup.find("meta", property="og:image")
@@ -1571,28 +1708,18 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
         _aoba_pick_image_url(scope, detail_url, room_id=room_id, og_image=og_image)
         or _aoba_pick_image_url(soup, detail_url, room_id=room_id, og_image=og_image)
     )
-
-    # Drop obvious chrome/placeholder or mismatched IDs
     if image_url:
         ul = image_url.lower()
         if any(bad in ul for bad in ["page_top", "logo", "icon", "sprite", "noimage", "loading"]):
             image_url = None
-        if room_id and image_url and ("img-asp.jp/bkn/" in ul) and (not re.search(rf"/bkn/{re.escape(room_id)}[_-]", ul)):
-            image_url = None
 
-# Titles (keep simple and consistent with other sources)
+    # Titles: keep simple + readable; remove any "No.xxxxxxxx" artifacts if present in meta titles
     type_jp = {"house": "戸建", "land": "土地"}.get(property_type, "物件")
     type_en = {"house": "House", "land": "Land"}.get(property_type, "Listing")
+
     title = f"{city} {type_jp}".strip()
     title_en_city = CITY_EN_MAP.get(city, city)
     title_en = f"{title_en_city} {type_en}".strip()
-    # Normalize EN type label
-    if property_type == "house":
-        title_en = f"{title_en_city} House {no_part}".strip()
-    elif property_type == "land":
-        title_en = f"{title_en_city} Land {no_part}".strip()
-    elif property_type == "mansion":
-        title_en = f"{title_en_city} Mansion {no_part}".strip()
 
     item = {
         "id": f"aoba-{room_id}" if room_id else f"aoba-{hash(detail_url)}",
@@ -1606,7 +1733,7 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
         "landSqm": land_sqm,
         "buildingSqm": building_sqm,
         "yearBuilt": year_built,
-        "age": round(age, 1) if age else 0,
+        "age": age,
         "lastUpdated": None,
         "seaViewScore": sea_score,
         "imageUrl": image_url,
@@ -1683,7 +1810,7 @@ def scrape_aoba(
                 seen_detail.add(detail_url)
 
                 try:
-                    item, kept = parse_aoba_detail_page(session, detail_url, ptype)
+                    item, kept = parse_aoba_detail_page(session, detail_url, ptype, ctx_text=ctx_text)
                     if not kept or not item:
                         filtered_out += 1
                         continue
