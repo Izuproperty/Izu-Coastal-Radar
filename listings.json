@@ -1,29 +1,7 @@
 {
-  "generatedAt": "2025-12-19T04:16:46Z",
+  "generatedAt": "2025-12-19T18:37:10Z",
   "fxRate": 155,
   "listings": [
-    {
-      "id": "izutaiyo-HIP593H",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP593H",
-      "title": "東伊豆町 熱川台",
-      "titleEn": "Higashi-Izu Town 熱川台",
-      "propertyType": "house",
-      "city": "東伊豆町",
-      "priceJpy": 15800000,
-      "landSqm": 310.72,
-      "buildingSqm": 167.4,
-      "yearBuilt": 1990,
-      "age": 35.6,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip593ha.jpg",
-      "highlightTags": [
-        "Sea View"
-      ],
-      "firstSeen": "2025-12-16T14:38:00Z",
-      "eventTypeJp": "新規登録",
-      "eventDate": "2025-11-29"
-    },
     {
       "id": "izutaiyo-HIP608H",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP608H",
@@ -577,8 +555,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/08/6765-1.jpg",
       "highlightTags": [
-        "Sea View",
-        "Walk to Sea"
+        "Sea View"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
     },
@@ -643,6 +620,7 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/12/6613-1.jpg",
       "highlightTags": [
         "Sea View",
+        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
@@ -733,83 +711,24 @@
         "Onsen"
       ],
       "firstSeen": "2025-12-19T04:16:46Z"
-    },
-    {
-      "id": "aoba-98036165",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
-      "title": "下田市 戸建 No.98036165",
-      "titleEn": "Shimoda City House No.98036165",
-      "propertyType": "house",
-      "city": "下田市",
-      "priceJpy": 34800000,
-      "landSqm": 363.82,
-      "buildingSqm": 401.29,
-      "yearBuilt": 1989,
-      "age": 36,
-      "lastUpdated": null,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=1766022821",
-      "highlightTags": [
-        "Walk to Sea"
-      ],
-      "firstSeen": "2025-12-18T15:15:58Z"
-    },
-    {
-      "id": "aoba-93233048",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room93233048.html",
-      "title": "東伊豆町 土地 No.93233048",
-      "titleEn": "Higashi-Izu Town Land No.93233048",
-      "propertyType": "land",
-      "city": "東伊豆町",
-      "priceJpy": 4800000,
-      "landSqm": 286.0,
-      "buildingSqm": null,
-      "yearBuilt": null,
-      "age": 0,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/93233048_1_500_500_3.jpg?t=1766022876",
-      "highlightTags": [
-        "Sea View"
-      ],
-      "firstSeen": "2025-12-18T15:15:58Z"
-    },
-    {
-      "id": "aoba-83802693",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room83802693.html",
-      "title": "東伊豆町 土地 No.83802693",
-      "titleEn": "Higashi-Izu Town Land No.83802693",
-      "propertyType": "land",
-      "city": "東伊豆町",
-      "priceJpy": 9800000,
-      "landSqm": 318.45,
-      "buildingSqm": null,
-      "yearBuilt": null,
-      "age": 0,
-      "lastUpdated": null,
-      "seaViewScore": 4,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/83802693_1_500_500_3.jpg?t=1766022831",
-      "highlightTags": [
-        "Sea View"
-      ],
-      "firstSeen": "2025-12-18T15:15:58Z"
     }
   ],
   "stats": {
-    "count": 38,
-    "izutaiyoCount": 25,
+    "count": 34,
+    "izutaiyoCount": 24,
     "mapleCount": 10,
-    "aobaCount": 3,
+    "aobaCount": 0,
     "tokusenHpnoCount": 14,
-    "searchAddedHpnoCount": 25,
-    "rawHpnoCount": 39,
+    "searchAddedHpnoCount": 24,
+    "rawHpnoCount": 38,
     "filteredOutSearchOnly": 14,
     "mapleFilteredOut": 142,
-    "aobaFilteredOut": 5,
-    "failures": 0
+    "aobaFilteredOut": 0,
+    "failures": 3
   },
-  "failures": []
+  "failures": [
+    "https://www.aoba-resort.com/house/",
+    "https://www.aoba-resort.com/mansion/",
+    "https://www.aoba-resort.com/land/"
+  ]
 }
