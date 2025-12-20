@@ -748,6 +748,13 @@ CITY_EN_MAP = {
     "函南町": "Kannami Town",
 }
 
+CITY_EN_MAP_SHORT = {k: re.sub(r"\s+(City|Town)$", "", v) for k, v in CITY_EN_MAP.items()}
+
+def city_en_short(jp_city: str) -> str:
+    v = CITY_EN_MAP.get(jp_city, jp_city) if jp_city else ""
+    return re.sub(r"\s+(City|Town)$", "", v)
+
+
 def _abs_url(base: str, href: str) -> str:
     href = (href or "").strip()
     if not href:
@@ -852,17 +859,46 @@ def _parse_year_built(text: str) -> Optional[int]:
     return None
 
 def _maple_has_onsen(text: str) -> bool:
-    t = text or ""
-    # Prefer explicit field like 温泉：有/無
-    m = re.search(r"温泉\s*[:：]\s*([^\s　]+)", t)
+    """Maple 'onsen' detection.
+
+    Maple pages sometimes express onsen as:
+      - 温泉：有/無 (explicit field)
+      - 温泉付 / 温泉付き
+      - 温泉権 / 温泉権利
+      - 温泉引込 / 温泉引き込み / 温泉引込み
+
+    Guard against common negatives (温泉なし/無/不可).
+    """
+    t = (text or "").replace("：", ":")
+
+    # Strong negatives
+    if any(neg in t for neg in ["温泉なし", "温泉無し", "温泉無", "温泉不可", "温泉利用不可", "温泉:無", "温泉:なし", "温泉:不可"]):
+        return False
+
+    # Explicit field: 温泉：有/無 etc.
+    m = re.search(r"温泉\s*[:：]?\s*([^\s　]+)", t)
     if m:
-        v = m.group(1)
-        if any(x in v for x in ["有", "あり", "○"]):
-            return True
-        if any(x in v for x in ["無", "なし", "×"]):
+        v = m.group(1).strip()
+        if any(k in v for k in ["-", "無", "なし", "無し", "不可", "×"]):
             return False
-    # Fallback keyword
-    return "温泉" in t and any(x in t for x in ["あり", "有", "源泉", "かけ流し", "掛け流し"])
+        if any(k in v for k in ["有", "あり", "有り", "○", "付", "引込", "引き込み", "権", "権利", "可能", "可", "源泉", "かけ流し", "掛け流し"]):
+            return True
+
+    # Phrase-based positives
+    positives = [
+        "温泉付", "温泉付き", "温泉つき",
+        "温泉権", "温泉権利",
+        "温泉引込", "温泉引き込み", "温泉引込み",
+        "源泉", "かけ流し", "掛け流し",
+    ]
+    if any(p in t for p in positives):
+        return True
+
+    # Generic fallback
+    if "温泉" in t and any(k in t for k in ["有", "あり", "有り", "付", "権", "引込", "源泉", "かけ流し", "掛け流し"]):
+        return True
+
+    return False
 
 def _maple_sea_view_and_walk(text: str) -> Tuple[bool, bool]:
     """Heuristic: (sea_view, walk_to_sea). walk_to_sea if <= 20 min on foot or <=1500m."""
@@ -1052,12 +1088,21 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
     # To keep the UI consistent (and translation-friendly), synthesize a compact title.
     type_jp = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, "物件")
     type_en = {"house": "House", "mansion": "Mansion", "land": "Land"}.get(property_type, "Listing")
-    no_part = f"No.{no}" if no else "No."
-    title_city = city or "Maple"
-    title = f"{title_city} {type_jp} {no_part}".strip()
+    # Titles: keep them clean (no 'No.xxxx' artifacts).
+    title_city = city or ""
+    if property_type == "house":
+        type_jp = "戸建"
+        type_en = "House"
+    elif property_type == "land":
+        type_jp = "土地"
+        type_en = "Land"
+    else:
+        type_jp = "物件"
+        type_en = "Listing"
 
-    title_en_city = CITY_EN_MAP.get(city, city) if city else "Maple"
-    title_en = f"{title_en_city} {type_en} {no_part}".strip()
+    title = f"{title_city} {type_jp}".strip() if title_city else type_jp
+    title_en_city = city_en_short(city) if city else "Maple"
+    title_en = f"{title_en_city} {type_en}".strip()
 
     # Price
     price_jpy = None
@@ -1212,6 +1257,7 @@ AOBA_SEA_KEYWORDS = [
     "海の見える",
     "相模湾",
     "伊豆諸島",
+    "伊豆七島", "伊豆の島々", "島々",
     "大島",
     "利島",
     "新島",
@@ -1394,7 +1440,7 @@ def _aoba_sea_view_and_walk(text: str) -> Tuple[bool, bool]:
 
     sea_view = any(k in t for k in AOBA_SEA_KEYWORDS)
     if not sea_view:
-        if re.search(r"(海|相模湾).{0,10}(望|眺望|見え)", t):
+        if re.search(r"(海|相模湾|伊豆諸島|伊豆七島|大島|オーシャン|Oshima|Sagami).{0,12}(望|眺望|見え|ビュー|一望)", t, re.IGNORECASE):
             sea_view = True
 
     walk_to_sea = False
@@ -1602,6 +1648,17 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
     signal_text = clean_text(" ".join(p for p in parts if p))
 
     sea_view, walk_to_sea = _aoba_sea_view_and_walk(signal_text)
+    # Fallback: some Aoba templates place the key 'view' wording outside the main content container.
+    # If we didn't detect anything yet, re-run detection on the full page text (still keyword-based).
+    if not sea_view and not walk_to_sea:
+        full_text = clean_text(soup.get_text(" ", strip=True))
+        for im in soup.find_all(["img", "source"]):
+            for a in ("alt", "title"):
+                v = (im.get(a) or "").strip()
+                if v:
+                    full_text += " " + v
+        sea_view, walk_to_sea = _aoba_sea_view_and_walk(full_text)
+
     if not (sea_view or walk_to_sea):
         if AOBA_DEBUG:
             # Print a short signal excerpt to understand misses
@@ -1700,10 +1757,18 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
 
 # Titles (keep simple and consistent with other sources)
     type_jp = {"house": "戸建", "mansion": "マンション", "land": "土地"}.get(property_type, "物件")
-    no_part = f"No.{room_id}" if room_id else "No."
-    title = f"{city} {type_jp} {no_part}".strip()
-    title_en_city = {"下田市": "Shimoda City", "東伊豆町": "Higashi-Izu Town"}.get(city, city)
-    title_en = f"{title_en_city} {type_jp if property_type!='mansion' else 'Mansion'} {no_part}".strip()
+    # Titles: clean (no listing numbers in headings)
+    if property_type == "house":
+        type_jp = "戸建"
+        type_en = "House"
+    else:
+        type_jp = "土地"
+        type_en = "Land"
+
+    title_city = city or ""
+    title = f"{title_city} {type_jp}".strip() if title_city else type_jp
+    title_en_city = city_en_short(city) if city else "Aoba"
+    title_en = f"{title_en_city} {type_en}".strip()
     # Normalize EN type label
     if property_type == "house":
         title_en = f"{title_en_city} House {no_part}".strip()
