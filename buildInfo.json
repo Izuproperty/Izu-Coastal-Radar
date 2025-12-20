@@ -1,9 +1,10 @@
 {
-  "generatedAt": "2025-12-20T14:47:51.843404+00:00",
+  "generatedAt": "2025-12-20T14:56:45.324243+00:00",
   "counts": {
-    "total": 64,
+    "total": 61,
     "izutaiyo": 42,
     "maple": 18,
-    "aoba": 4
+    "aoba": 1,
+    "tokai": 0
   }
 }

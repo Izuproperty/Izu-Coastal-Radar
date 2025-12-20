@@ -2,16 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-Izu Coastal Radar listings generator (Izutaiyo + Maple + Aoba)
+Izu Coastal Radar listings generator
+Sources: Izu Taiyo + Maple + Aoba + Tokai Yajima
 
 Outputs:
   - listings.json
   - buildInfo.json
 
 Updates:
-- LOCATIONS: Shimoda, Higashi-Izu, Minami-Izu, AND Kawazu allowed.
-- Filters: No Condos, Sea View/Walk required.
-- Debugging: Verbose prints retained for troubleshooting.
+- Added Tokai Yajima source.
+- Fixed Izu Taiyo image links (handling relative paths).
+- Expanded Sea View keywords (Yumigahama, Hirizo) to catch Minami Izu properties.
 """
 
 from __future__ import annotations
@@ -39,12 +40,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 IZUTAIYO_BASE = "https://www.izutaiyo.co.jp"
 MAPLE_BASE = "https://www.maple-h.co.jp"
 AOBA_BASE = "https://www.aoba-resort.com"
+TOKAI_BASE = "https://tokaiyajima.com"
 
 OUT_LISTINGS = "listings.json"
 OUT_BUILDINFO = "buildInfo.json"
 
-SLEEP_MIN = 0.50
-SLEEP_MAX = 1.00
+SLEEP_MIN = 1.00
+SLEEP_MAX = 2.00
 
 DEFAULT_RETRIES = 3
 
@@ -70,9 +72,11 @@ CITY_EN_MAP = {
     "静岡市": "Shizuoka",
 }
 
+# Expanded keywords to catch Minami Izu specific spots
 SEA_KEYWORDS = [
     "海", "オーシャン", "海望", "海一望", "相模湾", "駿河湾", 
-    "太平洋", "海近", "海岸", "ビーチ", "Sea", "Ocean", "白浜"
+    "太平洋", "海近", "海岸", "ビーチ", "Sea", "Ocean", "白浜",
+    "弓ヶ浜", "ヒリゾ", "外浦", "吉佐美", "入田", "多々戸"
 ]
 WALK_KEYWORDS = ["徒歩", "歩", "近", "Walk"]
 
@@ -155,27 +159,12 @@ def request(session: requests.Session, url: str, *, headers: dict = HEADERS_DESK
     raise last_exc  # type: ignore
 
 def normalize_city_jp(text: str) -> Optional[str]:
-    """
-    Scans text for strict target cities.
-    Handles 'Kamo-gun Higashi-Izu-cho' by finding 'Higashi-Izu'.
-    """
+    """Scans text for strict target cities."""
     if not text: return None
-    # Check strictly allowed list only
     if "東伊豆" in text: return "東伊豆町"
     if "南伊豆" in text: return "南伊豆町"
     if "河津" in text: return "河津町"
     if "下田" in text: return "下田市"
-    return None
-
-def detect_city_in_text(text: str) -> Optional[str]:
-    # Helper for debugging prints
-    if "東伊豆" in text: return "東伊豆町"
-    if "南伊豆" in text: return "南伊豆町"
-    if "河津" in text: return "河津町"
-    if "下田" in text: return "下田市"
-    if "伊東" in text: return "伊東市"
-    if "伊豆市" in text: return "伊豆市"
-    if "熱海" in text: return "熱海市"
     return None
 
 def load_prev_first_seen(path: str = OUT_LISTINGS) -> Dict[str, str]:
@@ -200,9 +189,7 @@ def apply_first_seen(listing_id: str, now: str, prev: Dict[str, str]) -> str:
 # ----------------------------
 
 def scan_izutaiyo_urls(session) -> Set[str]:
-    """Grab ALL property URLs first."""
     found_urls = set()
-    
     print("  - Scanning Tokusen...")
     try:
         r = request(session, f"{IZUTAIYO_BASE}/tokusen.php")
@@ -232,7 +219,6 @@ def scan_izutaiyo_urls(session) -> Set[str]:
                     found_urls.add(urljoin(url, a['href']))
             sleep_jitter()
         except: break
-
     return found_urls
 
 def parse_izutaiyo_detail(session, url, event_records) -> Tuple[Optional[dict], bool]:
@@ -244,41 +230,25 @@ def parse_izutaiyo_detail(session, url, event_records) -> Tuple[Optional[dict], 
         m_id = re.search(r"hp(?:bun)?no=([A-Za-z0-9]+)", url)
         raw_id = m_id.group(1) if m_id else str(abs(hash(url)))
         
-        # 1. Title
         title = ""
         h = soup.find(["h1", "h2"])
         if h: title = clean_text(h.get_text())
         
-        # 2. Location Check
         city = normalize_city_jp(text)
-        if not city:
-            found_city = detect_city_in_text(text)
-            if found_city:
-                print(f"    [Skip IzuTaiyo] City not allowed: {found_city} ({url})")
-            else:
-                print(f"    [Skip IzuTaiyo] No city detected ({url})")
-            return None, True
+        if not city: return None, True
 
-        # 3. Type Filter (Mansion)
         if "マンション" in title or "マンション" in text:
             is_mansion = False
             for tr in soup.find_all("tr"):
                  if "種目" in tr.get_text() and "マンション" in tr.get_text():
                      is_mansion = True
-            if is_mansion:
-                print(f"    [Skip IzuTaiyo] Condo detected: {title}")
-                return None, True
+            if is_mansion: return None, True
         
-        # 4. Sea View Filter
         sea_score = 0
         if any(k in text for k in SEA_KEYWORDS): sea_score = 4
         if "海まで徒歩" in text or "海へ徒歩" in text: sea_score = max(sea_score, 3)
-        
-        if sea_score == 0:
-             print(f"    [Skip IzuTaiyo] No Sea View keywords found: {title}")
-             return None, True
+        if sea_score == 0: return None, True
 
-        # Property Type
         ptype = "house"
         if "土地" in title and "戸建" not in title: ptype = "land"
         elif "売地" in title: ptype = "land"
@@ -301,11 +271,15 @@ def parse_izutaiyo_detail(session, url, event_records) -> Tuple[Optional[dict], 
         year = year_from_text(text)
         age = compute_age(year)
 
+        # FIX: Robust image extraction (handling relative paths)
         img = None
         og = soup.find("meta", attrs={"property": "og:image"})
-        if og: img = og.get("content")
-        if img and img.startswith("/"):
-            img = urljoin(IZUTAIYO_BASE, img)
+        if og:
+            raw_img = og.get("content")
+            if raw_img:
+                # Resolve relative path against BASE URL, not current page URL
+                # Izu Taiyo OG images are often relative to root
+                img = urljoin(IZUTAIYO_BASE, raw_img)
 
         etype, edate = event_records.get(raw_id, (None, None))
 
@@ -330,10 +304,7 @@ def parse_izutaiyo_detail(session, url, event_records) -> Tuple[Optional[dict], 
             "eventDate": edate,
         }
         return item, True
-
-    except Exception as e:
-        print(f"    [Error IzuTaiyo] {e}")
-        return None, False
+    except: return None, False
 
 
 # ----------------------------
@@ -347,15 +318,11 @@ def parse_maple_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
         text = clean_text(soup.get_text(" ", strip=True))
 
         city = normalize_city_jp(text)
-        if not city: 
-            return None, True 
+        if not city: return None, True 
 
-        # Filter: Sea View or Walk
         sea = any(k in text for k in SEA_KEYWORDS)
         walk = any(k in text for k in WALK_KEYWORDS) and any(k in text for k in ["海", "ビーチ"])
-        
-        if not (sea or walk):
-            return None, True
+        if not (sea or walk): return None, True
 
         title = ""
         og_t = soup.find("meta", attrs={"property": "og:title"})
@@ -364,7 +331,6 @@ def parse_maple_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
             title = f"{city} {('戸建' if ptype=='house' else '土地')}"
         
         price = yen_to_int(text)
-        
         land_sqm = None
         m_l = re.search(r"(?:土地面積|土地)\s*[:：]?\s*([0-9\.]+)\s*㎡", text)
         if m_l: land_sqm = safe_float(m_l.group(1))
@@ -378,8 +344,7 @@ def parse_maple_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
 
         tags = []
         if "温泉" in text and any(k in text for k in ["有", "付", "権利", "引込"]):
-            if "温泉無" not in text:
-                tags.append("Onsen")
+            if "温泉無" not in text: tags.append("Onsen")
 
         img = None
         og_img = soup.find("meta", attrs={"property": "og:image"})
@@ -407,8 +372,7 @@ def parse_maple_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
             "highlightTags": tags,
         }
         return item, True
-    except:
-        return None, False
+    except: return None, False
 
 def scrape_maple(session, now, prev):
     listings = []
@@ -444,6 +408,7 @@ def scrape_maple(session, now, prev):
         except: pass
     return listings
 
+
 # ----------------------------
 # Aoba
 # ----------------------------
@@ -459,11 +424,9 @@ def parse_aoba_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
 
         sea = any(k in text for k in SEA_KEYWORDS)
         walk = any(k in text for k in WALK_KEYWORDS) and any(k in text for k in ["海", "ビーチ", "海岸"])
-        
         if not (sea or walk): return None, True
 
         price = yen_to_int(text)
-        
         title = f"{city} {('戸建' if ptype=='house' else '土地')}"
         
         land_sqm = None
@@ -503,8 +466,7 @@ def parse_aoba_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
             "highlightTags": [],
         }
         return item, True
-    except:
-        return None, False
+    except: return None, False
 
 def scrape_aoba(session, now, prev):
     listings = []
@@ -538,6 +500,137 @@ def scrape_aoba(session, now, prev):
         except: pass
     return listings
 
+
+# ----------------------------
+# Tokai Yajima
+# ----------------------------
+
+def parse_tokai_detail(session, url) -> Tuple[Optional[dict], bool]:
+    try:
+        r = request(session, url)
+        r.encoding = r.apparent_encoding
+        soup = BeautifulSoup(r.text, "html.parser")
+        text = clean_text(soup.get_text(" ", strip=True))
+
+        # Check City
+        city = normalize_city_jp(text)
+        if not city: return None, True
+
+        # Check Condo
+        # Tokai Yajima often puts type in title or a table
+        title = ""
+        h = soup.find(["h1", "h2"])
+        if h: title = clean_text(h.get_text())
+        if "マンション" in title or "マンション" in text:
+             # double check
+             if "種別" in text and "マンション" in text:
+                 return None, True
+
+        # Check Sea View
+        sea = any(k in text for k in SEA_KEYWORDS)
+        walk = any(k in text for k in WALK_KEYWORDS) and any(k in text for k in ["海", "ビーチ"])
+        if not (sea or walk): return None, True
+
+        # Extract Price
+        price = yen_to_int(text)
+        if not price:
+             # try finding .price class
+             p_tag = soup.find(class_=re.compile("price"))
+             if p_tag: price = yen_to_int(p_tag.get_text())
+
+        # Type (Land/House)
+        ptype = "house"
+        if "土地" in title or "売地" in title: ptype = "land"
+
+        land_sqm = None
+        m_l = re.search(r"土地(?:面積)?[:：]?\s*([0-9\.]+)\s*㎡", text)
+        if m_l: land_sqm = safe_float(m_l.group(1))
+
+        bldg_sqm = None
+        m_b = re.search(r"(?:建物|延床)面積[:：]?\s*([0-9\.]+)\s*㎡", text)
+        if m_b: bldg_sqm = safe_float(m_b.group(1))
+
+        year = year_from_text(text)
+        age = compute_age(year)
+        
+        tags = []
+        if "温泉" in text and any(k in text for k in ["有", "付", "権利", "引込"]):
+            if "温泉無" not in text: tags.append("Onsen")
+
+        # Image
+        img = None
+        # Try finding main image
+        main_img = soup.find("img", class_=re.compile("main|detail"))
+        if main_img:
+             img = urljoin(TOKAI_BASE, main_img.get("src"))
+        if not img:
+             og = soup.find("meta", attrs={"property": "og:image"})
+             if og: img = urljoin(TOKAI_BASE, og.get("content"))
+
+        m_id = re.search(r"/bukken/(\d+)", url)
+        raw_id = m_id.group(1) if m_id else str(abs(hash(url)))
+
+        item = {
+            "id": f"tokai-{raw_id}",
+            "source": "Tokai Yajima",
+            "sourceUrl": url,
+            "title": title or "Tokai Property",
+            "titleEn": f"{CITY_EN_MAP.get(city, city)} {ptype.capitalize()}",
+            "propertyType": ptype,
+            "city": city,
+            "priceJpy": price,
+            "landSqm": land_sqm,
+            "buildingSqm": bldg_sqm,
+            "yearBuilt": year,
+            "age": round(age, 1) if age else 0,
+            "lastUpdated": None,
+            "seaViewScore": 4 if sea else 3,
+            "imageUrl": img,
+            "highlightTags": tags,
+        }
+        return item, True
+
+    except Exception as e:
+        return None, False
+
+def scrape_tokai(session, now, prev):
+    listings = []
+    print("  - Tokai Yajima: Scanning...")
+    
+    # Try multiple entry points for safety
+    start_urls = [
+        f"{TOKAI_BASE}/search2/buy_result", # Generic list
+        f"{TOKAI_BASE}/search2/buy_area"     # Area select (might contain direct links)
+    ]
+    
+    found_urls = set()
+    for base_url in start_urls:
+        try:
+            r = request(session, base_url)
+            r.encoding = r.apparent_encoding
+            soup = BeautifulSoup(r.text, "html.parser")
+            
+            # Find detail links. Usually /bukken/info/... or ?bukken_id=...
+            for a in soup.find_all("a", href=True):
+                h = a['href']
+                # Tokai usually uses /bukken/ or similar
+                if "/bukken/" in h or "bukken_id" in h:
+                     found_urls.add(urljoin(base_url, h))
+        except: pass
+        sleep_jitter()
+
+    print(f"    Found {len(found_urls)} potential Tokai URLs. Filtering...")
+    
+    for u in found_urls:
+        item, ok = parse_tokai_detail(session, u)
+        if ok and item:
+             item["firstSeen"] = apply_first_seen(item["id"], now, prev)
+             listings.append(item)
+        sleep_jitter()
+        
+    return listings
+
+
 # ----------------------------
 # Main
 # ----------------------------
@@ -552,7 +645,7 @@ def main():
     events = {} 
     
     izutaiyo_urls = scan_izutaiyo_urls(session)
-    print(f"  - Found {len(izutaiyo_urls)} IzuTaiyo candidates. Checking details...")
+    print(f"  - Found {len(izutaiyo_urls)} IzuTaiyo candidates.")
     
     it_valid = 0
     for url in izutaiyo_urls:
@@ -571,6 +664,11 @@ def main():
     print("Scraping Aoba...")
     aoba_list = scrape_aoba(session, now, prev_seen)
     all_listings.extend(aoba_list)
+    
+    print("Scraping Tokai Yajima...")
+    tokai_list = scrape_tokai(session, now, prev_seen)
+    print(f"  - Tokai valid: {len(tokai_list)}")
+    all_listings.extend(tokai_list)
 
     # FINAL FILTER: No mansions
     final_listings = [l for l in all_listings if l["propertyType"] != "mansion"]
@@ -592,7 +690,8 @@ def main():
             "total": len(final_listings),
             "izutaiyo": len([l for l in final_listings if l["source"]=="Izu Taiyo"]),
             "maple": len([l for l in final_listings if l["source"]=="Maple Housing"]),
-            "aoba": len([l for l in final_listings if l["source"]=="Aoba Resort"])
+            "aoba": len([l for l in final_listings if l["source"]=="Aoba Resort"]),
+            "tokai": len([l for l in final_listings if l["source"]=="Tokai Yajima"])
         }
     }
     with open(OUT_BUILDINFO, "w", encoding="utf-8") as f:
@@ -602,6 +701,7 @@ def main():
     print(f"  Izu Taiyo: {build['counts']['izutaiyo']}")
     print(f"  Maple:     {build['counts']['maple']}")
     print(f"  Aoba:      {build['counts']['aoba']}")
+    print(f"  Tokai:     {build['counts']['tokai']}")
 
 if __name__ == "__main__":
     main()
