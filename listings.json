@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-19T18:37:10Z",
+  "generatedAt": "2025-12-20T03:45:45Z",
   "fxRate": 155,
   "listings": [
     {
@@ -109,27 +109,6 @@
       "firstSeen": "2025-12-15T06:26:18Z"
     },
     {
-      "id": "izutaiyo-MIB289M",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB289M",
-      "title": "南伊豆町 理光ヘルスケアマンション",
-      "titleEn": "Minami-Izu Town 理光ヘルスケアマンション",
-      "propertyType": "mansion",
-      "city": "南伊豆町",
-      "priceJpy": 3330000,
-      "landSqm": 2070.13,
-      "buildingSqm": 34.61,
-      "yearBuilt": 1985,
-      "age": 40.9,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib289ma.jpg",
-      "highlightTags": [
-        "Walk to Sea",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-19T04:16:46Z"
-    },
-    {
       "id": "izutaiyo-MIB316H",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB316H",
       "title": "南伊豆町 入間",
@@ -170,69 +149,6 @@
         "Walk to Sea"
       ],
       "firstSeen": "2025-12-16T14:38:00Z"
-    },
-    {
-      "id": "izutaiyo-MIB371M",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB371M",
-      "title": "南伊豆町 理光ヘルスケアマンション",
-      "titleEn": "Minami-Izu Town 理光ヘルスケアマンション",
-      "propertyType": "mansion",
-      "city": "南伊豆町",
-      "priceJpy": 4000000,
-      "landSqm": 2070.13,
-      "buildingSqm": 34.67,
-      "yearBuilt": 1985,
-      "age": 40.9,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib371ma.jpg",
-      "highlightTags": [
-        "Walk to Sea",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-19T04:16:46Z"
-    },
-    {
-      "id": "izutaiyo-MIB372M",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB372M",
-      "title": "南伊豆町 理光ヘルスケアマンション",
-      "titleEn": "Minami-Izu Town 理光ヘルスケアマンション",
-      "propertyType": "mansion",
-      "city": "南伊豆町",
-      "priceJpy": 6500000,
-      "landSqm": 2070.13,
-      "buildingSqm": 66.89,
-      "yearBuilt": 1985,
-      "age": 40.9,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib372ma.jpg",
-      "highlightTags": [
-        "Walk to Sea",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-19T04:16:46Z"
-    },
-    {
-      "id": "izutaiyo-MIB373M",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MIB373M",
-      "title": "南伊豆町 理光ヘルスケアマンション",
-      "titleEn": "Minami-Izu Town 理光ヘルスケアマンション",
-      "propertyType": "mansion",
-      "city": "南伊豆町",
-      "priceJpy": 6000000,
-      "landSqm": 2070.13,
-      "buildingSqm": 66.95,
-      "yearBuilt": 1985,
-      "age": 40.9,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib373ma.jpg",
-      "highlightTags": [
-        "Walk to Sea",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-19T04:16:46Z"
     },
     {
       "id": "izutaiyo-MIL005H",
@@ -333,27 +249,6 @@
       "firstSeen": "2025-12-16T15:04:47Z"
     },
     {
-      "id": "izutaiyo-SM2013M",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2013M",
-      "title": "下田市 ロイヤルアーク下田",
-      "titleEn": "Shimoda City ロイヤルアーク下田",
-      "propertyType": "mansion",
-      "city": "下田市",
-      "priceJpy": 4000000,
-      "landSqm": 1672.67,
-      "buildingSqm": 70.94,
-      "yearBuilt": 1990,
-      "age": 35.6,
-      "lastUpdated": null,
-      "seaViewScore": 0,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2013ma.jpg",
-      "highlightTags": [
-        "Walk to Sea",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-19T04:16:46Z"
-    },
-    {
       "id": "izutaiyo-SMB342G",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB342G",
       "title": "下田市 西中",
@@ -411,48 +306,6 @@
         "Walk to Sea"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
-    },
-    {
-      "id": "izutaiyo-SMB407M",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB407M",
-      "title": "下田市 リゾート129 碁石が浜パートＩ",
-      "titleEn": "Shimoda City リゾート129 碁石が浜パートＩ",
-      "propertyType": "mansion",
-      "city": "下田市",
-      "priceJpy": 8800000,
-      "landSqm": 1502.0,
-      "buildingSqm": 56.15,
-      "yearBuilt": 1988,
-      "age": 37.7,
-      "lastUpdated": null,
-      "seaViewScore": 3,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb407ma.jpg",
-      "highlightTags": [
-        "Walk to Sea",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-19T04:16:46Z"
-    },
-    {
-      "id": "izutaiyo-SMB408M",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
-      "title": "下田市 リゾート129 碁石が浜パートＩ",
-      "titleEn": "Shimoda City リゾート129 碁石が浜パートＩ",
-      "propertyType": "mansion",
-      "city": "下田市",
-      "priceJpy": 15800000,
-      "landSqm": 1502.0,
-      "buildingSqm": 58.34,
-      "yearBuilt": 1988,
-      "age": 37.7,
-      "lastUpdated": null,
-      "seaViewScore": 3,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408ma.jpg",
-      "highlightTags": [
-        "Walk to Sea",
-        "Onsen"
-      ],
-      "firstSeen": "2025-12-19T04:16:46Z"
     },
     {
       "id": "izutaiyo-SMB409H",
@@ -577,6 +430,7 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/08/6750-1.jpg",
       "highlightTags": [
         "Sea View",
+        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
@@ -620,7 +474,6 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2024/12/6613-1.jpg",
       "highlightTags": [
         "Sea View",
-        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
@@ -665,6 +518,7 @@
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2023/06/6383-1-1.jpg",
       "highlightTags": [
         "Sea View",
+        "Walk to Sea",
         "Onsen"
       ],
       "firstSeen": "2025-12-16T15:04:47Z"
@@ -691,44 +545,169 @@
       "firstSeen": "2025-12-16T15:04:47Z"
     },
     {
-      "id": "maple-6734",
-      "source": "Maple Housing",
-      "sourceUrl": "https://www.maple-h.co.jp/estate_db/6734%ef%bc%9a%e5%ae%a4%e5%86%85%e7%8a%b6%e6%85%8b%e8%89%af%e5%a5%bd%e3%83%bb%e3%83%aa%e3%83%93%e3%83%b3%e3%82%b0%e3%82%88%e3%82%8a%e6%b5%b7%e3%82%92%e6%9c%9b%e3%82%802ldk/",
-      "title": "東伊豆町 マンション No.6734",
-      "titleEn": "Higashi-Izu Town Mansion No.6734",
-      "propertyType": "mansion",
+      "id": "aoba-99255589",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room99255589.html",
+      "title": "東伊豆町 戸建 No.99255589",
+      "titleEn": "Higashi-Izu Town House No.99255589",
+      "propertyType": "house",
       "city": "東伊豆町",
-      "priceJpy": 6900000,
-      "landSqm": 9736.0,
-      "buildingSqm": 100.0,
-      "yearBuilt": 1991,
-      "age": 34,
+      "priceJpy": 9800000,
+      "landSqm": 700.0,
+      "buildingSqm": 159.81,
+      "yearBuilt": 1999,
+      "age": 26,
       "lastUpdated": null,
       "seaViewScore": 4,
-      "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/06/1-3.jpg",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/99255589_1_500_500_3.jpg?t=1766022815",
+      "highlightTags": [
+        "Sea View"
+      ],
+      "firstSeen": "2025-12-20T03:45:45Z"
+    },
+    {
+      "id": "aoba-98586218",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
+      "title": "東伊豆町 戸建 No.98586218",
+      "titleEn": "Higashi-Izu Town House No.98586218",
+      "propertyType": "house",
+      "city": "東伊豆町",
+      "priceJpy": 16800000,
+      "landSqm": 538.45,
+      "buildingSqm": 177.26,
+      "yearBuilt": 1973,
+      "age": 52,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=1766022906",
       "highlightTags": [
         "Sea View",
         "Onsen"
       ],
-      "firstSeen": "2025-12-19T04:16:46Z"
+      "firstSeen": "2025-12-20T03:45:45Z"
+    },
+    {
+      "id": "aoba-98036165",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
+      "title": "下田市 戸建 No.98036165",
+      "titleEn": "Shimoda City House No.98036165",
+      "propertyType": "house",
+      "city": "下田市",
+      "priceJpy": 34800000,
+      "landSqm": 363.82,
+      "buildingSqm": 401.29,
+      "yearBuilt": 1989,
+      "age": 36,
+      "lastUpdated": null,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=1766022821",
+      "highlightTags": [
+        "Walk to Sea"
+      ],
+      "firstSeen": "2025-12-18T15:15:58Z"
+    },
+    {
+      "id": "aoba-96311271",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
+      "title": "東伊豆町 戸建 No.96311271",
+      "titleEn": "Higashi-Izu Town House No.96311271",
+      "propertyType": "house",
+      "city": "東伊豆町",
+      "priceJpy": 14800000,
+      "landSqm": 325.0,
+      "buildingSqm": 100.74,
+      "yearBuilt": 1988,
+      "age": 37,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=1766022902",
+      "highlightTags": [
+        "Sea View",
+        "Walk to Sea",
+        "Onsen"
+      ],
+      "firstSeen": "2025-12-20T03:45:45Z"
+    },
+    {
+      "id": "aoba-94642399",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94642399.html",
+      "title": "東伊豆町 戸建 No.94642399",
+      "titleEn": "Higashi-Izu Town House No.94642399",
+      "propertyType": "house",
+      "city": "東伊豆町",
+      "priceJpy": 7800000,
+      "landSqm": 666.0,
+      "buildingSqm": 93.14,
+      "yearBuilt": 1989,
+      "age": 36,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=1766022815",
+      "highlightTags": [
+        "Sea View",
+        "Onsen"
+      ],
+      "firstSeen": "2025-12-20T03:45:45Z"
+    },
+    {
+      "id": "aoba-93233048",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room93233048.html",
+      "title": "東伊豆町 土地 No.93233048",
+      "titleEn": "Higashi-Izu Town Land No.93233048",
+      "propertyType": "land",
+      "city": "東伊豆町",
+      "priceJpy": 4800000,
+      "landSqm": 286.0,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/93233048_1_500_500_3.jpg?t=1766022876",
+      "highlightTags": [
+        "Sea View"
+      ],
+      "firstSeen": "2025-12-18T15:15:58Z"
+    },
+    {
+      "id": "aoba-83802693",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b3/bknarea-ao22301/room83802693.html",
+      "title": "東伊豆町 土地 No.83802693",
+      "titleEn": "Higashi-Izu Town Land No.83802693",
+      "propertyType": "land",
+      "city": "東伊豆町",
+      "priceJpy": 9800000,
+      "landSqm": 318.45,
+      "buildingSqm": null,
+      "yearBuilt": null,
+      "age": 0,
+      "lastUpdated": null,
+      "seaViewScore": 4,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/83802693_1_500_500_3.jpg?t=1766022831",
+      "highlightTags": [
+        "Sea View"
+      ],
+      "firstSeen": "2025-12-18T15:15:58Z"
     }
   ],
   "stats": {
-    "count": 34,
-    "izutaiyoCount": 24,
-    "mapleCount": 10,
-    "aobaCount": 0,
+    "count": 33,
+    "izutaiyoCount": 17,
+    "mapleCount": 9,
+    "aobaCount": 7,
     "tokusenHpnoCount": 14,
     "searchAddedHpnoCount": 24,
     "rawHpnoCount": 38,
     "filteredOutSearchOnly": 14,
-    "mapleFilteredOut": 142,
-    "aobaFilteredOut": 0,
-    "failures": 3
+    "mapleFilteredOut": 131,
+    "aobaFilteredOut": 8,
+    "failures": 0
   },
-  "failures": [
-    "https://www.aoba-resort.com/house/",
-    "https://www.aoba-resort.com/mansion/",
-    "https://www.aoba-resort.com/land/"
-  ]
+  "failures": []
 }

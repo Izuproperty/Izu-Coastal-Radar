@@ -19,6 +19,7 @@ Outputs: listings.json in the schema your current index.html expects.
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from datetime import datetime, timezone
@@ -28,6 +29,9 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
+
+# Debug flags
+AOBA_DEBUG = str(os.environ.get('AOBA_DEBUG','')).lower() in ('1','true','yes','on')
 
 BASE = "https://www.izutaiyo.co.jp/"
 TOKUSEN_LANDING = "https://www.izutaiyo.co.jp/tokusen.php?hptantou=shimoda"
@@ -39,8 +43,8 @@ MAPLE_ROOT = f"{MAPLE_BASE}/estate_db/"
 MAPLE_LISTING_TYPES = {
     "house": "house",     # 戸建
     "land": "estate",     # 土地
-    "mansion": "mansion", # マンション
 }
+
 
 # Exclude these Maple area buckets entirely
 MAPLE_EXCLUDE_AREAS = ["熱海～網代", "宇佐美～伊東", "川奈～富戸"]
@@ -54,9 +58,9 @@ MAPLE_EXCLUDE_CITIES_JP = ["伊豆市", "伊東市", "静岡市"]
 AOBA_BASE = "https://www.aoba-resort.com"
 AOBA_LISTING_TYPES = {
     "house": "house",     # 戸建
-    "mansion": "mansion", # マンション
     "land": "land",       # 土地
 }
+
 
 # Only keep these municipalities from Aoba (normalize 東伊豆町 variants)
 AOBA_ALLOWED_CITIES = ["下田市", "東伊豆町", "賀茂郡東伊豆町"]
@@ -1015,6 +1019,9 @@ def parse_maple_detail_page(session: requests.Session, detail_url: str, property
     # Sea view / walk to sea rules
     sea_view, walk_to_sea = _maple_sea_view_and_walk(page_text)
     if not (sea_view or walk_to_sea):
+        if AOBA_DEBUG:
+            # Print a short signal excerpt to understand misses
+            print(f"    [AOBA_DEBUG] no signal: url={detail_url} city={city!r} excerpt='{signal_text[:140]}'")
         return None, False
 
     # Listing number
@@ -1362,11 +1369,22 @@ def _aoba_extract_address(soup: BeautifulSoup, scope: Optional[BeautifulSoup] = 
     return ""
 
 def _aoba_city_from_address(addr: str) -> str:
-    a = addr or ""
-    if "下田市" in a:
+    a = (addr or "").lower()
+
+    # JP forms
+    if "下田市" in addr:
         return "下田市"
-    if "賀茂郡東伊豆町" in a or "東伊豆町" in a:
+    if "賀茂郡東伊豆町" in addr or "東伊豆町" in addr:
         return "東伊豆町"
+
+    # Romanized variants sometimes appear in fallback text
+    if "shimoda" in a:
+        return "下田市"
+    if "higashiizu" in a or "higashi-izu" in a or "higashi izu" in a:
+        return "東伊豆町"
+    if "kamo" in a and "higashi" in a and "izu" in a:
+        return "東伊豆町"
+
     return ""
 
 
@@ -1534,17 +1552,60 @@ def parse_aoba_detail_page(session: requests.Session, detail_url: str, property_
     addr = _aoba_extract_address(soup, scope)
     city = _aoba_city_from_address(addr)
 
+    # Prefer URL-derived area mapping when address parsing is incomplete.
+    url_city = ""
+    m_area = re.search(r"bknarea-ao(\d+)", detail_url)
+    if m_area:
+        url_city = AOBA_BKNAREA_TO_CITY.get(m_area.group(1), "")
+
+    if not city and url_city:
+        city = url_city
+
     # Extra guard: sometimes a bad scope/DOM selection can pick up unrelated "所在地" text.
-    # Require that the chosen city token appears in the *detail scope text* as well.
-    if city and (city not in scope_text):
+    # Only apply the scope_text city-token requirement when we did NOT derive city from URL.
+    if city and (city not in scope_text) and (not url_city or city != url_city):
         city = ""
 
     # Strict: only keep allowed cities.
     if city not in {"下田市", "東伊豆町"}:
         return None, False
 
-    sea_view, walk_to_sea = _aoba_sea_view_and_walk(scope_text)
+    # Build a richer signal text for sea/walk detection: body scope + title/meta + JSON-LD + alt/title labels.
+    parts = [scope_text]
+    try:
+        if soup.title and soup.title.string:
+            parts.append(clean_text(soup.title.string))
+    except Exception:
+        pass
+
+    for meta_sel in ('meta[property="og:description"]', 'meta[name="description"]', 'meta[name="keywords"]', 'meta[property="og:title"]'):
+        mtag = soup.select_one(meta_sel)
+        if mtag and mtag.get("content"):
+            parts.append(clean_text(mtag.get("content")))
+
+    # JSON-LD often includes descriptive text
+    for s in soup.find_all("script", attrs={"type": "application/ld+json"}):
+        txt = (s.string or "")
+        if txt:
+            parts.append(clean_text(txt))
+
+    # Attribute labels within the chosen scope (icons/badges)
+    try:
+        for el in scope.select("img[alt], img[title], [aria-label], [title]"):
+            for attr in ("alt", "aria-label", "title"):
+                v = el.get(attr)
+                if v:
+                    parts.append(clean_text(v))
+    except Exception:
+        pass
+
+    signal_text = clean_text(" ".join(p for p in parts if p))
+
+    sea_view, walk_to_sea = _aoba_sea_view_and_walk(signal_text)
     if not (sea_view or walk_to_sea):
+        if AOBA_DEBUG:
+            # Print a short signal excerpt to understand misses
+            print(f"    [AOBA_DEBUG] no signal: url={detail_url} city={city!r} excerpt='{signal_text[:140]}'")
         return None, False
 
     room_id = None
@@ -1733,17 +1794,23 @@ def scrape_aoba(
                 container = _aoba_find_listing_container(a)
                 ctx_text = clean_text(container.get_text(" ", strip=True) if container else a.get_text(" ", strip=True))
 
-                city = _aoba_extract_city_from_text(ctx_text)
+                # Prefer URL-derived area (bknarea-aoXXXXX) over card text; card text can be polluted by filter UI.
+                url_city = ""
+                m_area = re.search(r"bknarea-ao(\d+)", detail_url)
+                if m_area:
+                    url_city = AOBA_BKNAREA_TO_CITY.get(m_area.group(1), "")
 
-                # Guard against accidentally capturing the whole filter UI / large wrappers:
-                if (ctx_text.count("下田市") + ctx_text.count("東伊豆町") + ctx_text.count("賀茂郡東伊豆町")) > 1:
-                    city = ""
+                city = url_city or _aoba_extract_city_from_text(ctx_text)
 
                 # If excluded city names appear in this context, it's likely not the per-card text.
                 if any(bad in ctx_text for bad in ("伊東市", "伊豆市", "静岡市")):
-                    city = ""
+                    if not url_city:
+                        city = ""
 
                 if city not in {"下田市", "東伊豆町"}:
+                    if AOBA_DEBUG and dbg['city'] < 3:
+                        dbg['city'] += 1
+                        print(f"    [AOBA_DEBUG] skip city: url={detail_url} url_city={url_city!r} ctx_city={city!r} ctx='{ctx_text[:120]}'")
                     continue
 
                 seen_detail.add(detail_url)
@@ -1901,15 +1968,26 @@ def main() -> None:
     listings.extend(aoba_listings)
     failures.extend(aoba_failures)
 
+    # Hard exclude condos/mansions everywhere (user preference).
+    listings = [l for l in listings if (l.get("propertyType") != "mansion")]
+
+    # Recompute per-source counts after filtering.
+    def _src_name(x: dict) -> str:
+        return str(x.get("source") or "Izu Taiyo")
+
+    izutaiyo_count = sum(1 for l in listings if _src_name(l) == "Izu Taiyo")
+    maple_count = sum(1 for l in listings if _src_name(l) == "Maple Housing")
+    aoba_count = sum(1 for l in listings if _src_name(l) == "Aoba Resort")
+
     out = {
         "generatedAt": now_iso,
         "fxRate": 155,
         "listings": listings,
         "stats": {
             "count": len(listings),
-            "izutaiyoCount": len(listings) - len(maple_listings) - len(aoba_listings),
-            "mapleCount": len(maple_listings),
-            "aobaCount": len(aoba_listings),
+            "izutaiyoCount": izutaiyo_count,
+            "mapleCount": maple_count,
+            "aobaCount": aoba_count,
             "tokusenHpnoCount": len(tokusen_set),
             "searchAddedHpnoCount": len(search_set),
             "rawHpnoCount": len(hpnos),
