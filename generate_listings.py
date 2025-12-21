@@ -10,10 +10,10 @@ Outputs:
   - buildInfo.json
 
 Updates:
-- FIX: Restored missing 'scrape_izutaiyo_event_records' function.
-- FIX: Izu Taiyo -> Uses "Footer Stripping" to ignore company branch addresses.
-- FIX: Aoba/Tokai/Maple -> Uses "First Match" address detection.
-- FIX: Aoba -> Scans all area codes (b1-b4).
+- FIX: Tokai Yajima -> Forces scan of '/search2/buy_result' & increases pagination to find buried listings.
+- FIX: Maple Images -> Ignores default 'og.png'. Scrapes real 'wp-post-image' or slider images.
+- FIX: Izu Taiyo Images -> Adds robust fallbacks to find main photo when og:image is missing.
+- Logic: Maintains Footer Stripping (Izu Taiyo) and First Match (others) for accurate filtering.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ HEADERS_DESKTOP = {
     "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
 }
 
-# STRICT LOCATION SCOPE (4 LOCATIONS)
+# STRICT LOCATION SCOPE
 ALLOWED_CITIES = {"下田市", "東伊豆町", "南伊豆町", "河津町"}
 
 CITY_EN_MAP = {
@@ -73,12 +73,13 @@ CITY_EN_MAP = {
     "静岡市": "Shizuoka",
 }
 
-# Expanded keywords to catch Minami Izu specific spots & "View" (展望)
+# POSITIVE KEYWORDS (Score 4)
 SEA_KEYWORDS = [
-    "海", "オーシャン", "海望", "海一望", "相模湾", "駿河湾", 
+    "オーシャン", "海一望", "海を望", "海望", "相模湾", "駿河湾", 
     "太平洋", "海近", "海岸", "ビーチ", "Sea", "Ocean", "白浜",
     "弓ヶ浜", "ヒリゾ", "外浦", "吉佐美", "入田", "多々戸", "展望"
 ]
+# WALK KEYWORDS (Score 3)
 WALK_KEYWORDS = ["徒歩", "歩", "近", "Walk"]
 
 # ----------------------------
@@ -129,25 +130,13 @@ def yen_to_int(text: str) -> Optional[int]:
     return total if total > 0 else None
 
 def extract_year_built(text: str) -> Optional[int]:
-    """
-    Handles both "Built: 1990" and "Age: 7.5 years".
-    Strictly looks for '築' to avoid grabbing '2025' from update date.
-    """
     t = clean_text(text)
     if not t: return None
-    
-    # Pattern 1: Absolute Year (築1990年)
     m_year = re.search(r"築(?:年月)?\s*[:：]?\s*(?:西暦)?([0-9]{4})年", t)
-    if m_year:
-        return int(m_year.group(1))
-        
-    # Pattern 2: Relative Age (築年数：7.5年)
+    if m_year: return int(m_year.group(1))
     m_age = re.search(r"築年数\s*[:：]?\s*([0-9\.]+)年", t)
     if m_age:
-        age_val = float(m_age.group(1))
-        current_year = dt.datetime.now().year
-        return int(current_year - age_val)
-
+        return int(dt.datetime.now().year - float(m_age.group(1)))
     return None
 
 def compute_age(year_built: Optional[int]) -> Optional[float]:
@@ -179,42 +168,29 @@ def normalize_city_jp(text: str) -> Optional[str]:
     return None
 
 def remove_footer(soup: BeautifulSoup, markers: List[str]) -> BeautifulSoup:
-    """
-    Destructively removes footer elements containing specific markers.
-    This prevents 'Shimoda Branch' in the footer from triggering a location match.
-    """
     for f in soup.find_all("footer"):
         f.decompose()
-    
     for marker in markers:
-        # Find text nodes containing the marker
         matches = soup.find_all(string=re.compile(marker))
         for m in matches:
-            # Climb up to find the container block and remove it
             parent = m.find_parent(["div", "table", "section", "ul"])
-            if parent:
-                parent.decompose()
+            if parent: parent.decompose()
     return soup
 
-def get_address_first_match(soup: BeautifulSoup, raw_text: str) -> str:
-    """
-    Finds the FIRST occurrence of an address block.
-    Property details are always at the top, company info at bottom.
-    """
+def get_address_field(soup: BeautifulSoup, raw_text: str) -> str:
     # 1. Structural Search
     for tag in soup.find_all(["th", "dt", "td", "div"]):
         txt = clean_text(tag.get_text())
-        if txt == "所在地" or txt == "住所" or "所在地" in txt[:5]:
+        if txt == "所在地" or txt == "住所" or txt.startswith("所在地"):
             sib = tag.find_next_sibling(["td", "dd", "div"])
             if sib: return clean_text(sib.get_text())
             if tag.name == "th":
                 sib_td = tag.find_next_sibling("td")
                 if sib_td: return clean_text(sib_td.get_text())
-
+    
     # 2. Raw Text Fallback
     m = re.search(r"所在地\s*[:：]?\s*([^\s<]+)", raw_text)
     if m: return m.group(1)
-    
     return ""
 
 def load_prev_first_seen(path: str = OUT_LISTINGS) -> Dict[str, str]:
@@ -239,7 +215,6 @@ def apply_first_seen(listing_id: str, now: str, prev: Dict[str, str]) -> str:
 # ----------------------------
 
 def scrape_izutaiyo_event_records(session) -> Dict[str, Tuple[str, str]]:
-    """Scrape 'New' page for event dates/types."""
     url = f"{IZUTAIYO_BASE}/new.php"
     records = {}
     try:
@@ -247,33 +222,26 @@ def scrape_izutaiyo_event_records(session) -> Dict[str, Tuple[str, str]]:
         soup = BeautifulSoup(r.text, "html.parser")
         for row in soup.find_all("tr"):
             txt = clean_text(row.get_text())
-            # Find date
             m_date = re.search(r"(20\d{2})[\/\.-](\d{1,2})[\/\.-](\d{1,2})", txt)
             date_iso = None
             if m_date:
                 date_iso = f"{m_date.group(1)}-{m_date.group(2).zfill(2)}-{m_date.group(3).zfill(2)}"
             
-            # Find ID
             hpno = None
             a = row.find("a", href=True)
             if a:
                 m_id = re.search(r"hpno=([A-Za-z0-9]+)", a['href'])
-                if not m_id:
-                    m_id = re.search(r"hpbunno=([A-Za-z0-9]+)", a['href'])
-                if m_id:
-                    hpno = m_id.group(1)
+                if not m_id: m_id = re.search(r"hpbunno=([A-Za-z0-9]+)", a['href'])
+                if m_id: hpno = m_id.group(1)
             
-            # Event Type
             etype = None
             for k in ["新規登録", "価格変更", "写真変更", "情報更新", "商談中", "成約"]:
                 if k in txt:
                     etype = k
                     break
-            
             if hpno and (etype or date_iso):
                 records[hpno] = (etype, date_iso)
-    except:
-        pass
+    except: pass
     return records
 
 def scan_izutaiyo_urls(session) -> Set[str]:
@@ -357,7 +325,7 @@ def parse_izutaiyo_detail(session, url, event_records) -> Tuple[Optional[dict], 
         for tr in soup.find_all("tr"):
             row = clean_text(tr.get_text())
             if "海" in row and ("見えない" in row or "無" in row):
-                # Only reject if we don't have a strong 'Walk' signal
+                # Trust table over keywords
                 if "一望" not in row and "有" not in row:
                     return None, True
 
@@ -386,11 +354,14 @@ def parse_izutaiyo_detail(session, url, event_records) -> Tuple[Optional[dict], 
         year = extract_year_built(text)
         age = compute_age(year)
 
+        # FIX: Robust Image Search
         img = None
         og = soup.find("meta", attrs={"property": "og:image"})
         if og: img = og.get("content")
+        
+        # Fallback: Look for main image in typical containers
         if not img:
-            for sel in ["img#main_img", "img.main-img", ".item_img img"]:
+            for sel in ["img#main_img", "img.main-img", ".item_img img", ".detail-img img"]:
                 tag = soup.select_one(sel)
                 if tag and tag.get("src"):
                     img = tag.get("src")
@@ -437,7 +408,7 @@ def parse_maple_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
         soup = remove_footer(soup, ["Copyright", "会社概要"])
         text = clean_text(soup.get_text(" ", strip=True))
 
-        addr = get_address_first_match(soup, text)
+        addr = get_address_field(soup, text)
         city = normalize_city_jp(addr)
         if not city: city = normalize_city_jp(text)
         if not city: return None, True 
@@ -468,9 +439,22 @@ def parse_maple_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
         if "温泉" in text and any(k in text for k in ["有", "付", "権利", "引込"]):
             if "温泉無" not in text: tags.append("Onsen")
 
+        # FIX: Ignore default OG image (og.png)
         img = None
         og_img = soup.find("meta", attrs={"property": "og:image"})
-        if og_img: img = og_img.get("content")
+        if og_img:
+            c = og_img.get("content")
+            if c and "og.png" not in c and "logo" not in c:
+                img = c
+        
+        # Fallback: Find real property image
+        if not img:
+            # Maple uses WP, look for wp-post-image or slider
+            for sel in ["img.wp-post-image", ".swiper-slide img", "div.main-image img"]:
+                tag = soup.select_one(sel)
+                if tag and tag.get("src"):
+                    img = tag.get("src")
+                    break
 
         m_id = re.search(r"/estate_db/(\d+)", url)
         mid = m_id.group(1) if m_id else str(abs(hash(url)))
@@ -542,7 +526,7 @@ def parse_aoba_detail(session, url, ptype) -> Tuple[Optional[dict], bool]:
         soup = remove_footer(soup, ["Copyright", "会社概要", "お問い合わせ先"])
         text = clean_text(soup.get_text(" ", strip=True))
 
-        addr = get_address_first_match(soup, text)
+        addr = get_address_field(soup, text)
         city = normalize_city_jp(addr)
         if not city: city = normalize_city_jp(text)
         if not city: return None, True
@@ -656,7 +640,7 @@ def parse_tokai_detail(session, url) -> Tuple[Optional[dict], bool]:
         soup = remove_footer(soup, ["会社概要", "お問い合わせ", "Copyright"])
         text = clean_text(soup.get_text(" ", strip=True))
 
-        addr = get_address_first_match(soup, text)
+        addr = get_address_field(soup, text)
         city = normalize_city_jp(addr)
         if not city: city = normalize_city_jp(text)
         if not city: return None, True
@@ -737,37 +721,30 @@ def scrape_tokai(session, now, prev):
     listings = []
     print("  - Tokai Yajima: Scanning...")
     
-    start_url = f"{TOKAI_BASE}/search2/buy_area"
-    city_links = set()
+    # FORCE SCAN OF MAIN SEARCH RESULTS
+    # This bypasses the 'buy_area' map and goes straight to the list
+    start_urls = [
+        f"{TOKAI_BASE}/search2/buy_result",
+        f"{TOKAI_BASE}/search2/buy_area"
+    ]
     
-    try:
-        r = request(session, start_url)
-        r.encoding = r.apparent_encoding
-        soup = BeautifulSoup(r.text, "html.parser")
-        
-        for a in soup.find_all("a", href=True):
-            txt = clean_text(a.get_text())
-            if any(c in txt for c in ALLOWED_CITIES):
-                city_links.add(urljoin(start_url, a['href']))
-    except:
-        pass
-    
-    if not city_links:
-        city_links.add(f"{TOKAI_BASE}/search2/buy_result")
-
     found_urls = set()
-    for list_url in city_links:
+    for start in start_urls:
         try:
-            r = request(session, list_url)
-            r.encoding = r.apparent_encoding
-            soup = BeautifulSoup(r.text, "html.parser")
-            
-            for a in soup.find_all("a", href=True):
-                h = a['href']
-                if "/bukken/" in h or "/fudo/" in h or "bukken_id" in h:
-                     found_urls.add(urljoin(list_url, h))
+            # Iterate pages 1 to 5 to catch older listings
+            for p in range(1, 6):
+                p_url = f"{start}?page={p}"
+                r = request(session, p_url)
+                r.encoding = r.apparent_encoding
+                soup = BeautifulSoup(r.text, "html.parser")
+                
+                # Grab detail links
+                for a in soup.find_all("a", href=True):
+                    h = a['href']
+                    if "/bukken/" in h or "/fudo/" in h or "bukken_id" in h:
+                        found_urls.add(urljoin(start, h))
+                sleep_jitter()
         except: pass
-        sleep_jitter()
 
     print(f"    Found {len(found_urls)} potential Tokai URLs.")
     
