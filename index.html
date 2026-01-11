@@ -16,704 +16,216 @@
       --tag-onsen: #ff453a;
       --tag-new: #30d158;
       --border: #333;
-      --footer-bg: #0b0b0c;
-      --footer-border: #1f1f21;
     }
-    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 0; }
-    header { background: #000; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; }
+    
+    header { background: #000; border-bottom: 1px solid var(--border); padding: 40px 20px; text-align: center; }
+    h1 { margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: var(--text-secondary); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
 
-    .vintage-hero {
-      display: flex; gap: 20px; padding: 40px 20px; overflow-x: auto;
-      background: linear-gradient(to bottom, #111, #000); justify-content: center;
-    }
-    .poster-frame { height: 180px; flex-shrink: 0; border: 1px solid #333; transition: transform 0.2s; opacity: 0.8; }
-    .poster-frame:hover { transform: scale(1.05); opacity: 1; border-color: #fff; }
-    .poster-frame img { height: 100%; width: auto; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-    .header-content { text-align: center; padding: 20px; }
-    h1 { margin: 0; font-size: 3rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { color: var(--text-secondary); margin-top: 8px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
-
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px 50px; }
-
-    /* DARK MODE STATS BAR */
-    .stats-bar {
-      display: flex; gap: 1px; background: #333; border: 1px solid #333;
-      border-radius: 12px; overflow: hidden; margin-bottom: 40px;
-    }
-    .stat-item { flex: 1; text-align: center; padding: 20px; background: var(--bg-card); }
-    .stat-val { font-size: 1.6rem; font-weight: 700; color: #fff; }
-    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
-    .stat-sub { font-size: 0.8rem; color: var(--accent); margin-top: 4px; }
-
-    /* CONTROLS */
+    /* Controls */
     .controls {
-      background: rgba(28,28,30,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
+      background: rgba(28,28,30,0.95); padding: 15px; border-radius: 12px; border: 1px solid #333;
       display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 30px;
-      position: sticky; top: 20px; z-index: 100; backdrop-filter: blur(10px);
+      position: sticky; top: 10px; z-index: 100; backdrop-filter: blur(10px);
     }
-
-    select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; outline: none; }
-    .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; }
-    .toggle-btn { padding: 8px 14px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
+    select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; }
+    .toggle-btn { padding: 8px 12px; border: 1px solid #333; background: #000; color: #888; cursor: pointer; border-radius: 6px; }
     .toggle-btn.active { background: #333; color: #fff; }
     .results-count { margin-left: auto; color: var(--text-secondary); font-weight: 600; }
 
-    /* GRID */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+    /* Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+    
     .card {
       background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid #2c2c2e;
       display: flex; flex-direction: column; transition: transform 0.2s;
     }
     .card:hover { transform: translateY(-4px); border-color: #555; }
 
-    .card-img-wrap { height: 220px; position: relative; }
+    .card-img-wrap { height: 200px; position: relative; background: #111; }
     .card-img { width: 100%; height: 100%; object-fit: cover; }
-
-    .overlay-tags { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100% - 24px); }
-    .ov-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(8px); color: #fff; }
-    .ov-type { background: rgba(0,0,0,0.6); }
+    
+    .overlay-tags { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
+    .ov-tag { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #fff; backdrop-filter: blur(4px); }
+    .ov-type { background: rgba(0,0,0,0.7); }
     .ov-sea { background: var(--tag-sea); }
-    .ov-onsen { background: var(--tag-onsen); }
     .ov-new { background: var(--tag-new); }
 
-    .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-    .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 10px; }
-    .card-price { font-size: 1.5rem; font-weight: 700; color: #fff; }
-    .card-age { background: #333; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: #ccc; white-space: nowrap; }
-
-    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; color: #ddd; text-decoration: none; line-height: 1.4; }
+    .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+    .card-price { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .card-title { font-size: 1rem; font-weight: 600; color: #ddd; margin-bottom: 10px; text-decoration: none; display: block; }
     .card-title:hover { color: var(--accent); }
-
-    .card-event {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-    .card-event strong {
-      color: #e6e6ea;
-      font-weight: 700;
-    }
-
-    .card-metrics { display: flex; gap: 15px; color: var(--text-secondary); font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #333; margin-bottom: 15px; flex-wrap: wrap; }
-    .metric span { color: #fff; font-weight: 600; }
-
-    .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #555; }
-    .view-btn { color: var(--accent); text-transform: uppercase; font-weight: 700; text-decoration: none; }
-
-    .no-listings { grid-column: 1/-1; text-align: center; padding: 100px; color: #555; }
-    .error-msg { grid-column: 1/-1; background: #220; border: 1px solid #533; padding: 16px; border-radius: 12px; color: #f5f5f7; }
-
-    /* FOOTER */
-    footer {
-      border-top: 1px solid var(--footer-border);
-      background: var(--footer-bg);
-      padding: 28px 20px 40px;
-    }
-    .footer-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    .footer-links { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-    .footer-links a {
-      color: #cfcfd2;
-      text-decoration: none;
-      font-weight: 600;
-      border-bottom: 1px solid transparent;
-    }
-    .footer-links a:hover { color: #fff; border-bottom-color: #555; }
-    .fx-meta { opacity: 0.9; }
-    .fx-meta code {
-      background: #111;
-      border: 1px solid #222;
-      padding: 2px 6px;
-      border-radius: 8px;
-      color: #d7d7db;
-      font-size: 0.85rem;
-    }
+    
+    .card-metrics { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .card-footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; }
+    .view-btn { color: var(--accent); font-weight: 700; text-decoration: none; }
+    
+    .error-msg { grid-column: 1/-1; background: #311; border: 1px solid #522; padding: 20px; border-radius: 8px; text-align: center; }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="vintage-hero">
-    <div class="poster-frame"><img src="assets/images/17E88B82-01F3-4A60-9571-935741E304B9.jpeg"></div>
-    <div class="poster-frame"><img src="assets/images/42DD5202-2825-48D4-BC01-1AF67FD8BFBE.jpeg"></div>
-    <div class="poster-frame"><img src="assets/images/57D6E8AA-D359-417A-AB92-037676775478.jpeg"></div>
-    <div class="poster-frame"><img src="assets/images/715105E4-F9EB-405D-A0E4-3D0C8C82EDE6.jpeg"></div>
-    <div class="poster-frame"><img src="assets/images/F62A2A51-B69F-4496-9061-1020FDC053B9.jpeg"></div>
-  </div>
-  <div class="header-content">
-    <h1>IZU COASTAL RADAR</h1>
-    <div class="subtitle" id="subtitle">Market Intelligence: Shimoda & South Izu</div>
-  </div>
+  <h1>IZU COASTAL RADAR</h1>
+  <div class="subtitle">Shimoda • Kawazu • Higashi-Izu</div>
 </header>
 
 <div class="container">
-  <div class="stats-bar" id="stats-panel" style="display:none">
-    <div class="stat-item">
-      <div class="stat-val" id="stat-price">-</div>
-      <div class="stat-label" id="lbl-avg-price">Avg Price</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-size">-</div>
-      <div class="stat-label" id="lbl-avg-size">Avg Size</div>
-      <div class="stat-sub" id="stat-size-sub"></div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-unit">-</div>
-      <div class="stat-label" id="lbl-unit">Price / Unit</div>
-      <div class="stat-sub" id="stat-unit-sub"></div>
-    </div>
-  </div>
-
   <div class="controls">
-    <div class="toggle-group">
-      <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
-      <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
-      <button class="toggle-btn" id="btn-cn" onclick="setLang('CN')">CN</button>
+    <div>
+      <button class="toggle-btn active" onclick="setLang('EN', this)">EN</button>
+      <button class="toggle-btn" onclick="setLang('JP', this)">JP</button>
+      <button class="toggle-btn" onclick="setLang('CN', this)">CN</button>
+    </div>
+    
+    <div>
+      <button class="toggle-btn active" onclick="setCurr('JPY', this)">¥</button>
+      <button class="toggle-btn" onclick="setCurr('USD', this)">$</button>
+      <button class="toggle-btn" onclick="setCurr('CNY', this)">CNY</button>
     </div>
 
-    <div class="toggle-group">
-      <button class="toggle-btn active" id="btn-jpy" onclick="setCurr('JPY')">¥</button>
-      <button class="toggle-btn" id="btn-usd" onclick="setCurr('USD')">$</button>
-      <button class="toggle-btn" id="btn-cny" onclick="setCurr('CNY')">CNY</button>
-    </div>
-
-    <select id="location-select" onchange="applyFilters()"></select>
-
-    <select id="source-select" onchange="applyFilters()"></select>
-
-    <!-- Condos removed -->
-    <select id="type-select" onchange="applyFilters()">
+    <select id="loc-select" onchange="render()"></select>
+    <select id="type-select" onchange="render()">
       <option value="all">All Types</option>
       <option value="house">House</option>
       <option value="land">Land</option>
     </select>
-
-    <select id="seaview-select" onchange="applyFilters()">
-      <option value="all">Any View</option>
-      <option value="4">Sea View</option>
-    </select>
-
-    <select id="sort-select" onchange="applyFilters()">
-      <option value="price-desc">Price: High-Low</option>
-      <option value="price-asc">Price: Low-High</option>
-      <option value="size-desc">Size: Largest</option>
-      <option value="age-desc">Age: Newest</option>
-    </select>
-
-    <div class="results-count" id="count-display"></div>
+    
+    <div class="results-count" id="count"></div>
   </div>
 
-  <div class="grid" id="listings-container">Loading...</div>
+  <div class="grid" id="grid">Loading...</div>
 </div>
 
-<footer>
-  <div class="footer-inner">
-    <div class="footer-links" id="footer-links">
-      <a href="links.html" id="useful-links">Useful Izu Links</a>
-    </div>
-    <div class="fx-meta" id="fx-meta"></div>
-  </div>
-</footer>
-
 <script>
-  let DATA = {
-    listings: [],
-    fxUsdJpy: 155,
-    fxCnyJpy: 20,
-    fxSource: "Manual",
-    generatedAt: null
-  };
-
-  let STATE = {
-    lang: 'EN',
-    curr: 'JPY',
-    loc: 'all',
-    source: 'all',
-    sort: 'price-desc',
-    type: 'all',
-    view: 'all'
-  };
-
-  const PROXY = "https://corsproxy.io/?";
-
-  // EN-only: remove “Town/City” suffixes
-  const LOC_MAP_EN = {
-    "下田市": "Shimoda",
-    "河津町": "Kawazu",
-    "東伊豆町": "Higashi-Izu",
-    "南伊豆町": "Minami-Izu",
-    "伊東市": "Ito",
-  };
-
-  const LOC_MAP_CN = {
-    "下田市": "下田市",
-    "河津町": "河津町",
-    "東伊豆町": "东伊豆町",
-    "南伊豆町": "南伊豆町",
-    "伊東市": "伊东市",
-  };
+  let DATA = { listings: [], fxUsd: 155, fxCny: 20 };
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all' };
 
   const TXT = {
-    EN: {
-      subtitle: "Market Intelligence: Shimoda & South Izu",
-      allLoc: "All Locations",
-      allSources: "All Sources",
-      allTypes: "All Types",
-      anyView: "Any View",
-      seaView: "Sea View",
-      listings: "Listings",
-      noSignal: "NO SIGNAL DETECTED.",
-      analyze: "ANALYZE →",
-      avgPrice: "Avg Price",
-      avgSize: "Avg Size",
-      unit: "Price / Unit",
-      seaTag: "SEA VIEW",
-      onsenTag: "ONSEN",
-      newTag: "NEW!",
-      landLabel: "Land",
-      usefulLinks: "Useful Izu Links",
-      fxLabel: "FX",
-      eventLabel: "Update"
-    },
-    JP: {
-      subtitle: "市場インテリジェンス：下田・南伊豆",
-      allLoc: "全地域",
-      allSources: "全ソース",
-      allTypes: "全種別",
-      anyView: "眺望指定なし",
-      seaView: "海眺望",
-      listings: "件",
-      noSignal: "該当なし",
-      analyze: "詳細 →",
-      avgPrice: "平均価格",
-      avgSize: "平均面積",
-      unit: "単価",
-      seaTag: "海眺望",
-      onsenTag: "温泉",
-      newTag: "新着",
-      landLabel: "土地",
-      usefulLinks: "役立つ伊豆リンク",
-      fxLabel: "為替",
-      eventLabel: "更新"
-    },
-    CN: {
-      subtitle: "市场情报：下田与南伊豆",
-      allLoc: "全部地区",
-      allSources: "全部来源",
-      allTypes: "全部类型",
-      anyView: "不限景观",
-      seaView: "海景",
-      listings: "套",
-      noSignal: "未找到匹配房源。",
-      analyze: "查看 →",
-      avgPrice: "平均价格",
-      avgSize: "平均面积",
-      unit: "单价",
-      seaTag: "海景",
-      onsenTag: "温泉",
-      newTag: "新",
-      landLabel: "土地",
-      usefulLinks: "伊豆实用链接",
-      fxLabel: "汇率",
-      eventLabel: "更新"
-    }
+    EN: { house: "House", land: "Land", view: "Analyze", allLoc: "All Locations" },
+    JP: { house: "戸建", land: "土地", view: "詳細", allLoc: "全エリア" },
+    CN: { house: "独栋", land: "土地", view: "查看", allLoc: "全部地区" }
   };
-
-  // Condos removed
-  const TYPE_LABELS = {
-    EN: { house: "House", land: "Land" },
-    JP: { house: "戸建", land: "土地" },
-    CN: { house: "独栋", land: "土地" }
-  };
-
-  const EVENT_TYPE_MAP = {
-    "新規登録": { EN: "New listing", JP: "新規登録", CN: "新上架" },
-    "価格変更": { EN: "Price change", JP: "価格変更", CN: "价格调整" },
-    "写真変更": { EN: "Photos updated", JP: "写真変更", CN: "照片更新" },
-    "情報更新": { EN: "Info updated", JP: "情報更新", CN: "信息更新" },
-    "商談中":   { EN: "Under negotiation", JP: "商談中", CN: "洽谈中" },
-    "成約":     { EN: "Sold", JP: "成約", CN: "已成交" }
-  };
-
-  async function fetchJsonNoStore(url) {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to fetch ${url} (${res.status})`);
-    return res.json();
-  }
-
-  async function loadBuildInfo() {
-    // Support either buildInfo.json or buildinfo.json (case differences)
-    try {
-      return await fetchJsonNoStore("buildInfo.json");
-    } catch (_) {
-      try {
-        return await fetchJsonNoStore("buildinfo.json");
-      } catch (_) {
-        return null;
-      }
-    }
-  }
 
   async function init() {
     try {
-      const build = await loadBuildInfo();
-      const v = (build && build.generatedAt) ? encodeURIComponent(build.generatedAt) : Date.now();
+      // Fetch Build Info to burst cache
+      let v = Date.now();
+      try {
+        const b = await fetch("buildInfo.json").then(r=>r.json());
+        v = b.generatedAt;
+      } catch(e) {}
 
-      const res = await fetch('listings.json?v=' + v, { cache: "no-store" });
-      if (!res.ok) throw new Error("JSON not found");
+      const res = await fetch(`listings.json?v=${v}`);
+      if (!res.ok) throw new Error("Could not load listings.json");
       const json = await res.json();
-      if (!json || !Array.isArray(json.listings)) throw new Error("Invalid JSON structure");
-
+      
       DATA.listings = json.listings;
+      DATA.fxUsd = json.fxRateUsd || 155;
+      DATA.fxCny = json.fxRateCny || 20;
 
-      // Backward-compatible FX fields:
-      // - fxRateUsd OR fxRate (legacy) treated as USD/JPY (JPY per USD)
-      // - fxRateCny treated as CNY/JPY (JPY per CNY)
-      DATA.fxUsdJpy = json.fxRateUsd || json.fxRate || 155;
-      DATA.fxCnyJpy = json.fxRateCny || 20;
-      DATA.fxSource = json.fxSource || "Manual";
-
-      // Prefer buildInfo.json generatedAt (new), fall back to listings.json generatedAt (legacy)
-      DATA.generatedAt = (build && build.generatedAt) ? build.generatedAt : (json.generatedAt || null);
-
-      updateToggles();
-      updateLabels();
-      populateLocations();
-      populateSources();
-      applyFilters();
-      renderFxFooter();
+      populateLocs();
+      render();
     } catch (e) {
-      document.getElementById('listings-container').innerHTML =
-        `<div class='error-msg'><strong>Failed to load data.</strong><br>${e.message}</div>`;
+      document.getElementById('grid').innerHTML = `<div class="error-msg">${e.message}</div>`;
     }
   }
 
-  function setLang(l) {
-    STATE.lang = l;
-    updateToggles();
-    updateLabels();
-    populateLocations();
-    populateSources();
-    applyFilters();
-    renderFxFooter();
-  }
-
-  function setCurr(c) {
-    STATE.curr = c;
-    updateToggles();
-    applyFilters();
-    renderFxFooter();
-  }
-
-  function updateToggles() {
-    document.getElementById('btn-en').className = STATE.lang==='EN'?'toggle-btn active':'toggle-btn';
-    document.getElementById('btn-jp').className = STATE.lang==='JP'?'toggle-btn active':'toggle-btn';
-    document.getElementById('btn-cn').className = STATE.lang==='CN'?'toggle-btn active':'toggle-btn';
-
-    document.getElementById('btn-jpy').className = STATE.curr==='JPY'?'toggle-btn active':'toggle-btn';
-    document.getElementById('btn-usd').className = STATE.curr==='USD'?'toggle-btn active':'toggle-btn';
-    document.getElementById('btn-cny').className = STATE.curr==='CNY'?'toggle-btn active':'toggle-btn';
-  }
-
-  function updateLabels() {
-    const t = TXT[STATE.lang];
-    document.getElementById('subtitle').innerText = t.subtitle;
-
-    document.getElementById('lbl-avg-price').innerText = t.avgPrice;
-    document.getElementById('lbl-avg-size').innerText = t.avgSize;
-    document.getElementById('lbl-unit').innerText = t.unit;
-
-    document.getElementById('useful-links').innerText = t.usefulLinks;
-
-    // Update select static option labels (condos removed)
-    const typeSel = document.getElementById('type-select');
-    typeSel.options[0].text = t.allTypes;
-    typeSel.options[1].text = TYPE_LABELS[STATE.lang].house;
-    typeSel.options[2].text = TYPE_LABELS[STATE.lang].land;
-
-    const viewSel = document.getElementById('seaview-select');
-    viewSel.options[0].text = t.anyView;
-    viewSel.options[1].text = t.seaView;
-  }
-
-  function populateLocations() {
-    const sel = document.getElementById('location-select');
-    const currentVal = sel.value || "all";
-    const cities = [...new Set(DATA.listings.map(l => l.city).filter(Boolean))].sort();
-    const t = TXT[STATE.lang];
-
-    sel.innerHTML = `<option value="all">${t.allLoc}</option>`;
-    cities.forEach(c => {
-      let label = c;
-      if (STATE.lang === 'EN') label = LOC_MAP_EN[c] || c;
-      if (STATE.lang === 'CN') label = LOC_MAP_CN[c] || c;
-      sel.innerHTML += `<option value="${c}">${label}</option>`;
+  function populateLocs() {
+    const s = document.getElementById('loc-select');
+    const locs = [...new Set(DATA.listings.map(l => l.city))].sort();
+    
+    const label = TXT[STATE.lang].allLoc;
+    s.innerHTML = `<option value="all">${label}</option>`;
+    
+    const LOC_EN = { "下田市": "Shimoda", "河津町": "Kawazu", "東伊豆町": "Higashi-Izu", "南伊豆町": "Minami-Izu" };
+    
+    locs.forEach(l => {
+      let name = l;
+      if (STATE.lang !== 'JP') name = LOC_EN[l] || l;
+      s.innerHTML += `<option value="${l}">${name}</option>`;
     });
-
-    sel.value = currentVal;
   }
 
-  function normalizeSource(l) {
-    return (l && l.source) ? String(l.source) : "Izu Taiyo";
+  function setLang(l, btn) {
+    STATE.lang = l;
+    updateBtns(btn);
+    populateLocs();
+    render();
   }
 
-  function populateSources() {
-    const sel = document.getElementById('source-select');
-    const currentVal = sel.value || "all";
-    const t = TXT[STATE.lang];
-
-    const sources = [...new Set(DATA.listings.map(l => normalizeSource(l)))].sort();
-
-    sel.innerHTML = `<option value="all">${t.allSources}</option>`;
-    sources.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
-    sel.value = currentVal;
+  function setCurr(c, btn) {
+    STATE.curr = c;
+    updateBtns(btn);
+    render();
   }
 
-  function fmtPriceJPY(v) {
-    return "¥" + (v/1000000).toFixed(1) + "M";
+  function updateBtns(clicked) {
+    const group = clicked.parentElement;
+    Array.from(group.children).forEach(b => b.classList.remove('active'));
+    clicked.classList.add('active');
   }
 
-  function fmtPrice(v) {
-    if (!v) return "-";
-    if (STATE.curr === 'JPY') return fmtPriceJPY(v);
-
-    if (STATE.curr === 'USD') {
-      return "$" + Math.round(v / DATA.fxUsdJpy).toLocaleString();
-    }
-
-    // CNY (label as CNY, not ¥)
-    return "CNY " + Math.round(v / DATA.fxCnyJpy).toLocaleString();
+  function fmtPrice(p) {
+    if (!p) return "-";
+    if (STATE.curr === 'JPY') return "¥" + (p/10000).toLocaleString() + "万";
+    if (STATE.curr === 'USD') return "$" + Math.round(p / DATA.fxUsd).toLocaleString();
+    if (STATE.curr === 'CNY') return "CNY " + Math.round(p / DATA.fxCny).toLocaleString();
   }
 
-  function pickSizeForStats(item) {
-    if (!item) return 0;
-    if (item.propertyType === "land") return item.landSqm || 0;
-    return item.buildingSqm || 0;
-  }
-
-  function renderStats(items) {
-    if (!items.length) {
-      document.getElementById('stats-panel').style.display = 'none';
-      return;
-    }
-    document.getElementById('stats-panel').style.display = 'flex';
-
-    const prices = items.map(i => i.priceJpy || 0).filter(v => v > 0);
-    const sizes = items.map(i => pickSizeForStats(i)).filter(v => v > 0);
-
-    const avgP = prices.length ? (prices.reduce((a,b)=>a+b,0) / prices.length) : 0;
-    const avgS = sizes.length ? (sizes.reduce((a,b)=>a+b,0) / sizes.length) : 0;
-
-    document.getElementById('stat-price').innerText = avgP ? fmtPrice(avgP) : "-";
-
-    if (!avgS || !avgP) {
-      document.getElementById('stat-size').innerText = avgS ? (Math.round(avgS) + " m²") : "-";
-      document.getElementById('stat-size-sub').innerText = "";
-      document.getElementById('stat-unit').innerText = "-";
-      document.getElementById('stat-unit-sub').innerText = "";
-      return;
-    }
-
-    const sqft = avgS * 10.764;
-
-    if (STATE.curr === 'USD') {
-      document.getElementById('stat-size').innerText = Math.round(sqft) + " ft²";
-      document.getElementById('stat-size-sub').innerText = `(${Math.round(avgS)} m²)`;
-
-      const ppSqft = (avgP / DATA.fxUsdJpy) / sqft;
-      document.getElementById('stat-unit').innerText = "$" + Math.round(ppSqft) + " /ft²";
-
-      const ppSqm = (avgP / DATA.fxUsdJpy) / avgS;
-      document.getElementById('stat-unit-sub').innerText = `($${Math.round(ppSqm)} /m²)`;
-      return;
-    }
-
-    if (STATE.curr === 'CNY') {
-      document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
-      document.getElementById('stat-size-sub').innerText = `(${Math.round(sqft)} ft²)`;
-
-      const ppSqm = (avgP / DATA.fxCnyJpy) / avgS;
-      document.getElementById('stat-unit').innerText = "CNY " + Math.round(ppSqm) + " /m²";
-
-      const ppSqft = (avgP / DATA.fxCnyJpy) / sqft;
-      document.getElementById('stat-unit-sub').innerText = `(CNY ${Math.round(ppSqft)} /ft²)`;
-      return;
-    }
-
-    // JPY
-    document.getElementById('stat-size').innerText = Math.round(avgS) + " m²";
-    document.getElementById('stat-size-sub').innerText = "";
-
-    const ppSqmJPY = avgP / avgS; // JPY per m2
-    document.getElementById('stat-unit').innerText = "¥" + Math.round(ppSqmJPY / 10000) + "万 /m²";
-    document.getElementById('stat-unit-sub').innerText = "";
-  }
-
-  function applyFilters() {
-    STATE.loc = document.getElementById('location-select').value;
-    STATE.source = document.getElementById('source-select').value;
-    STATE.type = document.getElementById('type-select').value;
-    STATE.view = document.getElementById('seaview-select').value;
-    STATE.sort = document.getElementById('sort-select').value;
-
-    let items = DATA.listings.filter(l => {
-      if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
-      if (STATE.source !== 'all' && normalizeSource(l) !== STATE.source) return false;
-      if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
-      if (STATE.view === '4' && (l.seaViewScore || 0) < 4) return false;
+  function render() {
+    const locFilter = document.getElementById('loc-select').value;
+    const typeFilter = document.getElementById('type-select').value;
+    
+    const items = DATA.listings.filter(l => {
+      if (locFilter !== 'all' && l.city !== locFilter) return false;
+      if (typeFilter !== 'all' && l.propertyType !== typeFilter) return false;
       return true;
     });
 
-    items.sort((a,b) => {
-      if (STATE.sort === 'price-desc') return (b.priceJpy||0) - (a.priceJpy||0);
-      if (STATE.sort === 'price-asc') return (a.priceJpy||0) - (b.priceJpy||0);
-      if (STATE.sort === 'size-desc') return (pickSizeForStats(b)||0) - (pickSizeForStats(a)||0);
-      if (STATE.sort === 'age-desc') return (a.age||999) - (b.age||999);
-      return 0;
-    });
-
-    renderListings(items);
-    renderStats(items);
-  }
-
-  function formatAgeBadge(l) {
-    const age = (l.age || 0);
-    const yb = l.yearBuilt;
-
-    if (yb && age > 0) {
-      if (STATE.lang === "EN") return `${yb} · ${Math.floor(age)} yrs`;
-      if (STATE.lang === "CN") return `${yb} · ${Math.floor(age)} 年`;
-      return `${yb} · 築${Math.floor(age)}年`;
-    }
-    if (age > 0) {
-      if (STATE.lang === "EN") return `${Math.floor(age)} yrs`;
-      if (STATE.lang === "CN") return `${Math.floor(age)} 年`;
-      return `築${Math.floor(age)}年`;
-    }
-    if (yb) return String(yb);
-    return "";
-  }
-
-  function isNewListing(listing, hours = 24) {
-    if (!listing || !listing.firstSeen) return false;
-    const t = Date.parse(listing.firstSeen);
-    if (!Number.isFinite(t)) return false;
-    return (Date.now() - t) < hours * 60 * 60 * 1000;
-  }
-
-  function formatEventDate(dateStr) {
-    // Expect YYYY-MM-DD; show JP as YYYY.MM.DD for readability
-    if (!dateStr) return "";
-    const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!m) return String(dateStr);
-    const y = m[1], mm = m[2], dd = m[3];
-    if (STATE.lang === "JP") return `${y}.${mm}.${dd}`;
-    return `${y}-${mm}-${dd}`;
-  }
-
-  function formatEventText(listing) {
-    if (!listing || !listing.eventDate || !listing.eventTypeJp) return "";
-    const t = TXT[STATE.lang];
-
-    const jpType = String(listing.eventTypeJp);
-    const labelObj = EVENT_TYPE_MAP[jpType] || { EN: jpType, JP: jpType, CN: jpType };
-    const label = labelObj[STATE.lang] || jpType;
-
-    const d = formatEventDate(listing.eventDate);
-    if (!d) return "";
-
-    return `<strong>${t.eventLabel}:</strong> ${label} • ${d}`;
-  }
-
-  function renderListings(items) {
-    const container = document.getElementById('listings-container');
-    const t = TXT[STATE.lang];
-
-    container.innerHTML = "";
-    document.getElementById('count-display').innerText = `${items.length} ${t.listings}`;
-
-    if (!items.length) {
-      container.innerHTML = `<div class="no-listings">${t.noSignal}</div>`;
-      return;
-    }
+    document.getElementById('count').innerText = items.length + " listings";
+    const grid = document.getElementById('grid');
+    grid.innerHTML = "";
 
     items.forEach(l => {
-      const imgUrl = l.imageUrl ? (PROXY + encodeURIComponent(l.imageUrl)) : "https://via.placeholder.com/400?text=No+Img";
-      const title = (STATE.lang === 'EN') ? (l.titleEn || l.title) :
-                    (STATE.lang === 'CN') ? (l.titleCn || l.titleEn || l.title) :
-                    l.title;
-
-      const typeLabel = (TYPE_LABELS[STATE.lang][l.propertyType] || l.propertyType);
-
-      const ageBadge = formatAgeBadge(l);
-      const ageInfo = ageBadge ? `<div class="card-age">${ageBadge}</div>` : '';
-
-      let tagsHtml = `<span class="ov-tag ov-type">${typeLabel}</span>`;
-      if (isNewListing(l, 24)) tagsHtml += `<span class="ov-tag ov-new">${t.newTag}</span>`;
-      if ((l.seaViewScore || 0) >= 4) tagsHtml += `<span class="ov-tag ov-sea">${t.seaTag}</span>`;
-      if ((l.highlightTags || []).includes("Onsen")) tagsHtml += `<span class="ov-tag ov-onsen">${t.onsenTag}</span>`;
-
+      const title = STATE.lang === 'JP' ? l.title : (l.titleEn || l.title);
+      const typeLabel = TXT[STATE.lang][l.propertyType] || l.propertyType;
+      
+      // Removed CORS Proxy - Listing images need direct access or referrer hiding
+      const img = l.imageUrl || "https://placehold.co/600x400?text=No+Image";
+      
+      let tags = `<span class="ov-tag ov-type">${typeLabel}</span>`;
+      if (l.seaViewScore >= 4) tags += `<span class="ov-tag ov-sea">Sea View</span>`;
+      
       let metrics = [];
-      if (l.propertyType !== "land" && l.buildingSqm) metrics.push(`<span>${Math.round(l.buildingSqm)}</span> m²`);
-      if (l.landSqm) metrics.push(`${t.landLabel} <span>${Math.round(l.landSqm)}</span> m²`);
+      if (l.landSqm) metrics.push(`Land: ${l.landSqm}m²`);
+      if (l.buildingSqm) metrics.push(`Bldg: ${l.buildingSqm}m²`);
+      if (l.age) metrics.push(`${l.age} yrs old`);
 
-      const eventText = formatEventText(l);
-      const eventHtml = eventText ? `<div class="card-event">${eventText}</div>` : '';
-
-      const card = `
+      const html = `
         <div class="card">
           <div class="card-img-wrap">
-            <a href="${l.sourceUrl}" target="_blank" rel="noopener">
-              <img src="${imgUrl}" class="card-img" loading="lazy">
+            <a href="${l.sourceUrl}" target="_blank">
+              <img src="${img}" class="card-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Img+Error'">
             </a>
-            <div class="overlay-tags">${tagsHtml}</div>
+            <div class="overlay-tags">${tags}</div>
           </div>
           <div class="card-body">
-            <div class="card-header-row">
-              <div class="card-price">${fmtPrice(l.priceJpy)}</div>
-              ${ageInfo}
-            </div>
-            <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="card-title">${title}</a>
-            ${eventHtml}
-            <div class="card-metrics">
-              ${metrics.map(m => `<div class="metric">${m}</div>`).join('<div style="color:#333">|</div>')}
-            </div>
+            <div class="card-price">${fmtPrice(l.priceJpy)}</div>
+            <a href="${l.sourceUrl}" target="_blank" class="card-title">${title}</a>
+            <div class="card-metrics">${metrics.join(" • ")}</div>
             <div class="card-footer">
-              <div style="opacity:0.5">Source: ${normalizeSource(l)}</div>
-              <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="view-btn">${t.analyze}</a>
+              <span>${l.source}</span>
+              <a href="${l.sourceUrl}" target="_blank" class="view-btn">${TXT[STATE.lang].view} &rarr;</a>
             </div>
           </div>
-        </div>`;
-      container.insertAdjacentHTML('beforeend', card);
+        </div>
+      `;
+      grid.insertAdjacentHTML('beforeend', html);
     });
-  }
-
-  function renderFxFooter() {
-    const t = TXT[STATE.lang];
-    const el = document.getElementById('fx-meta');
-
-    const gen = DATA.generatedAt ? new Date(DATA.generatedAt) : null;
-    const genStr = gen ? gen.toLocaleString() : "-";
-
-    const usd = Number(DATA.fxUsdJpy || 0);
-    const cny = Number(DATA.fxCnyJpy || 0);
-
-    el.innerHTML = `
-      <span>${t.fxLabel}:</span>
-      <code>USD/JPY ${usd ? usd.toFixed(2) : "-"}</code>
-      <code>CNY/JPY ${cny ? cny.toFixed(2) : "-"}</code>
-      <span style="opacity:0.8">· source: ${DATA.fxSource || "Manual"} · generated: ${genStr}</span>
-    `;
   }
 
   init();
