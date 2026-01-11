@@ -22,7 +22,17 @@
 
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-    /* Controls */
+    /* STATS BAR */
+    .stats-bar {
+      display: flex; gap: 1px; background: #333; border: 1px solid #333;
+      border-radius: 12px; overflow: hidden; margin-bottom: 30px;
+    }
+    .stat-item { flex: 1; text-align: center; padding: 20px; background: var(--bg-card); }
+    .stat-val { font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+    .stat-sub { font-size: 0.8rem; color: var(--accent); margin-top: 4px; }
+
+    /* CONTROLS */
     .controls {
       background: rgba(30,30,32,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
       display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 30px;
@@ -36,9 +46,9 @@
     .toggle-btn:hover { background: #111; }
     .toggle-btn.active { background: #333; color: #fff; font-weight: 600; }
     
-    .results-count { margin-left: auto; color: var(--text-secondary); font-size: 0.9rem; }
+    .results-count { margin-left: auto; color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; }
 
-    /* Grid */
+    /* GRID */
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
     
     .card {
@@ -72,6 +82,24 @@
 </header>
 
 <div class="container">
+  
+  <div class="stats-bar" id="stats-panel">
+    <div class="stat-item">
+      <div class="stat-val" id="stat-price">-</div>
+      <div class="stat-label">Avg Price</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-size">-</div>
+      <div class="stat-label">Avg Size</div>
+      <div class="stat-sub" id="stat-size-sub"></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-unit">-</div>
+      <div class="stat-label">Unit Price</div>
+      <div class="stat-sub" id="stat-unit-sub"></div>
+    </div>
+  </div>
+
   <div class="controls">
     <div class="toggle-group">
       <button class="toggle-btn active" onclick="setLang('EN', this)">EN</button>
@@ -85,11 +113,9 @@
     </div>
 
     <select id="loc-select" onchange="render()"></select>
-    
     <select id="source-select" onchange="render()">
       <option value="all">All Brokers</option>
     </select>
-    
     <select id="type-select" onchange="render()">
       <option value="all">All Types</option>
       <option value="house">House</option>
@@ -105,7 +131,7 @@
 <script>
   let DATA = [];
   let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all' };
-  const FX_USD = 155; // Static Fallback
+  const FX_USD = 155; 
 
   const TXT = {
     EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land" },
@@ -115,23 +141,20 @@
 
   async function init() {
     try {
-      // Force cache burst
       const res = await fetch(`listings.json?t=${Date.now()}`);
       if (!res.ok) throw new Error("Failed to load listings");
       const json = await res.json();
       DATA = json.listings || [];
-      
       populateFilters();
       render();
     } catch (e) {
-      document.getElementById('grid').innerHTML = `<div style="padding:20px; color:red">Error loading data: ${e.message}</div>`;
+      document.getElementById('grid').innerHTML = `<div style="padding:20px; color:red">Error: ${e.message}</div>`;
     }
   }
 
   function populateFilters() {
     const locSel = document.getElementById('loc-select');
     const srcSel = document.getElementById('source-select');
-    
     const locs = [...new Set(DATA.map(l => l.city))].sort();
     const srcs = [...new Set(DATA.map(l => l.source))].sort();
     
@@ -146,7 +169,7 @@
     STATE.lang = l;
     document.querySelectorAll('.toggle-group:first-child .toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    populateFilters(); // Re-render labels
+    populateFilters(); 
     render();
   }
 
@@ -161,6 +184,57 @@
     if (!p) return "-";
     if (STATE.curr === 'JPY') return "¥" + (p/10000).toLocaleString() + "万";
     if (STATE.curr === 'USD') return "$" + Math.round(p / FX_USD).toLocaleString();
+    return p;
+  }
+
+  // Helper to pick correct size (Land vs Building)
+  function getSize(l) {
+    if (l.propertyType === 'land') return l.landSqm || 0;
+    return l.buildingSqm || 0;
+  }
+
+  function renderStats(items) {
+    const pEl = document.getElementById('stat-price');
+    const sEl = document.getElementById('stat-size');
+    const subEl = document.getElementById('stat-size-sub');
+    const uEl = document.getElementById('stat-unit');
+    const uSubEl = document.getElementById('stat-unit-sub');
+
+    if (!items.length) {
+      pEl.innerText = "-"; sEl.innerText = "-"; uEl.innerText = "-";
+      return;
+    }
+
+    // Averages
+    const totalP = items.reduce((a,b) => a + (b.priceJpy||0), 0);
+    const totalS = items.reduce((a,b) => a + getSize(b), 0);
+    const avgP = totalP / items.length;
+    const avgS = totalS / items.length; // in m²
+
+    // 1. Avg Price
+    pEl.innerText = fmtPrice(avgP);
+
+    // 2. Avg Size
+    if (STATE.curr === 'USD') {
+      const sqft = avgS * 10.764;
+      sEl.innerText = Math.round(sqft).toLocaleString() + " ft²";
+      subEl.innerText = `(${Math.round(avgS)} m²)`;
+      
+      // Unit Price ($/sqft)
+      const usdP = avgP / FX_USD;
+      const ppSqft = usdP / sqft;
+      uEl.innerText = "$" + Math.round(ppSqft) + " /ft²";
+      uSubEl.innerText = "";
+    } else {
+      // Metric / JPY
+      sEl.innerText = Math.round(avgS).toLocaleString() + " m²";
+      subEl.innerText = "";
+      
+      // Unit Price (JPY / Tsubo is standard, but simple /m2 here)
+      const ppSqm = avgP / avgS;
+      uEl.innerText = "¥" + Math.round(ppSqm/10000).toLocaleString() + "万 /m²";
+      uSubEl.innerText = "";
+    }
   }
 
   function render() {
@@ -175,19 +249,17 @@
       return true;
     });
 
+    renderStats(filtered);
+
     document.getElementById('count').innerText = `${filtered.length} listings`;
     const grid = document.getElementById('grid');
     grid.innerHTML = "";
 
     filtered.forEach(l => {
-      // Logic: Prefer EN title if lang is EN, otherwise JP title. 
-      // Fallback to "Property in [City]" if title is missing.
       let title = (STATE.lang === 'JP') ? l.title : (l.titleEn || l.title);
       if (!title || title === "-") title = `${l.city} Property`;
 
       const pType = TXT[STATE.lang][l.propertyType] || l.propertyType;
-      
-      // Image Handling: No Proxy, direct link
       const img = l.imageUrl || "https://placehold.co/600x400?text=No+Image";
 
       const html = `
