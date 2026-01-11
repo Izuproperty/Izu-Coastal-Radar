@@ -7,63 +7,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-body: #000000;
-      --bg-card: #1c1c1e;
-      --text-primary: #f5f5f7;
+      --bg-body: #050505;
+      --bg-card: #151517;
+      --text-primary: #e5e5e7;
       --text-secondary: #86868b;
-      --accent: #0a84ff;
-      --tag-sea: #0a84ff;
-      --tag-onsen: #ff453a;
-      --tag-new: #30d158;
+      --accent: #2997ff;
       --border: #333;
     }
-    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 50px; }
     
-    header { background: #000; border-bottom: 1px solid var(--border); padding: 40px 20px; text-align: center; }
-    h1 { margin: 0; font-size: 2.5rem; font-weight: 800; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { color: var(--text-secondary); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    header { background: #000; border-bottom: 1px solid var(--border); padding: 30px 20px; text-align: center; }
+    h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
+    .subtitle { color: var(--text-secondary); margin-top: 5px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
 
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
     /* Controls */
     .controls {
-      background: rgba(28,28,30,0.95); padding: 15px; border-radius: 12px; border: 1px solid #333;
+      background: rgba(30,30,32,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
       display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 30px;
       position: sticky; top: 10px; z-index: 100; backdrop-filter: blur(10px);
     }
-    select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; }
-    .toggle-btn { padding: 8px 12px; border: 1px solid #333; background: #000; color: #888; cursor: pointer; border-radius: 6px; }
-    .toggle-btn.active { background: #333; color: #fff; }
-    .results-count { margin-left: auto; color: var(--text-secondary); font-weight: 600; }
+    
+    select { padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; outline: none; }
+    
+    .toggle-group { display: flex; border: 1px solid #333; border-radius: 8px; overflow: hidden; }
+    .toggle-btn { padding: 8px 12px; border: none; background: #000; color: #666; cursor: pointer; transition: 0.2s; }
+    .toggle-btn:hover { background: #111; }
+    .toggle-btn.active { background: #333; color: #fff; font-weight: 600; }
+    
+    .results-count { margin-left: auto; color: var(--text-secondary); font-size: 0.9rem; }
 
     /* Grid */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
     
     .card {
-      background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid #2c2c2e;
+      background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid #222;
       display: flex; flex-direction: column; transition: transform 0.2s;
     }
-    .card:hover { transform: translateY(-4px); border-color: #555; }
+    .card:hover { transform: translateY(-3px); border-color: #444; }
 
-    .card-img-wrap { height: 200px; position: relative; background: #111; }
+    .card-img-wrap { height: 220px; position: relative; background: #111; }
     .card-img { width: 100%; height: 100%; object-fit: cover; }
     
-    .overlay-tags { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
-    .ov-tag { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #fff; backdrop-filter: blur(4px); }
-    .ov-type { background: rgba(0,0,0,0.7); }
-    .ov-sea { background: var(--tag-sea); }
-    .ov-new { background: var(--tag-new); }
+    .tag { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #fff; backdrop-filter: blur(5px); background: rgba(0,0,0,0.6); }
+    .tag-sea { background: var(--accent); }
 
     .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-    .card-price { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
-    .card-title { font-size: 1rem; font-weight: 600; color: #ddd; margin-bottom: 10px; text-decoration: none; display: block; }
-    .card-title:hover { color: var(--accent); }
+    .price { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .title { font-size: 1rem; font-weight: 500; color: #ccc; margin-bottom: 10px; text-decoration: none; line-height: 1.4; }
+    .title:hover { color: var(--accent); }
     
-    .card-metrics { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-    .card-footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; }
-    .view-btn { color: var(--accent); font-weight: 700; text-decoration: none; }
+    .meta { font-size: 0.85rem; color: #777; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; display: flex; gap: 10px; }
     
-    .error-msg { grid-column: 1/-1; background: #311; border: 1px solid #522; padding: 20px; border-radius: 8px; text-align: center; }
+    .footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: #555; align-items: center; }
+    .view-btn { color: var(--accent); font-weight: 600; text-decoration: none; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -75,149 +73,139 @@
 
 <div class="container">
   <div class="controls">
-    <div>
+    <div class="toggle-group">
       <button class="toggle-btn active" onclick="setLang('EN', this)">EN</button>
       <button class="toggle-btn" onclick="setLang('JP', this)">JP</button>
       <button class="toggle-btn" onclick="setLang('CN', this)">CN</button>
     </div>
     
-    <div>
+    <div class="toggle-group">
       <button class="toggle-btn active" onclick="setCurr('JPY', this)">¥</button>
       <button class="toggle-btn" onclick="setCurr('USD', this)">$</button>
-      <button class="toggle-btn" onclick="setCurr('CNY', this)">CNY</button>
     </div>
 
     <select id="loc-select" onchange="render()"></select>
+    
+    <select id="source-select" onchange="render()">
+      <option value="all">All Brokers</option>
+    </select>
+    
     <select id="type-select" onchange="render()">
       <option value="all">All Types</option>
       <option value="house">House</option>
       <option value="land">Land</option>
     </select>
     
-    <div class="results-count" id="count"></div>
+    <div class="results-count" id="count">...</div>
   </div>
 
-  <div class="grid" id="grid">Loading...</div>
+  <div class="grid" id="grid"></div>
 </div>
 
 <script>
-  let DATA = { listings: [], fxUsd: 155, fxCny: 20 };
-  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all' };
+  let DATA = [];
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all' };
+  const FX_USD = 155; // Static Fallback
 
   const TXT = {
-    EN: { house: "House", land: "Land", view: "Analyze", allLoc: "All Locations" },
-    JP: { house: "戸建", land: "土地", view: "詳細", allLoc: "全エリア" },
-    CN: { house: "独栋", land: "土地", view: "查看", allLoc: "全部地区" }
+    EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land" },
+    JP: { view: "詳細", allLoc: "全エリア", allSrc: "全業者", house: "戸建", land: "土地" },
+    CN: { view: "查看", allLoc: "全部地区", allSrc: "全部中介", house: "独栋", land: "土地" }
   };
 
   async function init() {
     try {
-      // Fetch Build Info to burst cache
-      let v = Date.now();
-      try {
-        const b = await fetch("buildInfo.json").then(r=>r.json());
-        v = b.generatedAt;
-      } catch(e) {}
-
-      const res = await fetch(`listings.json?v=${v}`);
-      if (!res.ok) throw new Error("Could not load listings.json");
+      // Force cache burst
+      const res = await fetch(`listings.json?t=${Date.now()}`);
+      if (!res.ok) throw new Error("Failed to load listings");
       const json = await res.json();
+      DATA = json.listings || [];
       
-      DATA.listings = json.listings;
-      DATA.fxUsd = json.fxRateUsd || 155;
-      DATA.fxCny = json.fxRateCny || 20;
-
-      populateLocs();
+      populateFilters();
       render();
     } catch (e) {
-      document.getElementById('grid').innerHTML = `<div class="error-msg">${e.message}</div>`;
+      document.getElementById('grid').innerHTML = `<div style="padding:20px; color:red">Error loading data: ${e.message}</div>`;
     }
   }
 
-  function populateLocs() {
-    const s = document.getElementById('loc-select');
-    const locs = [...new Set(DATA.listings.map(l => l.city))].sort();
+  function populateFilters() {
+    const locSel = document.getElementById('loc-select');
+    const srcSel = document.getElementById('source-select');
     
-    const label = TXT[STATE.lang].allLoc;
-    s.innerHTML = `<option value="all">${label}</option>`;
+    const locs = [...new Set(DATA.map(l => l.city))].sort();
+    const srcs = [...new Set(DATA.map(l => l.source))].sort();
     
-    const LOC_EN = { "下田市": "Shimoda", "河津町": "Kawazu", "東伊豆町": "Higashi-Izu", "南伊豆町": "Minami-Izu" };
+    locSel.innerHTML = `<option value="all">${TXT[STATE.lang].allLoc}</option>`;
+    srcSel.innerHTML = `<option value="all">${TXT[STATE.lang].allSrc}</option>`;
     
-    locs.forEach(l => {
-      let name = l;
-      if (STATE.lang !== 'JP') name = LOC_EN[l] || l;
-      s.innerHTML += `<option value="${l}">${name}</option>`;
-    });
+    locs.forEach(l => locSel.innerHTML += `<option value="${l}">${l}</option>`);
+    srcs.forEach(s => srcSel.innerHTML += `<option value="${s}">${s}</option>`);
   }
 
   function setLang(l, btn) {
     STATE.lang = l;
-    updateBtns(btn);
-    populateLocs();
+    document.querySelectorAll('.toggle-group:first-child .toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    populateFilters(); // Re-render labels
     render();
   }
 
   function setCurr(c, btn) {
     STATE.curr = c;
-    updateBtns(btn);
+    document.querySelectorAll('.toggle-group:nth-child(2) .toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
     render();
-  }
-
-  function updateBtns(clicked) {
-    const group = clicked.parentElement;
-    Array.from(group.children).forEach(b => b.classList.remove('active'));
-    clicked.classList.add('active');
   }
 
   function fmtPrice(p) {
     if (!p) return "-";
     if (STATE.curr === 'JPY') return "¥" + (p/10000).toLocaleString() + "万";
-    if (STATE.curr === 'USD') return "$" + Math.round(p / DATA.fxUsd).toLocaleString();
-    if (STATE.curr === 'CNY') return "CNY " + Math.round(p / DATA.fxCny).toLocaleString();
+    if (STATE.curr === 'USD') return "$" + Math.round(p / FX_USD).toLocaleString();
   }
 
   function render() {
-    const locFilter = document.getElementById('loc-select').value;
-    const typeFilter = document.getElementById('type-select').value;
-    
-    const items = DATA.listings.filter(l => {
-      if (locFilter !== 'all' && l.city !== locFilter) return false;
-      if (typeFilter !== 'all' && l.propertyType !== typeFilter) return false;
+    STATE.loc = document.getElementById('loc-select').value;
+    STATE.type = document.getElementById('type-select').value;
+    STATE.source = document.getElementById('source-select').value;
+
+    const filtered = DATA.filter(l => {
+      if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
+      if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
+      if (STATE.source !== 'all' && l.source !== STATE.source) return false;
       return true;
     });
 
-    document.getElementById('count').innerText = items.length + " listings";
+    document.getElementById('count').innerText = `${filtered.length} listings`;
     const grid = document.getElementById('grid');
     grid.innerHTML = "";
 
-    items.forEach(l => {
-      const title = STATE.lang === 'JP' ? l.title : (l.titleEn || l.title);
-      const typeLabel = TXT[STATE.lang][l.propertyType] || l.propertyType;
+    filtered.forEach(l => {
+      // Logic: Prefer EN title if lang is EN, otherwise JP title. 
+      // Fallback to "Property in [City]" if title is missing.
+      let title = (STATE.lang === 'JP') ? l.title : (l.titleEn || l.title);
+      if (!title || title === "-") title = `${l.city} Property`;
+
+      const pType = TXT[STATE.lang][l.propertyType] || l.propertyType;
       
-      // Removed CORS Proxy - Listing images need direct access or referrer hiding
+      // Image Handling: No Proxy, direct link
       const img = l.imageUrl || "https://placehold.co/600x400?text=No+Image";
-      
-      let tags = `<span class="ov-tag ov-type">${typeLabel}</span>`;
-      if (l.seaViewScore >= 4) tags += `<span class="ov-tag ov-sea">Sea View</span>`;
-      
-      let metrics = [];
-      if (l.landSqm) metrics.push(`Land: ${l.landSqm}m²`);
-      if (l.buildingSqm) metrics.push(`Bldg: ${l.buildingSqm}m²`);
-      if (l.age) metrics.push(`${l.age} yrs old`);
 
       const html = `
         <div class="card">
           <div class="card-img-wrap">
             <a href="${l.sourceUrl}" target="_blank">
-              <img src="${img}" class="card-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Img+Error'">
+              <img src="${img}" class="card-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Error'">
             </a>
-            <div class="overlay-tags">${tags}</div>
+            <div class="tag tag-sea">Sea View</div>
           </div>
           <div class="card-body">
-            <div class="card-price">${fmtPrice(l.priceJpy)}</div>
-            <a href="${l.sourceUrl}" target="_blank" class="card-title">${title}</a>
-            <div class="card-metrics">${metrics.join(" • ")}</div>
-            <div class="card-footer">
+            <div class="price">${fmtPrice(l.priceJpy)}</div>
+            <a href="${l.sourceUrl}" target="_blank" class="title">${title}</a>
+            <div class="meta">
+              <span>${pType}</span>
+              <span>${l.city}</span>
+            </div>
+            <div class="footer">
               <span>${l.source}</span>
               <a href="${l.sourceUrl}" target="_blank" class="view-btn">${TXT[STATE.lang].view} &rarr;</a>
             </div>
