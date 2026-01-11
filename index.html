@@ -14,23 +14,23 @@
       --accent: #2997ff;
       --border: #333;
     }
-    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; padding-bottom: 50px; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
     
     header { background: #000; border-bottom: 1px solid var(--border); padding: 30px 20px; text-align: center; }
     h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
     .subtitle { color: var(--text-secondary); margin-top: 5px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
 
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; flex: 1; width: 100%; box-sizing: border-box; }
 
     /* STATS BAR */
     .stats-bar {
       display: flex; gap: 1px; background: #333; border: 1px solid #333;
       border-radius: 12px; overflow: hidden; margin-bottom: 30px;
     }
-    .stat-item { flex: 1; text-align: center; padding: 20px; background: var(--bg-card); }
-    .stat-val { font-size: 1.5rem; font-weight: 700; color: #fff; }
-    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
-    .stat-sub { font-size: 0.8rem; color: var(--accent); margin-top: 4px; }
+    .stat-item { flex: 1; text-align: center; padding: 15px; background: var(--bg-card); }
+    .stat-val { font-size: 1.3rem; font-weight: 700; color: #fff; }
+    .stat-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+    .stat-sub { font-size: 0.75rem; color: var(--accent); margin-top: 2px; }
 
     /* CONTROLS */
     .controls {
@@ -70,8 +70,13 @@
     
     .meta { font-size: 0.85rem; color: #777; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; display: flex; gap: 10px; }
     
-    .footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: #555; align-items: center; }
+    .card-footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: #555; align-items: center; }
     .view-btn { color: var(--accent); font-weight: 600; text-decoration: none; text-transform: uppercase; }
+
+    /* PAGE FOOTER */
+    footer { border-top: 1px solid var(--border); background: #000; padding: 40px 20px; margin-top: 40px; text-align: center; }
+    .footer-link { color: var(--text-secondary); text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: 0.2s; }
+    .footer-link:hover { color: #fff; border-bottom-color: #fff; }
   </style>
 </head>
 <body>
@@ -113,9 +118,7 @@
     </div>
 
     <select id="loc-select" onchange="render()"></select>
-    <select id="source-select" onchange="render()">
-      <option value="all">All Brokers</option>
-    </select>
+    <select id="source-select" onchange="render()"></select>
     <select id="type-select" onchange="render()">
       <option value="all">All Types</option>
       <option value="house">House</option>
@@ -128,15 +131,19 @@
   <div class="grid" id="grid"></div>
 </div>
 
+<footer>
+  <a href="links.html" class="footer-link" id="link-useful">Useful Izu Links</a>
+</footer>
+
 <script>
   let DATA = [];
   let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all' };
   const FX_USD = 155; 
 
   const TXT = {
-    EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land" },
-    JP: { view: "詳細", allLoc: "全エリア", allSrc: "全業者", house: "戸建", land: "土地" },
-    CN: { view: "查看", allLoc: "全部地区", allSrc: "全部中介", house: "独栋", land: "土地" }
+    EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land", useful: "Useful Izu Links" },
+    JP: { view: "詳細", allLoc: "全エリア", allSrc: "全業者", house: "戸建", land: "土地", useful: "伊豆のお役立ちリンク" },
+    CN: { view: "查看", allLoc: "全部地区", allSrc: "全部中介", house: "独栋", land: "土地", useful: "伊豆实用链接" }
   };
 
   async function init() {
@@ -155,6 +162,11 @@
   function populateFilters() {
     const locSel = document.getElementById('loc-select');
     const srcSel = document.getElementById('source-select');
+    
+    // Preserve selection if re-populating
+    const oldLoc = locSel.value;
+    const oldSrc = srcSel.value;
+
     const locs = [...new Set(DATA.map(l => l.city))].sort();
     const srcs = [...new Set(DATA.map(l => l.source))].sort();
     
@@ -163,12 +175,19 @@
     
     locs.forEach(l => locSel.innerHTML += `<option value="${l}">${l}</option>`);
     srcs.forEach(s => srcSel.innerHTML += `<option value="${s}">${s}</option>`);
+
+    if ([...locSel.options].some(o => o.value === oldLoc)) locSel.value = oldLoc;
+    if ([...srcSel.options].some(o => o.value === oldSrc)) srcSel.value = oldSrc;
   }
 
   function setLang(l, btn) {
     STATE.lang = l;
     document.querySelectorAll('.toggle-group:first-child .toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    
+    // Update footer link text
+    document.getElementById('link-useful').innerText = TXT[l].useful;
+    
     populateFilters(); 
     render();
   }
@@ -187,7 +206,6 @@
     return p;
   }
 
-  // Helper to pick correct size (Land vs Building)
   function getSize(l) {
     if (l.propertyType === 'land') return l.landSqm || 0;
     return l.buildingSqm || 0;
@@ -205,32 +223,23 @@
       return;
     }
 
-    // Averages
     const totalP = items.reduce((a,b) => a + (b.priceJpy||0), 0);
     const totalS = items.reduce((a,b) => a + getSize(b), 0);
     const avgP = totalP / items.length;
-    const avgS = totalS / items.length; // in m²
+    const avgS = totalS / items.length; 
 
-    // 1. Avg Price
     pEl.innerText = fmtPrice(avgP);
 
-    // 2. Avg Size
     if (STATE.curr === 'USD') {
       const sqft = avgS * 10.764;
       sEl.innerText = Math.round(sqft).toLocaleString() + " ft²";
       subEl.innerText = `(${Math.round(avgS)} m²)`;
-      
-      // Unit Price ($/sqft)
-      const usdP = avgP / FX_USD;
-      const ppSqft = usdP / sqft;
+      const ppSqft = (avgP / FX_USD) / sqft;
       uEl.innerText = "$" + Math.round(ppSqft) + " /ft²";
       uSubEl.innerText = "";
     } else {
-      // Metric / JPY
       sEl.innerText = Math.round(avgS).toLocaleString() + " m²";
       subEl.innerText = "";
-      
-      // Unit Price (JPY / Tsubo is standard, but simple /m2 here)
       const ppSqm = avgP / avgS;
       uEl.innerText = "¥" + Math.round(ppSqm/10000).toLocaleString() + "万 /m²";
       uSubEl.innerText = "";
@@ -250,8 +259,8 @@
     });
 
     renderStats(filtered);
-
     document.getElementById('count').innerText = `${filtered.length} listings`;
+    
     const grid = document.getElementById('grid');
     grid.innerHTML = "";
 
@@ -277,7 +286,7 @@
               <span>${pType}</span>
               <span>${l.city}</span>
             </div>
-            <div class="footer">
+            <div class="card-footer">
               <span>${l.source}</span>
               <a href="${l.sourceUrl}" target="_blank" class="view-btn">${TXT[STATE.lang].view} &rarr;</a>
             </div>
