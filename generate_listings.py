@@ -172,44 +172,44 @@ def get_best_image(soup, url):
     return ""
 
 def get_izutaiyo_image(soup, url, property_id):
-    """Izu Taiyo-specific image finder - handles canvas-based images"""
-    # Izu Taiyo uses canvas to render images via JavaScript
-    # Look for image data in script tags or data attributes
+    """Izu Taiyo-specific image finder - constructs image URLs from property ID"""
+    # Izu Taiyo images follow a predictable pattern:
+    # Property ID: SMB410H -> Images at: bb/sm/smb410ha.jpg, bb/sm/smb410hb.jpg, etc.
 
-    # Strategy 1: Look for image URLs in JavaScript
-    for script in soup.find_all("script"):
-        script_text = script.string if script.string else ""
-        # Look for common patterns: picture_data, image_url, etc.
-        if property_id and property_id.lower() in script_text.lower():
-            # Extract image URLs from script
-            import re
-            # Look for URLs ending in .jpg, .jpeg, .png
-            img_matches = re.findall(r'["\']([^"\']*?\.(?:jpg|jpeg|png|gif))["\']', script_text)
-            if img_matches:
-                for match in img_matches:
-                    # Skip logos/banners
-                    if any(skip in match.lower() for skip in ["logo", "rogo", "banner", "bnr", "icon", "tel.gif"]):
-                        continue
-                    # Prefer images with property ID
-                    if property_id.lower() in match.lower():
-                        full_url = urljoin(url, match)
-                        print(f"  [DEBUG] Found image in script for {property_id}: {full_url}")
-                        return full_url
+    if property_id:
+        # Convert property ID to lowercase for image path
+        prop_lower = property_id.lower()
+        # Get first 2 characters for directory
+        dir_name = prop_lower[:2]
 
-    # Strategy 2: Check for data attributes on canvas or nearby elements
-    canvas = soup.find("canvas", id="picture_canvas")
-    if canvas:
-        for attr in ['data-src', 'data-image', 'data-url']:
-            if canvas.get(attr):
-                img_url = urljoin(url, canvas.get(attr))
-                print(f"  [DEBUG] Found image in canvas {attr}: {img_url}")
-                return img_url
+        # Try constructing image URLs (a, b, c variants)
+        for letter in ['a', 'b', 'c']:
+            img_path = f"bb/{dir_name}/{prop_lower}{letter}.jpg"
+            img_url = urljoin(url, img_path)
+            print(f"  [DEBUG] Constructed Izu Taiyo image URL: {img_url}")
+            # Return the first one (they can check others on the site)
+            return img_url
 
-    # Strategy 3: Fall back to img tags
+    # Fallback to searching the page
+    print(f"  [DEBUG] No property ID available for image construction")
+
+    # Strategy 1: Look for image URLs in noscript or commented sections
+    # Check for images in pattern bb/{dir}/{id}{letter}.jpg
+    import re
+    page_text = str(soup)
+    img_pattern = r'bb/\w+/\w+[a-z]\.jpg'
+    img_matches = re.findall(img_pattern, page_text)
+
+    if img_matches:
+        # Use the first match
+        img_url = urljoin(url, img_matches[0])
+        print(f"  [DEBUG] Found Izu Taiyo image in HTML: {img_url}")
+        return img_url
+    # Strategy 2: Fall back to img tags as last resort
     all_imgs = soup.find_all("img")
     candidates = []
 
-    print(f"  [DEBUG] No canvas images found, searching {len(all_imgs)} img tags for {property_id}")
+    print(f"  [DEBUG] Falling back to img tag search, found {len(all_imgs)} img tags")
 
     for img in all_imgs:
         src = img.get("src", "")
