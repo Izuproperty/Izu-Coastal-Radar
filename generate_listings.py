@@ -140,24 +140,32 @@ def determine_type(title, text):
 
 def get_best_image(soup, url):
     """Robust image finder: OG Tag -> Main ID -> First Large Image"""
-    # 1. Meta Tag (Best quality usually)
+    # 1. Meta Tag (Best quality usually) - but skip if it's a logo
     og = soup.find("meta", attrs={"property": "og:image"})
     if og and og.get("content"):
-        return urljoin(url, og.get("content"))
+        og_url = og.get("content")
+        og_lower = og_url.lower()
+        # Skip if it's obviously a logo
+        if not any(skip in og_lower for skip in ["logo", "rogo", "icon", "og.png", "og.jpg"]):
+            return urljoin(url, og_url)
 
     # 2. Known ID/Classes
     selectors = ["#main_img", ".main_img", ".wp-post-image", ".item_img img", ".swiper-slide img"]
     for sel in selectors:
         el = soup.select_one(sel)
         if el and el.get("src"):
-            return urljoin(url, el.get("src"))
+            src = el.get("src")
+            src_lower = src.lower()
+            # Skip logos
+            if not any(skip in src_lower for skip in ["logo", "rogo", "icon"]):
+                return urljoin(url, src)
 
     # 3. Fallback: First image that looks like a photo (jpg/png) and not a logo
     for img in soup.find_all("img"):
         src = img.get("src", "")
         if not src: continue
         lower = src.lower()
-        if "logo" in lower or "icon" in lower or "map" in lower: continue
+        if any(skip in lower for skip in ["logo", "rogo", "icon", "map", "banner", "nav", "/title/"]): continue
         if ".jpg" in lower or ".jpeg" in lower or ".png" in lower:
             return urljoin(url, src)
 
@@ -170,6 +178,8 @@ def get_izutaiyo_image(soup, url, property_id):
     all_imgs = soup.find_all("img")
     candidates = []
 
+    print(f"  [DEBUG] Searching for images in {property_id}, found {len(all_imgs)} total img tags")
+
     for img in all_imgs:
         src = img.get("src", "")
         if not src:
@@ -179,22 +189,32 @@ def get_izutaiyo_image(soup, url, property_id):
         full_url = urljoin(url, src)
         lower_src = src.lower()
 
-        # Skip obvious non-property images
-        if any(skip in lower_src for skip in ["logo", "rogo", "icon", "banner", "nav", "button", "arrow", "spacer", "bg_"]):
+        # Debug: show what we're examining
+        print(f"  [DEBUG]   Examining: {src[:60]}")
+
+        # Skip obvious non-property images (EXPLICIT rogo.jpg check)
+        skip_keywords = ["logo", "rogo", "icon", "banner", "nav", "button", "arrow", "spacer", "bg_", "/title/"]
+        should_skip = any(skip in lower_src for skip in skip_keywords)
+        if should_skip:
+            print(f"  [DEBUG]     -> SKIP (contains excluded keyword)")
             continue
 
         # Must be an image file
         if not any(ext in lower_src for ext in [".jpg", ".jpeg", ".png", ".gif"]):
+            print(f"  [DEBUG]     -> SKIP (not image extension)")
             continue
 
         # Prefer images that look like property photos
-        priority = 0
+        priority = 10  # Base priority for any valid image
+
         if property_id and property_id.lower() in lower_src:
             priority = 100  # Highest priority
+            print(f"  [DEBUG]     -> MATCH property ID! Priority: {priority}")
         elif any(pattern in lower_src for pattern in ["photo", "img", "pic", "image", "_1", "_01", "p01"]):
             priority = 50
+            print(f"  [DEBUG]     -> Looks like photo. Priority: {priority}")
         else:
-            priority = 10
+            print(f"  [DEBUG]     -> Generic image. Priority: {priority}")
 
         # Check size if available
         width = img.get("width", "")
@@ -203,21 +223,32 @@ def get_izutaiyo_image(soup, url, property_id):
             w = int(width)
             if w >= 200:  # Prefer larger images
                 priority += 20
+                print(f"  [DEBUG]     -> Large image ({w}px), bonus +20")
             elif w < 100:  # Penalize tiny images
                 priority -= 30
+                print(f"  [DEBUG]     -> Tiny image ({w}px), penalty -30")
 
-        candidates.append((priority, full_url))
+        if priority > 0:  # Only add if priority is positive
+            candidates.append((priority, full_url))
+            print(f"  [DEBUG]     -> Added as candidate with priority {priority}")
 
     # Sort by priority and return best match
     if candidates:
         candidates.sort(reverse=True, key=lambda x: x[0])
-        best_url = candidates[0][1]
-        print(f"  [DEBUG] Selected image for {property_id}: {best_url}")
+        best_priority, best_url = candidates[0]
+        print(f"  [DEBUG] ✓ Selected image for {property_id}: priority={best_priority}")
+        print(f"  [DEBUG]   URL: {best_url}")
         return best_url
 
-    # Fallback
-    print(f"  [DEBUG] No image found for {property_id}, using fallback")
-    return get_best_image(soup, url)
+    # Fallback - but log it
+    print(f"  [DEBUG] ✗ No valid image candidates for {property_id} (found {len(all_imgs)} total images)")
+    print(f"  [DEBUG]   Trying generic fallback...")
+    fallback_img = get_best_image(soup, url)
+    if fallback_img:
+        print(f"  [DEBUG]   Fallback found: {fallback_img}")
+    else:
+        print(f"  [DEBUG]   No fallback image found either!")
+    return fallback_img
 
 def extract_actual_city_from_title(title):
     """
@@ -618,6 +649,14 @@ class Maple(BaseScraper):
             sleep_jitter()
 
     def parse_detail(self, url):
+        # IMMEDIATE REJECTION: Category pages (bulletproof check)
+        url_lower = url.lower().rstrip('/')
+        if url_lower.endswith('estate_db/office') or url_lower.endswith('estate_db/lease') or \
+           url_lower.endswith('estate_db/mansion') or url_lower.endswith('estate_db/house') or \
+           url_lower.endswith('estate_db/estate') or url_lower.endswith('estate_db/land'):
+            print(f"  [CATEGORY PAGE FILTERED] {url}")
+            return
+
         STATS["scanned"] += 1
         soup = self.fetch(url)
         if not soup: return
@@ -635,29 +674,48 @@ class Maple(BaseScraper):
                     break
 
         # If we got generic title, try to decode from URL
-        if not title or "メープルハウジング" in title or "伊豆の不動産" in title:
+        is_generic = not title or "メープルハウジング" in title or "伊豆の不動産" in title
+        if is_generic:
             try:
                 from urllib.parse import unquote
                 # URL like: .../6763%ef%bc%9a%e8%87%aa%e7%84%b6...
                 # Extract the encoded part after estate_db/
                 url_parts = url.split('/estate_db/')
                 if len(url_parts) > 1:
-                    encoded_title = url_parts[1].strip('/').split('/')[0]  # Get first segment only
+                    # Get everything between estate_db/ and the next / or end
+                    path_after_db = url_parts[1].strip('/')
+                    # Get first path segment (the property slug)
+                    encoded_title = path_after_db.split('/')[0] if '/' in path_after_db else path_after_db
+
+                    print(f"  [DEBUG] Decoding title from URL segment: {encoded_title[:50]}...")
                     decoded = unquote(encoded_title)
+                    print(f"  [DEBUG] Decoded to: {decoded[:80]}")
+
                     # Extract property description after the ID and colon
                     if '：' in decoded:
                         title = decoded.split('：', 1)[1].strip()
+                        print(f"  [DEBUG] Extracted after ：: {title[:80]}")
                     elif ':' in decoded:
                         title = decoded.split(':', 1)[1].strip()
+                        print(f"  [DEBUG] Extracted after :: {title[:80]}")
                     else:
-                        # No colon, just use the decoded string
-                        title = decoded
+                        # No colon, check if it starts with digits (property ID)
+                        # and try to extract meaningful part
+                        if decoded[:4].isdigit():
+                            title = decoded[4:].strip()  # Skip property ID
+                            print(f"  [DEBUG] Removed ID prefix: {title[:80]}")
+                        else:
+                            title = decoded
+                            print(f"  [DEBUG] Using full decoded: {title[:80]}")
 
                     # If title is still generic or empty, keep original
-                    if not title or len(title) < 3:
+                    if not title or len(title) < 3 or "メープルハウジング" in title:
+                        print(f"  [DEBUG] Decoded title still generic or empty, keeping fallback")
                         title = None
             except Exception as e:
                 print(f"  [DEBUG] Title decode failed for {url}: {e}")
+                import traceback
+                traceback.print_exc()
                 title = None
 
         if not title:
@@ -699,6 +757,7 @@ class Maple(BaseScraper):
             return
 
         price = extract_price(full_text)
+        print(f"  [DEBUG] Maple - Extracted price for {url[:60]}: {price}")
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
         if not price or price <= 0:
@@ -868,6 +927,7 @@ class Aoba(BaseScraper):
             return
 
         price = extract_price(full_text)
+        print(f"  [DEBUG] Aoba - Extracted price for {url[:60]}: {price}")
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
         if not price or price <= 0:
