@@ -487,8 +487,12 @@ class Maple(BaseScraper):
                 path = urlparse(full).path.rstrip('/')
                 parts = [p for p in path.split('/') if p]
 
-                # Valid property: ['estate_db', 'house' or 'estate', 'property-name']
-                if len(parts) >= 3 and parts[0] == "estate_db" and parts[1] in ["house", "estate"]:
+                # Valid property: ['estate_db', 'property-name'] (2+ parts)
+                # Exclude category pages like /estate_db/house/ or /estate_db/estate/
+                if len(parts) >= 2 and parts[0] == "estate_db":
+                    # Exclude if second part is just a category
+                    if len(parts) == 2 and parts[1] in ["house", "estate"]:
+                        continue
                     candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
@@ -564,10 +568,13 @@ class Maple(BaseScraper):
 class Aoba(BaseScraper):
     def run(self):
         print("--- Scanning Aoba ---")
-        # Try multiple pages
+        # Use area-specific search URLs instead of general listing pages
+        # This ensures we only get properties from target areas
         urls = [
-            "https://www.aoba-resort.com/house/",
-            "https://www.aoba-resort.com/land/"
+            "https://www.aoba-resort.com/room?area_code=ao22219",  # Shimoda
+            "https://www.aoba-resort.com/room?area_code=ao22301",  # Kawazu
+            "https://www.aoba-resort.com/room?area_code=ao22302",  # Higashi-Izu
+            "https://www.aoba-resort.com/room?area_code=ao22304",  # Minami-Izu
         ]
         candidates = set()
 
