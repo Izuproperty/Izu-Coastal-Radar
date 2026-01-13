@@ -159,13 +159,13 @@ def get_best_image(soup, url):
 def get_location_trust(soup, full_text, context_city=None):
     """
     Determines city.
-    1. If context_city is provided (from search URL), use it.
-    2. Search Address Table.
-    3. Search Title.
-    4. Search Body.
+    1. Search Address Table.
+    2. Search Title.
+    3. Search Body.
+    4. If nothing found, use context_city as fallback.
     """
-    # 1. Trust the search context!
-    if context_city: return context_city
+    # NOTE: We check the page content FIRST because search results often
+    # return properties from neighboring cities even when filtering by city code
 
     # 2. Address Table - Check with whitespace normalization
     markers = ["所在地", "住所", "Location", "物件所在地", "エリア"]
@@ -202,7 +202,14 @@ def get_location_trust(soup, full_text, context_city=None):
         if city: return city
 
     # 4. Full Text scan (expanded to first 1000 chars)
-    return normalize_city(full_text[:1000])
+    city = normalize_city(full_text[:1000])
+    if city: return city
+
+    # 5. Last resort: use search context if provided
+    if context_city and context_city in TARGET_CITIES_JP:
+        return context_city
+
+    return None
 
 # --- SCRAPERS ---
 
@@ -317,15 +324,20 @@ class IzuTaiyo(BaseScraper):
             STATS["skipped_sold"] += 1
             return
 
-        # 3. Mansion? - Check for specific patterns, not just the word
-        # Look for "マンション情報" (mansion information) not just "マンション" (which might be a property name)
+        # 3. Mansion? - Check for specific type indicators
+        # "のマンション情報" = mansion listing, "の家情報" = house listing
+        # Brokers often add "マンション" as a keyword tag, so we need to be specific
         is_mansion = False
-        if "マンション情報" in title or "マンション" in title and "情報" in title:
-            is_mansion = True
-        elif "mansion" in title.lower() and ("information" in title.lower() or "listing" in title.lower()):
+
+        # Positive indicators it's a mansion
+        if "のマンション情報" in title or "のマンション" in title:
             is_mansion = True
         elif "condo" in title.lower():
             is_mansion = True
+
+        # Negative indicators it's NOT a mansion (override)
+        if "の家情報" in title or "戸建" in title:
+            is_mansion = False
 
         if is_mansion:
             print(f"  [MANSION FILTERED] {city} - {title[:60]}")
