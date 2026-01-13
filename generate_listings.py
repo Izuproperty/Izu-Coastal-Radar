@@ -242,39 +242,43 @@ class IzuTaiyo(BaseScraper):
 
         # Strategy: Scan their main pages directly - they use onclick JavaScript
         # Let's try the search result pages and parse onclick attributes
+        # hpkind: 0=Mansion(skip), 1=House, 2=Land
+        property_types = [1, 2]  # We want Houses and Land only
+
         for code, city_name in city_map.items():
-            # Try search URL
-            search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind=0"
-            print(f"  Fetching {city_name} listings from: {search_url}")
-            soup = self.fetch(search_url)
-            if not soup:
-                print(f"  [WARNING] Failed to fetch {city_name}")
-                continue
+            for hpkind in property_types:
+                search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind={hpkind}"
+                type_name = "House" if hpkind == 1 else "Land"
+                print(f"  Fetching {city_name} {type_name}...")
+                soup = self.fetch(search_url)
+                if not soup:
+                    print(f"  [WARNING] Failed to fetch {city_name} {type_name}")
+                    continue
 
-            # Look for onclick handlers with property IDs
-            for tag in soup.find_all(True, onclick=True):
-                onclick = tag.get("onclick", "")
-                # Extract hpno from onclick like: location.href='d.php?hpno=12345'
-                match = re.search(r"d\.php\?hpno=(\d+)", onclick)
-                if match:
-                    prop_id = match.group(1)
-                    d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
-                    found_links[d_link] = city_name
+                # Look for onclick handlers with property IDs
+                for tag in soup.find_all(True, onclick=True):
+                    onclick = tag.get("onclick", "")
+                    # Extract hpno from onclick like: location.href='d.php?hpno=12345'
+                    match = re.search(r"d\.php\?hpno=(\d+)", onclick)
+                    if match:
+                        prop_id = match.group(1)
+                        d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
+                        found_links[d_link] = city_name
 
-                # Also check for hpbunno
-                match = re.search(r"d\.php\?hpbunno=([^'\"&]+)", onclick)
-                if match:
-                    prop_id = match.group(1).strip()
-                    d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
-                    found_links[d_link] = city_name
+                    # Also check for hpbunno
+                    match = re.search(r"d\.php\?hpbunno=([^'\"&]+)", onclick)
+                    if match:
+                        prop_id = match.group(1).strip()
+                        d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
+                        found_links[d_link] = city_name
 
-            # Also try direct links
-            for a in soup.find_all("a", href=True):
-                href = a['href']
-                if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
-                    full = urljoin("https://www.izutaiyo.co.jp", href)
-                    # Extract the city context
-                    found_links[full] = city_name
+                # Also try direct links
+                for a in soup.find_all("a", href=True):
+                    href = a['href']
+                    if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
+                        full = urljoin("https://www.izutaiyo.co.jp", href)
+                        # Extract the city context
+                        found_links[full] = city_name
 
         print(f"  > Processing {len(found_links)} unique listings...")
 
@@ -361,33 +365,38 @@ class IzuTaiyo(BaseScraper):
 class Maple(BaseScraper):
     def run(self):
         print("--- Scanning Maple ---")
-        urls = [
+        # Try multiple pages and pagination
+        base_urls = [
             "https://www.maple-h.co.jp/estate_db/house/",
-            "https://www.maple-h.co.jp/estate_db/estate/"
+            "https://www.maple-h.co.jp/estate_db/house/page/2/",
+            "https://www.maple-h.co.jp/estate_db/house/page/3/",
+            "https://www.maple-h.co.jp/estate_db/estate/",
+            "https://www.maple-h.co.jp/estate_db/estate/page/2/",
+            "https://www.maple-h.co.jp/estate_db/estate/page/3/"
         ]
         candidates = set()
-        for u in urls:
+
+        for u in base_urls:
             soup = self.fetch(u)
             if not soup: continue
 
-            # Look for article links (WordPress posts)
+            # Look for article/property links more broadly
             for a in soup.find_all("a", href=True):
                 href = a.get("href", "")
                 full = urljoin(u, href)
 
-                # Match property pages - they should have the pattern /estate_db/{category}/{slug}/
-                # and NOT be the category page itself
-                if "maple-h.co.jp/estate_db/" in full and full not in urls:
-                    # Must have a path beyond just /house/ or /estate/
-                    # Looking for URLs like: /estate_db/house/property-name/
-                    path = urlparse(full).path
-                    parts = [p for p in path.split("/") if p]
-
-                    # Valid property URL should have: estate_db, category, property-slug
-                    if len(parts) >= 3 and parts[0] == "estate_db":
-                        # Exclude pagination, feed, category index
-                        if not any(x in full for x in ["page/", "feed", "/page", "category", "tag", "author"]):
-                            candidates.add(full)
+                # Match property pages - any URL under /estate_db/ that looks like a post
+                if "maple-h.co.jp/estate_db/" in full:
+                    # Exclude category pages, pagination, feeds
+                    if any(x in full for x in ["/house/", "/estate/"]):
+                        # Exclude the category index itself
+                        if full.rstrip('/') not in [x.rstrip('/') for x in base_urls]:
+                            # Exclude pagination and other meta pages
+                            if not any(x in href for x in ["page/", "feed", "category/", "tag/", "author/"]):
+                                # Must end with property slug (not just /house/ or /estate/)
+                                path_clean = full.rstrip('/').split('/')
+                                if len(path_clean) > 5:  # Has property slug after category
+                                    candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
         # Process all candidates
@@ -465,26 +474,39 @@ class Aoba(BaseScraper):
         # Target area codes for Aoba Resort
         # ao22219=Shimoda, ao22301=Kawazu, ao22302=Higashi, ao22304=Minami
         target_codes = ["ao22219", "ao22301", "ao22302", "ao22304"]
+        exclude_codes = ["ao22208", "ao22222", "ao22205"]  # Ito, Atami, etc.
 
-        urls = ["https://www.aoba-resort.com/house/", "https://www.aoba-resort.com/land/"]
+        # Try multiple pages
+        urls = [
+            "https://www.aoba-resort.com/house/",
+            "https://www.aoba-resort.com/land/",
+            "https://www.aoba-resort.com/area-b2/",
+            "https://www.aoba-resort.com/area-b3/"
+        ]
         candidates = set()
 
         for u in urls:
             soup = self.fetch(u)
             if not soup: continue
 
-            # More comprehensive link finding
+            # Find all property links
             for a in soup.find_all("a", href=True):
                 href = a['href']
                 full = urljoin("https://www.aoba-resort.com", href)
 
-                # Filter by target area codes in URL
-                if any(code in full for code in target_codes):
-                    # Look for room pages
-                    if "room" in full and full.endswith(".html"):
+                # Look for room pages
+                if "room" in full and full.endswith(".html"):
+                    # Filter: INCLUDE target codes OR EXCLUDE wrong codes
+                    has_target = any(code in full for code in target_codes)
+                    has_exclude = any(code in full for code in exclude_codes)
+
+                    if has_target:
+                        candidates.add(full)
+                    elif not has_exclude and "/area-" in full:
+                        # If no area code, might still be valid - let parse_detail filter
                         candidates.add(full)
 
-        print(f"  > Processing {len(candidates)} candidates (filtered by target areas)...")
+        print(f"  > Processing {len(candidates)} candidates...")
         # Process all candidates
         for link in list(candidates):
             self.parse_detail(link)
