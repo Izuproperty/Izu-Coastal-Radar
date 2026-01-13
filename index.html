@@ -159,21 +159,35 @@
     }
   }
 
+  // City name translations
+  const CITY_MAP = {
+    "下田": "Shimoda",
+    "河津": "Kawazu",
+    "東伊豆": "Higashi-Izu",
+    "南伊豆": "Minami-Izu",
+    "賀茂郡": "Minami-Izu"
+  };
+
+  function getCityName(city) {
+    if (STATE.lang === 'EN') return CITY_MAP[city] || city;
+    return city;
+  }
+
   function populateFilters() {
     const locSel = document.getElementById('loc-select');
     const srcSel = document.getElementById('source-select');
-    
+
     // Preserve selection if re-populating
     const oldLoc = locSel.value;
     const oldSrc = srcSel.value;
 
     const locs = [...new Set(DATA.map(l => l.city))].sort();
     const srcs = [...new Set(DATA.map(l => l.source))].sort();
-    
+
     locSel.innerHTML = `<option value="all">${TXT[STATE.lang].allLoc}</option>`;
     srcSel.innerHTML = `<option value="all">${TXT[STATE.lang].allSrc}</option>`;
-    
-    locs.forEach(l => locSel.innerHTML += `<option value="${l}">${l}</option>`);
+
+    locs.forEach(l => locSel.innerHTML += `<option value="${l}">${getCityName(l)}</option>`);
     srcs.forEach(s => srcSel.innerHTML += `<option value="${s}">${s}</option>`);
 
     if ([...locSel.options].some(o => o.value === oldLoc)) locSel.value = oldLoc;
@@ -246,6 +260,22 @@
     }
   }
 
+  function getJPTitle(fullTitle) {
+    // Extract concise property info from verbose Izu Taiyo titles
+    // Format: "下田市 白浜（1500万円）の家情報はこちら！..." -> "下田市 白浜"
+    if (!fullTitle) return "";
+
+    // Try to extract city + location from start of title
+    const match = fullTitle.match(/^([^（]+)/);
+    if (match) {
+      const short = match[1].trim();
+      // Remove common suffixes like "の家情報", "の土地情報"
+      return short.replace(/の家情報.*$/, '').replace(/の土地情報.*$/, '').trim();
+    }
+
+    return fullTitle;
+  }
+
   function render() {
     STATE.loc = document.getElementById('loc-select').value;
     STATE.type = document.getElementById('type-select').value;
@@ -258,14 +288,17 @@
       return true;
     });
 
+    // Sort by price descending (highest first)
+    filtered.sort((a, b) => (b.priceJpy || 0) - (a.priceJpy || 0));
+
     renderStats(filtered);
     document.getElementById('count').innerText = `${filtered.length} listings`;
-    
+
     const grid = document.getElementById('grid');
     grid.innerHTML = "";
 
     filtered.forEach(l => {
-      let title = (STATE.lang === 'JP') ? l.title : (l.titleEn || l.title);
+      let title = (STATE.lang === 'JP') ? getJPTitle(l.title) : (l.titleEn || l.title);
       if (!title || title === "-") title = `${l.city} Property`;
 
       const pType = TXT[STATE.lang][l.propertyType] || l.propertyType;
