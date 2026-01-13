@@ -164,48 +164,59 @@ def get_best_image(soup, url):
     return ""
 
 def get_izutaiyo_image(soup, url, property_id):
-    """Izu Taiyo-specific image finder based on property ID"""
-    # First, look for images on the page that contain the property ID
-    for img in soup.find_all("img"):
-        src = img.get("src", "")
-        # Check if image contains property ID or looks like a property photo
-        if property_id.lower() in src.lower():
-            return urljoin(url, src)
-        # Also check for numbered photo patterns (common for properties)
-        if any(pattern in src.lower() for pattern in ["photo", "p01", "_1.", "_01.", "img01"]):
-            # Skip logos and icons
-            if not any(skip in src.lower() for skip in ["logo", "icon", "map", "button"]):
-                full_url = urljoin(url, src)
-                # Make sure it's a real image file
-                if any(ext in full_url.lower() for ext in [".jpg", ".jpeg", ".png"]):
-                    return full_url
+    """Izu Taiyo-specific image finder - simplified to be less strict"""
+    # Strategy: Find the first reasonably-sized image that's not obviously a logo/icon
 
-    # Try to find the main property image div/section
-    main_img_selectors = ["#mainimage img", ".mainimage img", "#photo img", ".photo img", ".bukken-image img"]
-    for selector in main_img_selectors:
-        img = soup.select_one(selector)
-        if img and img.get("src"):
-            src = img.get("src")
-            if "logo" not in src.lower():
-                return urljoin(url, src)
+    all_imgs = soup.find_all("img")
+    candidates = []
 
-    # Last resort: find first large image that's not a logo
-    for img in soup.find_all("img"):
+    for img in all_imgs:
         src = img.get("src", "")
         if not src:
             continue
-        # Skip small images (likely logos/icons)
-        width = img.get("width", "")
-        if width and width.isdigit() and int(width) < 100:
-            continue
-        # Skip logos and navigation
-        if any(skip in src.lower() for skip in ["logo", "icon", "nav", "button", "arrow", "banner"]):
-            continue
-        # Must be a valid image
-        if any(ext in src.lower() for ext in [".jpg", ".jpeg", ".png"]):
-            return urljoin(url, src)
 
-    # Fallback to generic image finder
+        # Get full URL
+        full_url = urljoin(url, src)
+        lower_src = src.lower()
+
+        # Skip obvious non-property images
+        if any(skip in lower_src for skip in ["logo", "rogo", "icon", "banner", "nav", "button", "arrow", "spacer", "bg_"]):
+            continue
+
+        # Must be an image file
+        if not any(ext in lower_src for ext in [".jpg", ".jpeg", ".png", ".gif"]):
+            continue
+
+        # Prefer images that look like property photos
+        priority = 0
+        if property_id and property_id.lower() in lower_src:
+            priority = 100  # Highest priority
+        elif any(pattern in lower_src for pattern in ["photo", "img", "pic", "image", "_1", "_01", "p01"]):
+            priority = 50
+        else:
+            priority = 10
+
+        # Check size if available
+        width = img.get("width", "")
+        height = img.get("height", "")
+        if width and width.isdigit():
+            w = int(width)
+            if w >= 200:  # Prefer larger images
+                priority += 20
+            elif w < 100:  # Penalize tiny images
+                priority -= 30
+
+        candidates.append((priority, full_url))
+
+    # Sort by priority and return best match
+    if candidates:
+        candidates.sort(reverse=True, key=lambda x: x[0])
+        best_url = candidates[0][1]
+        print(f"  [DEBUG] Selected image for {property_id}: {best_url}")
+        return best_url
+
+    # Fallback
+    print(f"  [DEBUG] No image found for {property_id}, using fallback")
     return get_best_image(soup, url)
 
 def extract_actual_city_from_title(title):
@@ -499,9 +510,9 @@ class IzuTaiyo(BaseScraper):
             price = extract_price(full_text)
 
         # 6. Price validation - Exclude properties with no price (likely sold/unavailable)
-        if price == 0:
+        if not price or price <= 0:
             title_preview = title if len(title) < 40 else title[:37] + "..."
-            print(f"  [PRICE FILTERED] No valid price found: {title_preview}")
+            print(f"  [PRICE FILTERED] No valid price found: {title_preview} (price={price})")
             STATS["skipped_sold"] += 1
             return
 
@@ -592,8 +603,11 @@ class Maple(BaseScraper):
                     category_pages = ["house", "estate", "office", "lease", "mansion", "land"]
                     if len(parts) == 2 and parts[1] in category_pages:
                         continue
+                    # ALSO exclude if URL ends with a category page (with trailing slash)
+                    if full.rstrip('/').endswith(tuple(f'/estate_db/{cat}' for cat in category_pages)):
+                        continue
                     # Also exclude if it contains these keywords anywhere
-                    if any(cat in full for cat in ["/office/", "/lease/", "/mansion/"]):
+                    if any(cat in full.lower() for cat in ["/office", "/lease", "/mansion"]):
                         continue
                     candidates.add(full)
 
@@ -621,28 +635,33 @@ class Maple(BaseScraper):
                     break
 
         # If we got generic title, try to decode from URL
-        if not title or "メープルハウジング" in title:
+        if not title or "メープルハウジング" in title or "伊豆の不動産" in title:
             try:
                 from urllib.parse import unquote
                 # URL like: .../6763%ef%bc%9a%e8%87%aa%e7%84%b6...
                 # Extract the encoded part after estate_db/
                 url_parts = url.split('/estate_db/')
                 if len(url_parts) > 1:
-                    encoded_title = url_parts[1].rstrip('/')
+                    encoded_title = url_parts[1].strip('/').split('/')[0]  # Get first segment only
                     decoded = unquote(encoded_title)
                     # Extract property description after the ID and colon
-                    if ':' in decoded or '：' in decoded:
-                        # Split on either : or ：
-                        for sep in ['：', ':']:
-                            if sep in decoded:
-                                title = decoded.split(sep, 1)[1].strip()
-                                break
+                    if '：' in decoded:
+                        title = decoded.split('：', 1)[1].strip()
+                    elif ':' in decoded:
+                        title = decoded.split(':', 1)[1].strip()
                     else:
+                        # No colon, just use the decoded string
                         title = decoded
-            except:
-                pass
 
-        if not title: title = "Maple Property"
+                    # If title is still generic or empty, keep original
+                    if not title or len(title) < 3:
+                        title = None
+            except Exception as e:
+                print(f"  [DEBUG] Title decode failed for {url}: {e}")
+                title = None
+
+        if not title:
+            title = "Maple Property"
 
         full_text = clean_text(soup.get_text())
 
@@ -682,8 +701,8 @@ class Maple(BaseScraper):
         price = extract_price(full_text)
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
-        if price == 0:
-            print(f"  [PRICE FILTERED] No valid price found: {url}")
+        if not price or price <= 0:
+            print(f"  [PRICE FILTERED] No valid price found: {url} (price={price})")
             STATS["skipped_sold"] += 1
             return
 
@@ -851,8 +870,8 @@ class Aoba(BaseScraper):
         price = extract_price(full_text)
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
-        if price == 0:
-            print(f"  [PRICE FILTERED] No valid price found: {url}")
+        if not price or price <= 0:
+            print(f"  [PRICE FILTERED] No valid price found: {url} (price={price})")
             STATS["skipped_sold"] += 1
             return
 
