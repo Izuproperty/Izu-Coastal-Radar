@@ -240,23 +240,32 @@
     const totalP = items.reduce((a,b) => a + (b.priceJpy||0), 0);
     const totalS = items.reduce((a,b) => a + getSize(b), 0);
     const avgP = totalP / items.length;
-    const avgS = totalS / items.length; 
+    const avgS = totalS / items.length;
 
     pEl.innerText = fmtPrice(avgP);
 
-    if (STATE.curr === 'USD') {
-      const sqft = avgS * 10.764;
-      sEl.innerText = Math.round(sqft).toLocaleString() + " ft²";
-      subEl.innerText = `(${Math.round(avgS)} m²)`;
-      const ppSqft = (avgP / FX_USD) / sqft;
-      uEl.innerText = "$" + Math.round(ppSqft) + " /ft²";
-      uSubEl.innerText = "";
+    // Only show size stats if we have size data
+    if (avgS > 0) {
+      if (STATE.curr === 'USD') {
+        const sqft = avgS * 10.764;
+        sEl.innerText = Math.round(sqft).toLocaleString() + " ft²";
+        subEl.innerText = `(${Math.round(avgS)} m²)`;
+        const ppSqft = (avgP / FX_USD) / sqft;
+        uEl.innerText = "$" + Math.round(ppSqft) + " /ft²";
+        uSubEl.innerText = "";
+      } else {
+        sEl.innerText = Math.round(avgS).toLocaleString() + " m²";
+        subEl.innerText = "";
+        const ppSqm = avgP / avgS;
+        uEl.innerText = "¥" + Math.round(ppSqm/10000).toLocaleString() + "万 /m²";
+        uSubEl.innerText = "";
+      }
     } else {
-      sEl.innerText = Math.round(avgS).toLocaleString() + " m²";
-      subEl.innerText = "";
-      const ppSqm = avgP / avgS;
-      uEl.innerText = "¥" + Math.round(ppSqm/10000).toLocaleString() + "万 /m²";
-      uSubEl.innerText = "";
+      // No size data available
+      sEl.innerText = "-";
+      subEl.innerText = "No data";
+      uEl.innerText = "-";
+      uSubEl.innerText = "No data";
     }
   }
 
@@ -317,7 +326,7 @@
             <a href="${l.sourceUrl}" target="_blank" class="title">${title}</a>
             <div class="meta">
               <span>${pType}</span>
-              <span>${l.city}</span>
+              <span>${getCityName(l.city)}</span>
             </div>
             <div class="card-footer">
               <span>${l.source}</span>

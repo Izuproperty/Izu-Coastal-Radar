@@ -165,24 +165,48 @@ def get_best_image(soup, url):
 
 def get_izutaiyo_image(soup, url, property_id):
     """Izu Taiyo-specific image finder based on property ID"""
-    # Try common Izu Taiyo image patterns based on property ID
-    # e.g., HIP593H might be at /img/bukken/HIP593H.jpg or /img/bukken/HIP593H_1.jpg
-    base_patterns = [
-        f"https://www.izutaiyo.co.jp/img/bukken/{property_id}.jpg",
-        f"https://www.izutaiyo.co.jp/img/bukken/{property_id}_1.jpg",
-        f"https://www.izutaiyo.co.jp/img/bukken/{property_id}_01.jpg",
-        f"https://www.izutaiyo.co.jp/images/{property_id}.jpg",
-        f"https://www.izutaiyo.co.jp/images/bukken/{property_id}.jpg",
-    ]
-
-    # Also look for images in the page that contain the property ID
+    # First, look for images on the page that contain the property ID
     for img in soup.find_all("img"):
         src = img.get("src", "")
+        # Check if image contains property ID or looks like a property photo
         if property_id.lower() in src.lower():
             return urljoin(url, src)
+        # Also check for numbered photo patterns (common for properties)
+        if any(pattern in src.lower() for pattern in ["photo", "p01", "_1.", "_01.", "img01"]):
+            # Skip logos and icons
+            if not any(skip in src.lower() for skip in ["logo", "icon", "map", "button"]):
+                full_url = urljoin(url, src)
+                # Make sure it's a real image file
+                if any(ext in full_url.lower() for ext in [".jpg", ".jpeg", ".png"]):
+                    return full_url
 
-    # Return first pattern to try (will be validated by browser)
-    return base_patterns[0]
+    # Try to find the main property image div/section
+    main_img_selectors = ["#mainimage img", ".mainimage img", "#photo img", ".photo img", ".bukken-image img"]
+    for selector in main_img_selectors:
+        img = soup.select_one(selector)
+        if img and img.get("src"):
+            src = img.get("src")
+            if "logo" not in src.lower():
+                return urljoin(url, src)
+
+    # Last resort: find first large image that's not a logo
+    for img in soup.find_all("img"):
+        src = img.get("src", "")
+        if not src:
+            continue
+        # Skip small images (likely logos/icons)
+        width = img.get("width", "")
+        if width and width.isdigit() and int(width) < 100:
+            continue
+        # Skip logos and navigation
+        if any(skip in src.lower() for skip in ["logo", "icon", "nav", "button", "arrow", "banner"]):
+            continue
+        # Must be a valid image
+        if any(ext in src.lower() for ext in [".jpg", ".jpeg", ".png"]):
+            return urljoin(url, src)
+
+    # Fallback to generic image finder
+    return get_best_image(soup, url)
 
 def extract_actual_city_from_title(title):
     """
@@ -592,7 +616,31 @@ class Maple(BaseScraper):
                 title = clean_text(elem.get_text())
                 if "|" in title: title = title.split("|")[0]
                 if "–" in title: title = title.split("–")[0]
-                if title: break
+                # Check if it's the generic site title
+                if "メープルハウジング" not in title and title:
+                    break
+
+        # If we got generic title, try to decode from URL
+        if not title or "メープルハウジング" in title:
+            try:
+                from urllib.parse import unquote
+                # URL like: .../6763%ef%bc%9a%e8%87%aa%e7%84%b6...
+                # Extract the encoded part after estate_db/
+                url_parts = url.split('/estate_db/')
+                if len(url_parts) > 1:
+                    encoded_title = url_parts[1].rstrip('/')
+                    decoded = unquote(encoded_title)
+                    # Extract property description after the ID and colon
+                    if ':' in decoded or '：' in decoded:
+                        # Split on either : or ：
+                        for sep in ['：', ':']:
+                            if sep in decoded:
+                                title = decoded.split(sep, 1)[1].strip()
+                                break
+                    else:
+                        title = decoded
+            except:
+                pass
 
         if not title: title = "Maple Property"
 
@@ -688,48 +736,32 @@ class Aoba(BaseScraper):
             print(f"    Found {len(html_links)} .html links")
             print(f"    Found {len(room_links)} 'room' links")
 
-            # Show sample links and analyze area codes
-            area_code_counts = {}
-            for a in html_links:
-                href = a.get("href", "")
-                for code in ["ao22219", "ao22301", "ao22302", "ao22304", "ao22208", "ao22222", "ao22205"]:
-                    if code in href:
-                        area_code_counts[code] = area_code_counts.get(code, 0) + 1
-
-            print(f"    Area code distribution:")
-            for code, count in sorted(area_code_counts.items()):
-                code_name = {
-                    "ao22219": "Shimoda",
-                    "ao22301": "Kawazu",
-                    "ao22302": "Higashi-Izu",
-                    "ao22304": "Minami-Izu",
-                    "ao22208": "Ito (excluded)",
-                    "ao22222": "Atami (excluded)",
-                    "ao22205": "Izu City (excluded)"
-                }.get(code, code)
-                print(f"      {code_name}: {count}")
-
-            # Find all property links - be more flexible
+            # Find all property links - be more permissive initially
+            # We'll filter by actual location in parse_detail()
             for a in soup.find_all("a", href=True):
                 href = a['href']
                 full = urljoin("https://www.aoba-resort.com", href)
 
-                # Look for property pages (room + .html)
+                # Look for property pages (room + .html or /house/ or /land/)
                 is_property = False
                 if "room" in full and full.endswith(".html"):
                     is_property = True
                 elif "/house/" in full and full.endswith(".html"):
-                    is_property = True
+                    # Exclude the main category page itself
+                    if full.rstrip('/') not in [u.rstrip('/') for u in urls]:
+                        is_property = True
                 elif "/land/" in full and full.endswith(".html"):
-                    is_property = True
+                    # Exclude the main category page itself
+                    if full.rstrip('/') not in [u.rstrip('/') for u in urls]:
+                        is_property = True
 
                 if is_property:
-                    # Only include if URL contains one of the target area codes
-                    has_target = any(code in full for code in target_codes)
+                    # Exclude known wrong areas if area code is in URL
                     has_exclude = any(code in full for code in exclude_codes)
-
-                    if has_target and not has_exclude and full not in urls:
+                    if not has_exclude and full not in urls:
                         candidates.add(full)
+
+            print(f"    Found {len(candidates)} candidate property links (before location filtering)")
 
         print(f"  > Found {len(candidates)} property pages")
         print(f"  > Processing {len(candidates)} candidates (will filter by city later)...")
