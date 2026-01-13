@@ -442,7 +442,27 @@ class Maple(BaseScraper):
 
         for u in base_urls:
             soup = self.fetch(u)
-            if not soup: continue
+            if not soup:
+                print(f"  [DEBUG] Failed to fetch {u}")
+                continue
+
+            # Debug: Show what we found
+            articles = soup.find_all("article")
+            all_links = soup.find_all("a", href=True)
+            estate_links = [a for a in all_links if "estate_db" in a.get("href", "")]
+
+            print(f"  [DEBUG] {u}")
+            print(f"    Found {len(articles)} article blocks")
+            print(f"    Found {len(all_links)} total links")
+            print(f"    Found {len(estate_links)} estate_db links")
+
+            # Show sample links
+            if len(estate_links) > 0:
+                print(f"    Sample links:")
+                for a in estate_links[:3]:
+                    href = a.get("href", "")
+                    full = urljoin(u, href)
+                    print(f"      - {full}")
 
             # Try multiple strategies to find property links
             # Strategy 1: Look in article blocks
@@ -550,7 +570,27 @@ class Aoba(BaseScraper):
 
         for u in urls:
             soup = self.fetch(u)
-            if not soup: continue
+            if not soup:
+                print(f"  [DEBUG] Failed to fetch {u}")
+                continue
+
+            # Debug: Show what we found
+            all_links = soup.find_all("a", href=True)
+            html_links = [a for a in all_links if a.get("href", "").endswith(".html")]
+            room_links = [a for a in all_links if "room" in a.get("href", "")]
+
+            print(f"  [DEBUG] {u}")
+            print(f"    Found {len(all_links)} total links")
+            print(f"    Found {len(html_links)} .html links")
+            print(f"    Found {len(room_links)} 'room' links")
+
+            # Show sample links
+            if len(html_links) > 0:
+                print(f"    Sample .html links:")
+                for a in html_links[:5]:
+                    href = a.get("href", "")
+                    full = urljoin("https://www.aoba-resort.com", href)
+                    print(f"      - {full}")
 
             # Find all property links - be more flexible
             for a in soup.find_all("a", href=True):
