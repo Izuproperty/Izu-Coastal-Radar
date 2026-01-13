@@ -151,7 +151,7 @@ def get_best_image(soup, url):
         el = soup.select_one(sel)
         if el and el.get("src"):
             return urljoin(url, el.get("src"))
-    
+
     # 3. Fallback: First image that looks like a photo (jpg/png) and not a logo
     for img in soup.find_all("img"):
         src = img.get("src", "")
@@ -160,8 +160,29 @@ def get_best_image(soup, url):
         if "logo" in lower or "icon" in lower or "map" in lower: continue
         if ".jpg" in lower or ".jpeg" in lower or ".png" in lower:
             return urljoin(url, src)
-    
+
     return ""
+
+def get_izutaiyo_image(soup, url, property_id):
+    """Izu Taiyo-specific image finder based on property ID"""
+    # Try common Izu Taiyo image patterns based on property ID
+    # e.g., HIP593H might be at /img/bukken/HIP593H.jpg or /img/bukken/HIP593H_1.jpg
+    base_patterns = [
+        f"https://www.izutaiyo.co.jp/img/bukken/{property_id}.jpg",
+        f"https://www.izutaiyo.co.jp/img/bukken/{property_id}_1.jpg",
+        f"https://www.izutaiyo.co.jp/img/bukken/{property_id}_01.jpg",
+        f"https://www.izutaiyo.co.jp/images/{property_id}.jpg",
+        f"https://www.izutaiyo.co.jp/images/bukken/{property_id}.jpg",
+    ]
+
+    # Also look for images in the page that contain the property ID
+    for img in soup.find_all("img"):
+        src = img.get("src", "")
+        if property_id.lower() in src.lower():
+            return urljoin(url, src)
+
+    # Return first pattern to try (will be validated by browser)
+    return base_patterns[0]
 
 def extract_actual_city_from_title(title):
     """
@@ -354,6 +375,13 @@ class IzuTaiyo(BaseScraper):
         soup = self.fetch(url)
         if not soup: return
 
+        # Extract property ID from URL for image lookup
+        property_id = None
+        if "hpno=" in url:
+            property_id = url.split("hpno=")[1].split("&")[0]
+        elif "hpbunno=" in url:
+            property_id = url.split("hpbunno=")[1].split("&")[0]
+
         # Remove footer and nav (can contain misleading location info)
         for tag in soup.find_all(["footer", "nav", ".footer", ".navigation"]):
             tag.decompose()
@@ -446,7 +474,19 @@ class IzuTaiyo(BaseScraper):
         if price == 0:
             price = extract_price(full_text)
 
-        img = get_best_image(soup, url)
+        # 6. Price validation - Exclude properties with no price (likely sold/unavailable)
+        if price == 0:
+            title_preview = title if len(title) < 40 else title[:37] + "..."
+            print(f"  [PRICE FILTERED] No valid price found: {title_preview}")
+            STATS["skipped_sold"] += 1
+            return
+
+        # Get image - use Izu Taiyo-specific method if we have property_id
+        if property_id:
+            img = get_izutaiyo_image(soup, url, property_id)
+        else:
+            img = get_best_image(soup, url)
+
         ptype = determine_type(title, full_text)
 
         self.add_item({
@@ -524,8 +564,12 @@ class Maple(BaseScraper):
                 # Valid property: ['estate_db', 'property-name'] (2+ parts)
                 # Exclude category pages like /estate_db/house/ or /estate_db/estate/
                 if len(parts) >= 2 and parts[0] == "estate_db":
-                    # Exclude if second part is just a category
-                    if len(parts) == 2 and parts[1] in ["house", "estate"]:
+                    # Exclude if second part is just a category (not a property)
+                    category_pages = ["house", "estate", "office", "lease", "mansion", "land"]
+                    if len(parts) == 2 and parts[1] in category_pages:
+                        continue
+                    # Also exclude if it contains these keywords anywhere
+                    if any(cat in full for cat in ["/office/", "/lease/", "/mansion/"]):
                         continue
                     candidates.add(full)
 
@@ -588,6 +632,13 @@ class Maple(BaseScraper):
             return
 
         price = extract_price(full_text)
+
+        # Price validation - Exclude properties with no price (likely sold/unavailable)
+        if price == 0:
+            print(f"  [PRICE FILTERED] No valid price found: {url}")
+            STATS["skipped_sold"] += 1
+            return
+
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
 
@@ -607,16 +658,17 @@ class Maple(BaseScraper):
 class Aoba(BaseScraper):
     def run(self):
         print("--- Scanning Aoba ---")
-        # Use area-specific search URLs instead of general listing pages
-        # This ensures we only get properties from target areas
+        # Scan general listing pages, but filter by area code in URLs
         urls = [
-            "https://www.aoba-resort.com/room?area_code=ao22219",  # Shimoda
-            "https://www.aoba-resort.com/room?area_code=ao22301",  # Kawazu
-            "https://www.aoba-resort.com/room?area_code=ao22302",  # Higashi-Izu
-            "https://www.aoba-resort.com/room?area_code=ao22304",  # Minami-Izu
+            "https://www.aoba-resort.com/house/",
+            "https://www.aoba-resort.com/house/page/2/",
+            "https://www.aoba-resort.com/land/",
+            "https://www.aoba-resort.com/land/page/2/",
         ]
         candidates = set()
 
+        # Target area codes (Shimoda, Kawazu, Higashi-Izu, Minami-Izu)
+        target_codes = ["ao22219", "ao22301", "ao22302", "ao22304"]
         # Exclude these known wrong area codes (Ito, Atami, Izu city)
         exclude_codes = ["ao22208", "ao22222", "ao22205"]
 
@@ -672,9 +724,11 @@ class Aoba(BaseScraper):
                     is_property = True
 
                 if is_property:
-                    # Exclude known wrong areas
+                    # Only include if URL contains one of the target area codes
+                    has_target = any(code in full for code in target_codes)
                     has_exclude = any(code in full for code in exclude_codes)
-                    if not has_exclude and full not in urls:
+
+                    if has_target and not has_exclude and full not in urls:
                         candidates.add(full)
 
         print(f"  > Found {len(candidates)} property pages")
@@ -763,6 +817,13 @@ class Aoba(BaseScraper):
             return
 
         price = extract_price(full_text)
+
+        # Price validation - Exclude properties with no price (likely sold/unavailable)
+        if price == 0:
+            print(f"  [PRICE FILTERED] No valid price found: {url}")
+            STATS["skipped_sold"] += 1
+            return
+
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
 
