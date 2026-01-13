@@ -35,14 +35,21 @@ CITY_EN_MAP = {
 }
 
 # "Sea View" Validation
-# If a property has these, it gets a high score.
-SEA_KEYWORDS = [
-    "オーシャン", "海一望", "海を望", "海望", "海近", "ビーチ", "Sea", "Ocean",
-    "白浜", "吉佐美", "入田", "多々戸", "眺望", "景色", "相模湾", "太平洋", "海岸", "伊豆七島",
-    "海 ：一望", "海： 一望", "海 ： 一望", "海が見え", "海見え", "オーシャンビュー",
-    "海の見え", "海側", "海前", "海沿い", "シービュー", "ベイビュー", "海眺望",
-    "海を一望", "海が一望", "オーシャンフロント", "ウォーターフロント"
+# Tiered scoring for more accuracy
+# HIGH CONFIDENCE: Explicit sea view language (score 4)
+HIGH_SEA_KEYWORDS = [
+    "海一望", "海を望", "海望", "海が見え", "海見え", "オーシャンビュー",
+    "海の見え", "海眺望", "海を一望", "海が一望", "オーシャンフロント",
+    "シービュー", "ベイビュー", "ウォーターフロント", "海 ：一望", "海： 一望", "海 ： 一望"
 ]
+
+# MEDIUM CONFIDENCE: Beach names, ocean names (score 3)
+MEDIUM_SEA_KEYWORDS = [
+    "白浜", "吉佐美", "入田", "多々戸", "相模湾", "太平洋", "オーシャン", "Ocean"
+]
+
+# For proximity scoring - used with "海" mention
+PROXIMITY_KEYWORDS = ["徒歩", "歩", "近", "分", "m", "メートル"]
 
 # Keywords to Identify House vs Land
 HOUSE_KEYWORDS = ["戸建", "家", "建物", "LDK", "House", "Room", "築"]
@@ -193,6 +200,10 @@ def get_location_trust(soup, full_text, context_city=None):
     3. Search Title with normalize_city.
     4. Search Body.
     5. If nothing found, use context_city as fallback.
+
+    CRITICAL: If title explicitly shows a city that's NOT in our target list,
+    we return "WRONG_CITY" to signal rejection. Never fall back to context
+    when we've detected the property is in the wrong location.
     """
     # NOTE: We check the page content FIRST because search results often
     # return properties from neighboring cities even when filtering by city code
@@ -203,12 +214,13 @@ def get_location_trust(soup, full_text, context_city=None):
         city = extract_actual_city_from_title(h1.get_text())
         if city: return city
         # If extract found a city but it's not in target list, it returned None
-        # In that case, we know this property is in wrong area, so stop here
+        # In that case, we know this property is in wrong area, so REJECT
         title_text = h1.get_text()
         # Check if title starts with a city name that's not ours
         if re.match(r'^[^「（]+?[市町村郡]', title_text):
             # Title has a city name, but it's not in our target list
-            return None
+            # Return special marker to indicate this should be rejected
+            return "WRONG_CITY"
 
     # 2. Address Table - Check with whitespace normalization
     markers = ["所在地", "住所", "Location", "物件所在地", "エリア"]
@@ -248,9 +260,11 @@ def get_location_trust(soup, full_text, context_city=None):
     # if city: return city
 
     # 5. Last resort: use search context if provided
+    # BUT NEVER if we already determined the property is in wrong city
     if context_city and context_city in TARGET_CITIES_JP:
         return context_city
 
+    # If we couldn't determine location, return None (will be filtered out)
     return None
 
 # --- SCRAPERS ---
@@ -349,17 +363,25 @@ class IzuTaiyo(BaseScraper):
 
         # 1. Location FIRST - Filter wrong cities before anything else
         city = get_location_trust(soup, full_text, city_ctx)
-        if not city:
-            # Be more lenient - log warning but try to extract
-            # If we have context from search, use it even if extraction fails
-            if city_ctx and any(c in city_ctx for c in TARGET_CITIES_JP):
-                city = normalize_city(city_ctx)
-            if not city:
-                # Extract city name from title for debug
-                title_preview = title if len(title) < 40 else title[:37] + "..."
-                print(f"  [LOCATION FILTERED] Not in target area: {title_preview}")
-                STATS["skipped_loc"] += 1
-                return
+        if city == "WRONG_CITY" or not city:
+            # Extract city name from title for debug
+            title_preview = title if len(title) < 40 else title[:37] + "..."
+            if city == "WRONG_CITY":
+                # Extract the actual wrong city name for better logging
+                h1 = soup.find("h1")
+                if h1:
+                    match = re.match(r'^([^「（]+?[市町村郡])', h1.get_text())
+                    if match:
+                        wrong_city = match.group(1).strip()
+                        print(f"  [LOCATION FILTERED] Wrong city {wrong_city}: {title_preview}")
+                    else:
+                        print(f"  [LOCATION FILTERED] Not in target area: {title_preview}")
+                else:
+                    print(f"  [LOCATION FILTERED] Not in target area: {title_preview}")
+            else:
+                print(f"  [LOCATION FILTERED] Could not determine city: {title_preview}")
+            STATS["skipped_loc"] += 1
+            return
 
         # 2. Sold?
         if is_contracted(title, full_text):
@@ -386,18 +408,30 @@ class IzuTaiyo(BaseScraper):
             STATS["skipped_mansion"] += 1
             return
 
-        # 4. Sea View Scoring (More nuanced)
+        # 4. Sea View Scoring (Tiered for accuracy)
         sea_score = 0
-        if any(k in full_text for k in SEA_KEYWORDS):
-            sea_score = 4
-        if "海は見えません" in full_text or "海眺望なし" in full_text:
+
+        # Check for explicit "no sea view" statements first
+        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
             sea_score = 0
-        # Boost score if "Walk to Sea" - be more lenient
-        if sea_score == 0:
-            has_sea_mention = any(k in full_text for k in ["海", "ビーチ", "Beach", "Ocean"])
-            has_proximity = any(k in full_text for k in ["徒歩", "歩", "近", "分", "m"])
-            if has_sea_mention and has_proximity:
+        # HIGH: Explicit sea view language
+        elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
+            sea_score = 4
+        # MEDIUM: Famous beach names or ocean names
+        elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
+            sea_score = 3
+        # LOW: Walking distance to sea (proximity + sea mention)
+        elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            if any(k in full_text for k in PROXIMITY_KEYWORDS):
                 sea_score = 2
+            # Just generic "海" mention without view or proximity = score 0
+
+        # 5. Sea View/Proximity Required - Filter out properties with no sea connection
+        if sea_score == 0:
+            title_preview = title if len(title) < 40 else title[:37] + "..."
+            print(f"  [SEA VIEW FILTERED] No sea view or proximity: {title_preview}")
+            STATS["skipped_loc"] += 1  # Using skipped_loc for now, could add new stat
+            return
 
         # Extract price from multiple possible locations
         price = 0
@@ -529,24 +563,29 @@ class Maple(BaseScraper):
             return
 
         city = get_location_trust(soup, full_text)
-        if not city:
-            # Be more lenient - if we can't find city, log but don't skip immediately
+        if city == "WRONG_CITY" or not city:
+            # Log and skip if wrong city or can't determine
             print(f"  [WARNING] Could not determine city for: {url}")
-            # Check if it mentions any target areas in full text
-            if not any(c in full_text for c in TARGET_CITIES_JP):
-                STATS["skipped_loc"] += 1
-                return
-            # Default to first found city or skip
-            city = normalize_city(full_text)
-            if not city:
-                STATS["skipped_loc"] += 1
-                return
+            STATS["skipped_loc"] += 1
+            return
 
-        sea_score = 4 if any(k in full_text for k in SEA_KEYWORDS) else 0
-        # Soft boost for proximity mentions
-        if sea_score == 0 and any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            if any(k in full_text for k in ["徒歩", "歩", "近", "分"]):
+        # Sea View Scoring (Tiered for accuracy)
+        sea_score = 0
+        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+            sea_score = 0
+        elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
+            sea_score = 4
+        elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
+            sea_score = 3
+        elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            if any(k in full_text for k in PROXIMITY_KEYWORDS):
                 sea_score = 2
+
+        # Filter out properties with no sea connection
+        if sea_score == 0:
+            print(f"  [SEA VIEW FILTERED] No sea view or proximity: {url}")
+            STATS["skipped_loc"] += 1
+            return
 
         price = extract_price(full_text)
         img = get_best_image(soup, url)
@@ -691,6 +730,11 @@ class Aoba(BaseScraper):
 
         # Use URL city as context if available
         city = get_location_trust(soup, full_text, url_city)
+        if city == "WRONG_CITY":
+            # Property is explicitly from wrong city
+            print(f"  [LOCATION FILTERED] Wrong city detected: {url}")
+            STATS["skipped_loc"] += 1
+            return
         if not city:
             # If URL had area code, trust it
             if url_city:
@@ -700,11 +744,23 @@ class Aoba(BaseScraper):
                 STATS["skipped_loc"] += 1
                 return
 
-        sea_score = 4 if any(k in full_text for k in SEA_KEYWORDS) else 0
-        # Soft boost for proximity mentions
-        if sea_score == 0 and any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            if any(k in full_text for k in ["徒歩", "歩", "近", "分"]):
+        # Sea View Scoring (Tiered for accuracy)
+        sea_score = 0
+        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+            sea_score = 0
+        elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
+            sea_score = 4
+        elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
+            sea_score = 3
+        elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            if any(k in full_text for k in PROXIMITY_KEYWORDS):
                 sea_score = 2
+
+        # Filter out properties with no sea connection
+        if sea_score == 0:
+            print(f"  [SEA VIEW FILTERED] No sea view or proximity: {url}")
+            STATS["skipped_loc"] += 1
+            return
 
         price = extract_price(full_text)
         img = get_best_image(soup, url)
