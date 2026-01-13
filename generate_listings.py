@@ -172,13 +172,44 @@ def get_best_image(soup, url):
     return ""
 
 def get_izutaiyo_image(soup, url, property_id):
-    """Izu Taiyo-specific image finder - simplified to be less strict"""
-    # Strategy: Find the first reasonably-sized image that's not obviously a logo/icon
+    """Izu Taiyo-specific image finder - handles canvas-based images"""
+    # Izu Taiyo uses canvas to render images via JavaScript
+    # Look for image data in script tags or data attributes
 
+    # Strategy 1: Look for image URLs in JavaScript
+    for script in soup.find_all("script"):
+        script_text = script.string if script.string else ""
+        # Look for common patterns: picture_data, image_url, etc.
+        if property_id and property_id.lower() in script_text.lower():
+            # Extract image URLs from script
+            import re
+            # Look for URLs ending in .jpg, .jpeg, .png
+            img_matches = re.findall(r'["\']([^"\']*?\.(?:jpg|jpeg|png|gif))["\']', script_text)
+            if img_matches:
+                for match in img_matches:
+                    # Skip logos/banners
+                    if any(skip in match.lower() for skip in ["logo", "rogo", "banner", "bnr", "icon", "tel.gif"]):
+                        continue
+                    # Prefer images with property ID
+                    if property_id.lower() in match.lower():
+                        full_url = urljoin(url, match)
+                        print(f"  [DEBUG] Found image in script for {property_id}: {full_url}")
+                        return full_url
+
+    # Strategy 2: Check for data attributes on canvas or nearby elements
+    canvas = soup.find("canvas", id="picture_canvas")
+    if canvas:
+        for attr in ['data-src', 'data-image', 'data-url']:
+            if canvas.get(attr):
+                img_url = urljoin(url, canvas.get(attr))
+                print(f"  [DEBUG] Found image in canvas {attr}: {img_url}")
+                return img_url
+
+    # Strategy 3: Fall back to img tags
     all_imgs = soup.find_all("img")
     candidates = []
 
-    print(f"  [DEBUG] Searching for images in {property_id}, found {len(all_imgs)} total img tags")
+    print(f"  [DEBUG] No canvas images found, searching {len(all_imgs)} img tags for {property_id}")
 
     for img in all_imgs:
         src = img.get("src", "")
@@ -784,19 +815,29 @@ class Maple(BaseScraper):
 class Aoba(BaseScraper):
     def run(self):
         print("--- Scanning Aoba ---")
-        # Scan general listing pages, but filter by area code in URLs
+        # Target area codes (Shimoda, Kawazu, Higashi-Izu, Minami-Izu)
+        target_codes = {
+            "ao22219": "下田",      # Shimoda
+            "ao22301": "河津",      # Kawazu
+            "ao22302": "東伊豆",    # Higashi-Izu
+            "ao22304": "南伊豆"     # Minami-Izu
+        }
+        # Exclude these known wrong area codes (Ito, Atami, Izu city)
+        exclude_codes = ["ao22208", "ao22222", "ao22205"]
+
+        # Scan both general listing pages AND area-specific pages
         urls = [
             "https://www.aoba-resort.com/house/",
             "https://www.aoba-resort.com/house/page/2/",
             "https://www.aoba-resort.com/land/",
             "https://www.aoba-resort.com/land/page/2/",
         ]
-        candidates = set()
 
-        # Target area codes (Shimoda, Kawazu, Higashi-Izu, Minami-Izu)
-        target_codes = ["ao22219", "ao22301", "ao22302", "ao22304"]
-        # Exclude these known wrong area codes (Ito, Atami, Izu city)
-        exclude_codes = ["ao22208", "ao22222", "ao22205"]
+        # Add area-specific pages for each target city
+        for code in target_codes.keys():
+            urls.append(f"https://www.aoba-resort.com/area-b2/bknarea-{code}/")
+
+        candidates = set()
 
         for u in urls:
             soup = self.fetch(u)
@@ -876,15 +917,16 @@ class Aoba(BaseScraper):
 
         # Extract city from URL as context (Aoba uses area codes in URLs)
         url_city_map = {
-            "ao22219": "下田",
-            "ao22301": "河津",
-            "ao22302": "東伊豆",
-            "ao22304": "南伊豆"
+            "ao22219": "下田",      # Shimoda
+            "ao22301": "河津",      # Kawazu
+            "ao22302": "東伊豆",    # Higashi-Izu
+            "ao22304": "南伊豆"     # Minami-Izu
         }
         url_city = None
         for code, city_name in url_city_map.items():
             if code in url:
                 url_city = city_name
+                print(f"  [DEBUG] Aoba - Detected area code {code} ({city_name}) in URL")
                 break
 
         # Try multiple title selectors
