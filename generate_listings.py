@@ -240,43 +240,41 @@ class IzuTaiyo(BaseScraper):
 
         found_links = {} # url -> city_context
 
-        # Strategy: Try multiple URL patterns to catch all listings
+        # Strategy: Scan their main pages directly - they use onclick JavaScript
+        # Let's try the search result pages and parse onclick attributes
         for code, city_name in city_map.items():
-            # Pattern 1: tokusen.php with hpcity parameter
-            urls_to_try = [
-                f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind=0",
-                f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}",
-                f"https://www.izutaiyo.co.jp/sn.php?hpcity[]={code}",  # New listings
-            ]
+            # Try search URL
+            search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind=0"
+            print(f"  Fetching {city_name} listings from: {search_url}")
+            soup = self.fetch(search_url)
+            if not soup:
+                print(f"  [WARNING] Failed to fetch {city_name}")
+                continue
 
-            for url in urls_to_try:
-                soup = self.fetch(url)
-                if not soup: continue
+            # Look for onclick handlers with property IDs
+            for tag in soup.find_all(True, onclick=True):
+                onclick = tag.get("onclick", "")
+                # Extract hpno from onclick like: location.href='d.php?hpno=12345'
+                match = re.search(r"d\.php\?hpno=(\d+)", onclick)
+                if match:
+                    prop_id = match.group(1)
+                    d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
+                    found_links[d_link] = city_name
 
-                # Find detail links - be more aggressive
-                for a in soup.find_all("a", href=True):
-                    href = a['href']
+                # Also check for hpbunno
+                match = re.search(r"d\.php\?hpbunno=([^'\"&]+)", onclick)
+                if match:
+                    prop_id = match.group(1).strip()
+                    d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
+                    found_links[d_link] = city_name
+
+            # Also try direct links
+            for a in soup.find_all("a", href=True):
+                href = a['href']
+                if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
                     full = urljoin("https://www.izutaiyo.co.jp", href)
-
-                    # Look for d.php or any page with hpno/hpbunno
-                    if "d.php" in full or "hpno=" in full or "hpbunno=" in full:
-                        # Extract property ID
-                        match = re.search(r'hpno=([^&]+)', full)
-                        if match:
-                            prop_id = match.group(1)
-                            # Handle multi-ID case (space or + separated)
-                            ids = re.split(r'[\s+]+', prop_id)
-                            for pid in ids:
-                                if pid.strip().isdigit():
-                                    d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={pid.strip()}"
-                                    found_links[d_link] = city_name
-
-                        match = re.search(r'hpbunno=([^&]+)', full)
-                        if match:
-                            prop_id = match.group(1).strip()
-                            if prop_id:
-                                d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
-                                found_links[d_link] = city_name
+                    # Extract the city context
+                    found_links[full] = city_name
 
         print(f"  > Processing {len(found_links)} unique listings...")
 
@@ -372,22 +370,28 @@ class Maple(BaseScraper):
             soup = self.fetch(u)
             if not soup: continue
 
-            # More comprehensive link finding
+            # Look for article links (WordPress posts)
             for a in soup.find_all("a", href=True):
                 href = a.get("href", "")
                 full = urljoin(u, href)
 
-                # Match estate_db listings more broadly
-                if "maple-h.co.jp/estate_db/" in full:
-                    # Look for property pages (usually contain numbers or specific patterns)
-                    if any(x in full for x in ["/house/", "/estate/"]) and full not in urls:
-                        # Exclude pagination and category pages
-                        if not any(x in full for x in ["page", "category", "tag", "search"]):
+                # Match property pages - they should have the pattern /estate_db/{category}/{slug}/
+                # and NOT be the category page itself
+                if "maple-h.co.jp/estate_db/" in full and full not in urls:
+                    # Must have a path beyond just /house/ or /estate/
+                    # Looking for URLs like: /estate_db/house/property-name/
+                    path = urlparse(full).path
+                    parts = [p for p in path.split("/") if p]
+
+                    # Valid property URL should have: estate_db, category, property-slug
+                    if len(parts) >= 3 and parts[0] == "estate_db":
+                        # Exclude pagination, feed, category index
+                        if not any(x in full for x in ["page/", "feed", "/page", "category", "tag", "author"]):
                             candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
-        # Increase cap to 100 to get more results
-        for link in list(candidates)[:100]:
+        # Process all candidates
+        for link in list(candidates):
             self.parse_detail(link)
             sleep_jitter()
 
@@ -458,8 +462,13 @@ class Maple(BaseScraper):
 class Aoba(BaseScraper):
     def run(self):
         print("--- Scanning Aoba ---")
+        # Target area codes for Aoba Resort
+        # ao22219=Shimoda, ao22301=Kawazu, ao22302=Higashi, ao22304=Minami
+        target_codes = ["ao22219", "ao22301", "ao22302", "ao22304"]
+
         urls = ["https://www.aoba-resort.com/house/", "https://www.aoba-resort.com/land/"]
         candidates = set()
+
         for u in urls:
             soup = self.fetch(u)
             if not soup: continue
@@ -469,14 +478,15 @@ class Aoba(BaseScraper):
                 href = a['href']
                 full = urljoin("https://www.aoba-resort.com", href)
 
-                # Look for room pages and other property pages
-                if any(x in full for x in ["room", "/house/", "/land/"]):
-                    if full.endswith(".html") or re.search(r"/(house|land)/\d+", full):
+                # Filter by target area codes in URL
+                if any(code in full for code in target_codes):
+                    # Look for room pages
+                    if "room" in full and full.endswith(".html"):
                         candidates.add(full)
 
-        print(f"  > Processing {len(candidates)} candidates...")
-        # Increase cap to get more results
-        for link in list(candidates)[:80]:
+        print(f"  > Processing {len(candidates)} candidates (filtered by target areas)...")
+        # Process all candidates
+        for link in list(candidates):
             self.parse_detail(link)
             sleep_jitter()
 
@@ -484,6 +494,19 @@ class Aoba(BaseScraper):
         STATS["scanned"] += 1
         soup = self.fetch(url)
         if not soup: return
+
+        # Extract city from URL as context (Aoba uses area codes in URLs)
+        url_city_map = {
+            "ao22219": "下田",
+            "ao22301": "河津",
+            "ao22302": "東伊豆",
+            "ao22304": "南伊豆"
+        }
+        url_city = None
+        for code, city_name in url_city_map.items():
+            if code in url:
+                url_city = city_name
+                break
 
         # Try multiple title selectors
         title = ""
@@ -510,15 +533,14 @@ class Aoba(BaseScraper):
             STATS["skipped_mansion"] += 1
             return
 
-        city = get_location_trust(soup, full_text)
+        # Use URL city as context if available
+        city = get_location_trust(soup, full_text, url_city)
         if not city:
-            # Be more lenient
-            print(f"  [WARNING] Could not determine city for: {url}")
-            if not any(c in full_text for c in TARGET_CITIES_JP):
-                STATS["skipped_loc"] += 1
-                return
-            city = normalize_city(full_text)
-            if not city:
+            # If URL had area code, trust it
+            if url_city:
+                city = url_city
+            else:
+                print(f"  [WARNING] Could not determine city for: {url}")
                 STATS["skipped_loc"] += 1
                 return
 
