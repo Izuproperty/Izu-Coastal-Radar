@@ -305,6 +305,7 @@ class IzuTaiyo(BaseScraper):
 
         # 2. Mansion?
         if any(k in title for k in MANSION_KEYWORDS):
+            print(f"  [MANSION FILTERED] {title[:60]} - URL: {url}")
             STATS["skipped_mansion"] += 1
             return
 
@@ -380,23 +381,21 @@ class Maple(BaseScraper):
             soup = self.fetch(u)
             if not soup: continue
 
-            # Look for article/property links more broadly
-            for a in soup.find_all("a", href=True):
-                href = a.get("href", "")
-                full = urljoin(u, href)
+            # Look for article entries (WordPress structure)
+            for article in soup.find_all("article"):
+                # Find links within article blocks
+                for a in article.find_all("a", href=True):
+                    href = a.get("href", "")
+                    full = urljoin(u, href)
 
-                # Match property pages - any URL under /estate_db/ that looks like a post
-                if "maple-h.co.jp/estate_db/" in full:
-                    # Exclude category pages, pagination, feeds
-                    if any(x in full for x in ["/house/", "/estate/"]):
-                        # Exclude the category index itself
-                        if full.rstrip('/') not in [x.rstrip('/') for x in base_urls]:
-                            # Exclude pagination and other meta pages
-                            if not any(x in href for x in ["page/", "feed", "category/", "tag/", "author/"]):
-                                # Must end with property slug (not just /house/ or /estate/)
-                                path_clean = full.rstrip('/').split('/')
-                                if len(path_clean) > 5:  # Has property slug after category
-                                    candidates.add(full)
+                    if "maple-h.co.jp/estate_db/" in full:
+                        # Exclude pagination, feed, and meta pages
+                        if not any(x in full for x in ["page/", "feed", "category/", "tag/", "author/", "#"]):
+                            # Must have a property slug after category
+                            path_parts = [p for p in urlparse(full).path.split('/') if p]
+                            # Valid: ['estate_db', 'house', 'property-slug'] = 3 parts
+                            if len(path_parts) >= 3 and path_parts[0] == "estate_db":
+                                candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
         # Process all candidates
@@ -471,19 +470,18 @@ class Maple(BaseScraper):
 class Aoba(BaseScraper):
     def run(self):
         print("--- Scanning Aoba ---")
-        # Target area codes for Aoba Resort
-        # ao22219=Shimoda, ao22301=Kawazu, ao22302=Higashi, ao22304=Minami
-        target_codes = ["ao22219", "ao22301", "ao22302", "ao22304"]
-        exclude_codes = ["ao22208", "ao22222", "ao22205"]  # Ito, Atami, etc.
+        # We'll be more lenient here and filter by city after fetching
+        # The area codes might not be in the listing page URLs
 
         # Try multiple pages
         urls = [
             "https://www.aoba-resort.com/house/",
-            "https://www.aoba-resort.com/land/",
-            "https://www.aoba-resort.com/area-b2/",
-            "https://www.aoba-resort.com/area-b3/"
+            "https://www.aoba-resort.com/land/"
         ]
         candidates = set()
+
+        # Exclude these known wrong area codes
+        exclude_codes = ["ao22208", "ao22222", "ao22205"]  # Ito, Atami, etc.
 
         for u in urls:
             soup = self.fetch(u)
@@ -496,19 +494,15 @@ class Aoba(BaseScraper):
 
                 # Look for room pages
                 if "room" in full and full.endswith(".html"):
-                    # Filter: INCLUDE target codes OR EXCLUDE wrong codes
-                    has_target = any(code in full for code in target_codes)
+                    # Exclude known wrong areas
                     has_exclude = any(code in full for code in exclude_codes)
 
-                    if has_target:
-                        candidates.add(full)
-                    elif not has_exclude and "/area-" in full:
-                        # If no area code, might still be valid - let parse_detail filter
+                    if not has_exclude:
                         candidates.add(full)
 
-        print(f"  > Processing {len(candidates)} candidates...")
-        # Process all candidates
-        for link in list(candidates):
+        print(f"  > Processing {len(candidates)} candidates (will filter by city)...")
+        # Process all candidates - parse_detail will filter by city
+        for link in list(candidates)[:60]:  # Cap at 60 to avoid timeout
             self.parse_detail(link)
             sleep_jitter()
 
