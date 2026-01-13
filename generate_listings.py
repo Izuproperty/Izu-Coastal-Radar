@@ -456,34 +456,40 @@ class Maple(BaseScraper):
             print(f"    Found {len(all_links)} total links")
             print(f"    Found {len(estate_links)} estate_db links")
 
-            # Show sample links
+            # Show more sample links to see actual property pages
             if len(estate_links) > 0:
-                print(f"    Sample links:")
-                for a in estate_links[:3]:
+                print(f"    Sample links (first 10):")
+                for a in estate_links[:10]:
                     href = a.get("href", "")
                     full = urljoin(u, href)
                     print(f"      - {full}")
 
-            # Try multiple strategies to find property links
-            # Strategy 1: Look in article blocks
-            for article in soup.find_all("article"):
-                for a in article.find_all("a", href=True):
-                    href = a.get("href", "")
-                    full = urljoin(u, href)
-                    if "maple-h.co.jp/estate_db/" in full and full not in base_urls:
-                        if not any(x in full for x in ["page/", "feed", "category", "tag", "author", "#"]):
-                            candidates.add(full)
+            # Extract property links - ignore article blocks since they don't exist
+            # Just look for estate_db links that aren't navigation
+            for a in soup.find_all("a", href=True):
+                href = a.get("href", "")
+                full = urljoin(u, href)
 
-            # Strategy 2: Look for any links with estate_db in them (fallback)
-            if len(candidates) == 0:
-                for a in soup.find_all("a", href=True):
-                    href = a.get("href", "")
-                    full = urljoin(u, href)
-                    if "maple-h.co.jp/estate_db/" in full and full not in base_urls:
-                        # Must have more path components than just category
-                        if full.count('/') > 5:  # Has property slug
-                            if not any(x in full for x in ["page/", "feed", "category", "tag", "author"]):
-                                candidates.add(full)
+                # Must contain estate_db
+                if "maple-h.co.jp/estate_db/" not in full:
+                    continue
+
+                # Skip base category URLs
+                if full.rstrip('/') in [x.rstrip('/') for x in base_urls]:
+                    continue
+
+                # Skip navigation/meta pages
+                if any(x in full for x in ["page/", "feed", "category/", "tag/", "author/", "/estate_db/#", "/estate_db$", "/house/$", "/estate/$"]):
+                    continue
+
+                # Must be longer than just the category (has property slug)
+                # Looking for: /estate_db/house/PROPERTY-NAME/ or /estate_db/estate/PROPERTY-NAME/
+                path = urlparse(full).path.rstrip('/')
+                parts = [p for p in path.split('/') if p]
+
+                # Valid property: ['estate_db', 'house' or 'estate', 'property-name']
+                if len(parts) >= 3 and parts[0] == "estate_db" and parts[1] in ["house", "estate"]:
+                    candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
         # Process all candidates
@@ -584,20 +590,33 @@ class Aoba(BaseScraper):
             print(f"    Found {len(html_links)} .html links")
             print(f"    Found {len(room_links)} 'room' links")
 
-            # Show sample links
-            if len(html_links) > 0:
-                print(f"    Sample .html links:")
-                for a in html_links[:5]:
-                    href = a.get("href", "")
-                    full = urljoin("https://www.aoba-resort.com", href)
-                    print(f"      - {full}")
+            # Show sample links and analyze area codes
+            area_code_counts = {}
+            for a in html_links:
+                href = a.get("href", "")
+                for code in ["ao22219", "ao22301", "ao22302", "ao22304", "ao22208", "ao22222", "ao22205"]:
+                    if code in href:
+                        area_code_counts[code] = area_code_counts.get(code, 0) + 1
+
+            print(f"    Area code distribution:")
+            for code, count in sorted(area_code_counts.items()):
+                code_name = {
+                    "ao22219": "Shimoda",
+                    "ao22301": "Kawazu",
+                    "ao22302": "Higashi-Izu",
+                    "ao22304": "Minami-Izu",
+                    "ao22208": "Ito (excluded)",
+                    "ao22222": "Atami (excluded)",
+                    "ao22205": "Izu City (excluded)"
+                }.get(code, code)
+                print(f"      {code_name}: {count}")
 
             # Find all property links - be more flexible
             for a in soup.find_all("a", href=True):
                 href = a['href']
                 full = urljoin("https://www.aoba-resort.com", href)
 
-                # Look for property pages (room + .html or just numeric IDs)
+                # Look for property pages (room + .html)
                 is_property = False
                 if "room" in full and full.endswith(".html"):
                     is_property = True
