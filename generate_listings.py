@@ -156,8 +156,8 @@ def get_best_image(soup, url):
         if el and el.get("src"):
             src = el.get("src")
             src_lower = src.lower()
-            # Skip logos
-            if not any(skip in src_lower for skip in ["logo", "rogo", "icon"]):
+            # Skip logos and banners
+            if not any(skip in src_lower for skip in ["logo", "rogo", "icon", "bnr", "banner", "tel.gif"]):
                 return urljoin(url, src)
 
     # 3. Fallback: First image that looks like a photo (jpg/png) and not a logo
@@ -165,7 +165,7 @@ def get_best_image(soup, url):
         src = img.get("src", "")
         if not src: continue
         lower = src.lower()
-        if any(skip in lower for skip in ["logo", "rogo", "icon", "map", "banner", "nav", "/title/"]): continue
+        if any(skip in lower for skip in ["logo", "rogo", "icon", "map", "banner", "bnr", "nav", "/title/", "tel.gif"]): continue
         if ".jpg" in lower or ".jpeg" in lower or ".png" in lower:
             return urljoin(url, src)
 
@@ -193,7 +193,7 @@ def get_izutaiyo_image(soup, url, property_id):
         print(f"  [DEBUG]   Examining: {src[:60]}")
 
         # Skip obvious non-property images (EXPLICIT rogo.jpg check)
-        skip_keywords = ["logo", "rogo", "icon", "banner", "nav", "button", "arrow", "spacer", "bg_", "/title/"]
+        skip_keywords = ["logo", "rogo", "icon", "banner", "bnr", "nav", "button", "arrow", "spacer", "bg_", "/title/", "tel.gif"]
         should_skip = any(skip in lower_src for skip in skip_keywords)
         if should_skip:
             print(f"  [DEBUG]     -> SKIP (contains excluded keyword)")
@@ -841,18 +841,38 @@ class Aoba(BaseScraper):
 
             print(f"    Found {len(candidates)} candidate property links (before location filtering)")
 
-        print(f"  > Found {len(candidates)} property pages")
+        print(f"  > Found {len(candidates)} property pages total")
+
+        if len(candidates) == 0:
+            print(f"  [WARNING] Aoba: No property links found on any pages!")
+            print(f"  [WARNING] This could indicate:")
+            print(f"             - Website structure has changed")
+            print(f"             - No properties currently listed")
+            print(f"             - Link detection logic needs updating")
+            return
+
         print(f"  > Processing {len(candidates)} candidates (will filter by city later)...")
 
         # Process all candidates - parse_detail will filter by city
+        aoba_before = len(self.items)
         for link in list(candidates)[:60]:  # Cap at 60 to avoid timeout
             self.parse_detail(link)
             sleep_jitter()
 
+        aoba_after = len(self.items)
+        aoba_saved = aoba_after - aoba_before
+        print(f"  > Aoba: Saved {aoba_saved} out of {len(candidates)} candidates")
+        if aoba_saved == 0 and len(candidates) > 0:
+            print(f"  [WARNING] All Aoba properties were filtered out!")
+            print(f"  [WARNING] Check: sea view requirements, location matching, price validation")
+
     def parse_detail(self, url):
         STATS["scanned"] += 1
+        print(f"  [DEBUG] Aoba - Parsing: {url[:80]}")
         soup = self.fetch(url)
-        if not soup: return
+        if not soup:
+            print(f"  [DEBUG] Aoba - Failed to fetch")
+            return
 
         # Extract city from URL as context (Aoba uses area codes in URLs)
         url_city_map = {
@@ -912,17 +932,25 @@ class Aoba(BaseScraper):
         sea_score = 0
         if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
             sea_score = 0
+            print(f"  [DEBUG] Aoba - Explicit 'no sea view' found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
+            print(f"  [DEBUG] Aoba - High confidence sea view detected")
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
+            print(f"  [DEBUG] Aoba - Medium confidence (beach name) detected")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
             if any(k in full_text for k in PROXIMITY_KEYWORDS):
                 sea_score = 2
+                print(f"  [DEBUG] Aoba - Sea proximity detected")
+            else:
+                print(f"  [DEBUG] Aoba - Generic sea mention without proximity")
+        else:
+            print(f"  [DEBUG] Aoba - No sea-related keywords found")
 
         # Filter out properties with no sea connection
         if sea_score == 0:
-            print(f"  [SEA VIEW FILTERED] No sea view or proximity: {url}")
+            print(f"  [SEA VIEW FILTERED] Aoba - No sea view or proximity: {url[:80]}")
             STATS["skipped_loc"] += 1
             return
 
