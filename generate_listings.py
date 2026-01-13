@@ -298,28 +298,39 @@ class IzuTaiyo(BaseScraper):
         title = clean_text(soup.find("h1").get_text()) if soup.find("h1") else "Izu Taiyo Property"
         full_text = clean_text(soup.get_text())
 
-        # 1. Sold?
-        if is_contracted(title, full_text):
-            STATS["skipped_sold"] += 1
-            return
-
-        # 2. Mansion?
-        if any(k in title for k in MANSION_KEYWORDS):
-            print(f"  [MANSION FILTERED] {title[:60]} - URL: {url}")
-            STATS["skipped_mansion"] += 1
-            return
-
-        # 3. Location (Trust Context from search URL)
+        # 1. Location FIRST - Filter wrong cities before anything else
         city = get_location_trust(soup, full_text, city_ctx)
         if not city:
             # Be more lenient - log warning but try to extract
-            print(f"  [WARNING] Could not determine city for: {url} (context: {city_ctx})")
             # If we have context from search, use it even if extraction fails
             if city_ctx and any(c in city_ctx for c in TARGET_CITIES_JP):
                 city = normalize_city(city_ctx)
             if not city:
+                # Extract city name from title for debug
+                title_preview = title if len(title) < 40 else title[:37] + "..."
+                print(f"  [LOCATION FILTERED] Not in target area: {title_preview}")
                 STATS["skipped_loc"] += 1
                 return
+
+        # 2. Sold?
+        if is_contracted(title, full_text):
+            STATS["skipped_sold"] += 1
+            return
+
+        # 3. Mansion? - Check for specific patterns, not just the word
+        # Look for "マンション情報" (mansion information) not just "マンション" (which might be a property name)
+        is_mansion = False
+        if "マンション情報" in title or "マンション" in title and "情報" in title:
+            is_mansion = True
+        elif "mansion" in title.lower() and ("information" in title.lower() or "listing" in title.lower()):
+            is_mansion = True
+        elif "condo" in title.lower():
+            is_mansion = True
+
+        if is_mansion:
+            print(f"  [MANSION FILTERED] {city} - {title[:60]}")
+            STATS["skipped_mansion"] += 1
+            return
 
         # 4. Sea View Scoring (More nuanced)
         sea_score = 0
