@@ -156,16 +156,59 @@ def get_best_image(soup, url):
     
     return ""
 
+def extract_actual_city_from_title(title):
+    """
+    Extract the actual city name from Izu Taiyo title format.
+    Titles are formatted as: CITY_NAME + PROPERTY + PRICE + の家情報/のマンション情報
+
+    Returns the city name if found, otherwise None.
+    Only returns if it's one of our target cities.
+    """
+    if not title: return None
+
+    # Common Japanese city/town suffixes
+    city_patterns = [
+        r'^([^「（]+?[市町村])',  # City at start followed by city/town/village suffix
+        r'^([^「（]+?[郡])',      # District
+    ]
+
+    for pattern in city_patterns:
+        match = re.search(pattern, title)
+        if match:
+            potential_city = match.group(1).strip()
+            # Check if this is one of our target cities
+            for target_city in TARGET_CITIES_JP:
+                if target_city in potential_city:
+                    return target_city
+            # If not a target city, return None (we'll filter it out)
+            return None
+
+    return None
+
 def get_location_trust(soup, full_text, context_city=None):
     """
     Determines city.
-    1. Search Address Table.
-    2. Search Title.
-    3. Search Body.
-    4. If nothing found, use context_city as fallback.
+    1. Extract from title using proper parsing (best for Izu Taiyo)
+    2. Search Address Table.
+    3. Search Title with normalize_city.
+    4. Search Body.
+    5. If nothing found, use context_city as fallback.
     """
     # NOTE: We check the page content FIRST because search results often
     # return properties from neighboring cities even when filtering by city code
+
+    # 1. Try to extract city from title using proper parsing (Izu Taiyo format)
+    h1 = soup.find("h1")
+    if h1:
+        city = extract_actual_city_from_title(h1.get_text())
+        if city: return city
+        # If extract found a city but it's not in target list, it returned None
+        # In that case, we know this property is in wrong area, so stop here
+        title_text = h1.get_text()
+        # Check if title starts with a city name that's not ours
+        if re.match(r'^[^「（]+?[市町村郡]', title_text):
+            # Title has a city name, but it's not in our target list
+            return None
 
     # 2. Address Table - Check with whitespace normalization
     markers = ["所在地", "住所", "Location", "物件所在地", "エリア"]
@@ -189,8 +232,7 @@ def get_location_trust(soup, full_text, context_city=None):
                     city = normalize_city(c)
                     if city: return city
 
-    # 3. Title
-    h1 = soup.find("h1")
+    # 3. Title with normalize_city
     if h1:
         city = normalize_city(h1.get_text())
         if city: return city
@@ -201,9 +243,9 @@ def get_location_trust(soup, full_text, context_city=None):
         city = normalize_city(h2.get_text())
         if city: return city
 
-    # 4. Full Text scan (expanded to first 1000 chars)
-    city = normalize_city(full_text[:1000])
-    if city: return city
+    # 4. Full Text scan - DO NOT use full text scan as it picks up keywords
+    # city = normalize_city(full_text[:1000])
+    # if city: return city
 
     # 5. Last resort: use search context if provided
     if context_city and context_city in TARGET_CITIES_JP:
