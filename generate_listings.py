@@ -37,9 +37,11 @@ CITY_EN_MAP = {
 # "Sea View" Validation
 # If a property has these, it gets a high score.
 SEA_KEYWORDS = [
-    "オーシャン", "海一望", "海を望", "海望", "海近", "ビーチ", "Sea", "Ocean", 
+    "オーシャン", "海一望", "海を望", "海望", "海近", "ビーチ", "Sea", "Ocean",
     "白浜", "吉佐美", "入田", "多々戸", "眺望", "景色", "相模湾", "太平洋", "海岸", "伊豆七島",
-    "海 ：一望", "海： 一望", "海 ： 一望", "海が見え", "海見え"
+    "海 ：一望", "海： 一望", "海 ： 一望", "海が見え", "海見え", "オーシャンビュー",
+    "海の見え", "海側", "海前", "海沿い", "シービュー", "ベイビュー", "海眺望",
+    "海を一望", "海が一望", "オーシャンフロント", "ウォーターフロント"
 ]
 
 # Keywords to Identify House vs Land
@@ -83,10 +85,15 @@ def normalize_city(text):
     """
     Scans text for target city names.
     Returns the first match found.
+    Handles whitespace variations.
     """
     if not text: return None
+    # Normalize whitespace for better matching
+    normalized = re.sub(r"\s+", "", text)
     for c in TARGET_CITIES_JP:
-        if c in text: return c
+        # Also remove whitespace from target cities for comparison
+        c_normalized = re.sub(r"\s+", "", c)
+        if c_normalized in normalized: return c
     return None
 
 def extract_price(text):
@@ -160,16 +167,24 @@ def get_location_trust(soup, full_text, context_city=None):
     # 1. Trust the search context!
     if context_city: return context_city
 
-    # 2. Address Table
-    markers = ["所在地", "住所", "Location"]
-    for marker in markers:
-        for tag in soup.find_all(["th", "td", "dt", "dd"]):
-            if marker in tag.get_text():
+    # 2. Address Table - Check with whitespace normalization
+    markers = ["所在地", "住所", "Location", "物件所在地", "エリア"]
+    for tag in soup.find_all(["th", "td", "dt", "dd", "div", "span"]):
+        tag_text = tag.get_text()
+        # Normalize whitespace for matching
+        tag_normalized = re.sub(r"\s+", "", tag_text)
+
+        for marker in markers:
+            marker_normalized = re.sub(r"\s+", "", marker)
+            if marker_normalized in tag_normalized:
                 # Check this tag and next siblings
-                candidates = [tag.get_text()]
+                candidates = [tag_text]
                 sib = tag.find_next_sibling()
                 if sib: candidates.append(sib.get_text())
-                
+                # Also check parent row if in table
+                parent = tag.find_parent("tr")
+                if parent: candidates.append(parent.get_text())
+
                 for c in candidates:
                     city = normalize_city(c)
                     if city: return city
@@ -180,8 +195,14 @@ def get_location_trust(soup, full_text, context_city=None):
         city = normalize_city(h1.get_text())
         if city: return city
 
-    # 4. Full Text scan
-    return normalize_city(full_text[:500])
+    # Also check h2 tags
+    h2 = soup.find("h2")
+    if h2:
+        city = normalize_city(h2.get_text())
+        if city: return city
+
+    # 4. Full Text scan (expanded to first 1000 chars)
+    return normalize_city(full_text[:1000])
 
 # --- SCRAPERS ---
 
@@ -211,43 +232,54 @@ class IzuTaiyo(BaseScraper):
         # Map City Codes to Names for Context Trust
         # 22219=Shimoda, 22301=Kawazu, 22302=Higashi, 22304=Minami
         city_map = {
-            "22219": "下田市",
-            "22301": "河津町",
-            "22302": "東伊豆町",
-            "22304": "南伊豆町"
+            "22219": "下田",
+            "22301": "河津",
+            "22302": "東伊豆",
+            "22304": "南伊豆"
         }
-        
-        # We scan these specific city lists
-        base_url = "https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={}&hpkind=0"
-        
+
         found_links = {} # url -> city_context
 
+        # Strategy: Try multiple URL patterns to catch all listings
         for code, city_name in city_map.items():
-            url = base_url.format(code)
-            soup = self.fetch(url)
-            if not soup: continue
-            
-            # Find detail links
-            for a in soup.find_all("a", href=True):
-                href = a['href']
-                full = urljoin("https://www.izutaiyo.co.jp", href)
-                
-                # Check for ID
-                if "hpno=" in full or "hpbunno=" in full:
-                    # If it's a multi-ID list in URL param
-                    if "tokusen.php" in full:
-                        qs = parse_qs(urlparse(full).query)
-                        if "hpno" in qs:
-                            ids = re.split(r'[ +]+', qs["hpno"][0])
-                            for i in ids:
-                                if i.strip():
-                                    d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={i.strip()}"
+            # Pattern 1: tokusen.php with hpcity parameter
+            urls_to_try = [
+                f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind=0",
+                f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}",
+                f"https://www.izutaiyo.co.jp/sn.php?hpcity[]={code}",  # New listings
+            ]
+
+            for url in urls_to_try:
+                soup = self.fetch(url)
+                if not soup: continue
+
+                # Find detail links - be more aggressive
+                for a in soup.find_all("a", href=True):
+                    href = a['href']
+                    full = urljoin("https://www.izutaiyo.co.jp", href)
+
+                    # Look for d.php or any page with hpno/hpbunno
+                    if "d.php" in full or "hpno=" in full or "hpbunno=" in full:
+                        # Extract property ID
+                        match = re.search(r'hpno=([^&]+)', full)
+                        if match:
+                            prop_id = match.group(1)
+                            # Handle multi-ID case (space or + separated)
+                            ids = re.split(r'[\s+]+', prop_id)
+                            for pid in ids:
+                                if pid.strip().isdigit():
+                                    d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={pid.strip()}"
                                     found_links[d_link] = city_name
-                    else:
-                        found_links[full] = city_name
+
+                        match = re.search(r'hpbunno=([^&]+)', full)
+                        if match:
+                            prop_id = match.group(1).strip()
+                            if prop_id:
+                                d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
+                                found_links[d_link] = city_name
 
         print(f"  > Processing {len(found_links)} unique listings...")
-        
+
         for link, city_ctx in found_links.items():
             self.parse_detail(link, city_ctx)
             sleep_jitter()
@@ -257,9 +289,10 @@ class IzuTaiyo(BaseScraper):
         soup = self.fetch(url)
         if not soup: return
 
-        # Remove footer (common source of "Atami" false flags in old versions)
-        for f in soup.find_all("footer"): f.decompose()
-        
+        # Remove footer and nav (can contain misleading location info)
+        for tag in soup.find_all(["footer", "nav", ".footer", ".navigation"]):
+            tag.decompose()
+
         title = clean_text(soup.find("h1").get_text()) if soup.find("h1") else "Izu Taiyo Property"
         full_text = clean_text(soup.get_text())
 
@@ -273,26 +306,44 @@ class IzuTaiyo(BaseScraper):
             STATS["skipped_mansion"] += 1
             return
 
-        # 3. Location (Trust Context if extraction fails)
+        # 3. Location (Trust Context from search URL)
         city = get_location_trust(soup, full_text, city_ctx)
         if not city:
-            STATS["skipped_loc"] += 1
-            return
+            # Be more lenient - log warning but try to extract
+            print(f"  [WARNING] Could not determine city for: {url} (context: {city_ctx})")
+            # If we have context from search, use it even if extraction fails
+            if city_ctx and any(c in city_ctx for c in TARGET_CITIES_JP):
+                city = normalize_city(city_ctx)
+            if not city:
+                STATS["skipped_loc"] += 1
+                return
 
-        # 4. Sea View (Soft Filter: Low score ok, but calculate it)
-        sea_score = 4 if any(k in full_text for k in SEA_KEYWORDS) else 0
-        if "海は見えません" in full_text: sea_score = 0
-        # Boost score if "Walk to Sea"
-        if sea_score == 0 and any(k in full_text for k in ["海", "ビーチ"]) and any(k in full_text for k in ["歩", "近", "分"]):
-            sea_score = 3
+        # 4. Sea View Scoring (More nuanced)
+        sea_score = 0
+        if any(k in full_text for k in SEA_KEYWORDS):
+            sea_score = 4
+        if "海は見えません" in full_text or "海眺望なし" in full_text:
+            sea_score = 0
+        # Boost score if "Walk to Sea" - be more lenient
+        if sea_score == 0:
+            has_sea_mention = any(k in full_text for k in ["海", "ビーチ", "Beach", "Ocean"])
+            has_proximity = any(k in full_text for k in ["徒歩", "歩", "近", "分", "m"])
+            if has_sea_mention and has_proximity:
+                sea_score = 2
 
-        # Extract
+        # Extract price from multiple possible locations
         price = 0
+        # Try table rows first
         for tr in soup.find_all("tr"):
-            if "価格" in tr.get_text():
-                price = extract_price(tr.get_text())
-                break
-        
+            tr_text = tr.get_text()
+            if any(k in tr_text for k in ["価格", "販売価格", "売買価格", "Price"]):
+                price = extract_price(tr_text)
+                if price > 0: break
+
+        # If not found, try full text
+        if price == 0:
+            price = extract_price(full_text)
+
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
 
@@ -320,15 +371,23 @@ class Maple(BaseScraper):
         for u in urls:
             soup = self.fetch(u)
             if not soup: continue
-            for a in soup.select("a"):
-                full = urljoin(u, a.get("href", ""))
-                # Only listings
-                if "maple-h.co.jp/estate_db/" in full and re.search(r"\d+", full):
-                    candidates.add(full)
+
+            # More comprehensive link finding
+            for a in soup.find_all("a", href=True):
+                href = a.get("href", "")
+                full = urljoin(u, href)
+
+                # Match estate_db listings more broadly
+                if "maple-h.co.jp/estate_db/" in full:
+                    # Look for property pages (usually contain numbers or specific patterns)
+                    if any(x in full for x in ["/house/", "/estate/"]) and full not in urls:
+                        # Exclude pagination and category pages
+                        if not any(x in full for x in ["page", "category", "tag", "search"]):
+                            candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
-        # Cap at 50 to avoid timeouts
-        for link in list(candidates)[:50]:
+        # Increase cap to 100 to get more results
+        for link in list(candidates)[:100]:
             self.parse_detail(link)
             sleep_jitter()
 
@@ -337,12 +396,17 @@ class Maple(BaseScraper):
         soup = self.fetch(url)
         if not soup: return
 
-        # Title extraction
-        h1 = soup.select_one("h1.entry-title")
-        title = clean_text(h1.get_text()) if h1 else ""
-        if not title:
-            meta = soup.find("title")
-            title = clean_text(meta.get_text()).split("|")[0] if meta else "Maple Property"
+        # Title extraction - try multiple selectors
+        title = ""
+        for selector in ["h1.entry-title", "h1", ".property-title", "title"]:
+            elem = soup.select_one(selector)
+            if elem:
+                title = clean_text(elem.get_text())
+                if "|" in title: title = title.split("|")[0]
+                if "–" in title: title = title.split("–")[0]
+                if title: break
+
+        if not title: title = "Maple Property"
 
         full_text = clean_text(soup.get_text())
 
@@ -356,10 +420,24 @@ class Maple(BaseScraper):
 
         city = get_location_trust(soup, full_text)
         if not city:
-            STATS["skipped_loc"] += 1
-            return
+            # Be more lenient - if we can't find city, log but don't skip immediately
+            print(f"  [WARNING] Could not determine city for: {url}")
+            # Check if it mentions any target areas in full text
+            if not any(c in full_text for c in TARGET_CITIES_JP):
+                STATS["skipped_loc"] += 1
+                return
+            # Default to first found city or skip
+            city = normalize_city(full_text)
+            if not city:
+                STATS["skipped_loc"] += 1
+                return
 
         sea_score = 4 if any(k in full_text for k in SEA_KEYWORDS) else 0
+        # Soft boost for proximity mentions
+        if sea_score == 0 and any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            if any(k in full_text for k in ["徒歩", "歩", "近", "分"]):
+                sea_score = 2
+
         price = extract_price(full_text)
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
@@ -385,12 +463,20 @@ class Aoba(BaseScraper):
         for u in urls:
             soup = self.fetch(u)
             if not soup: continue
-            for a in soup.select("a[href*='room']"):
-                if a['href'].endswith(".html"):
-                    candidates.add(urljoin("https://www.aoba-resort.com", a['href']))
+
+            # More comprehensive link finding
+            for a in soup.find_all("a", href=True):
+                href = a['href']
+                full = urljoin("https://www.aoba-resort.com", href)
+
+                # Look for room pages and other property pages
+                if any(x in full for x in ["room", "/house/", "/land/"]):
+                    if full.endswith(".html") or re.search(r"/(house|land)/\d+", full):
+                        candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
-        for link in list(candidates)[:40]:
+        # Increase cap to get more results
+        for link in list(candidates)[:80]:
             self.parse_detail(link)
             sleep_jitter()
 
@@ -399,8 +485,21 @@ class Aoba(BaseScraper):
         soup = self.fetch(url)
         if not soup: return
 
-        h2 = soup.find("h2")
-        title = clean_text(h2.get_text()) if h2 else "Aoba Property"
+        # Try multiple title selectors
+        title = ""
+        for selector in ["h2", "h1", ".property-title", ".entry-title"]:
+            if isinstance(selector, str) and selector.startswith("."):
+                elem = soup.select_one(selector)
+            else:
+                elem = soup.find(selector)
+            if elem:
+                title = clean_text(elem.get_text())
+                if title: break
+
+        if not title:
+            title_tag = soup.find("title")
+            title = clean_text(title_tag.get_text()).split("|")[0] if title_tag else "Aoba Property"
+
         full_text = clean_text(soup.get_text())
 
         if is_contracted(title, full_text):
@@ -413,10 +512,22 @@ class Aoba(BaseScraper):
 
         city = get_location_trust(soup, full_text)
         if not city:
-            STATS["skipped_loc"] += 1
-            return
+            # Be more lenient
+            print(f"  [WARNING] Could not determine city for: {url}")
+            if not any(c in full_text for c in TARGET_CITIES_JP):
+                STATS["skipped_loc"] += 1
+                return
+            city = normalize_city(full_text)
+            if not city:
+                STATS["skipped_loc"] += 1
+                return
 
         sea_score = 4 if any(k in full_text for k in SEA_KEYWORDS) else 0
+        # Soft boost for proximity mentions
+        if sea_score == 0 and any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            if any(k in full_text for k in ["徒歩", "歩", "近", "分"]):
+                sea_score = 2
+
         price = extract_price(full_text)
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
@@ -459,16 +570,31 @@ def main():
     with open(OUT_BUILDINFO, "w", encoding="utf-8") as f:
         json.dump({"counts": counts, "generatedAt": out["generatedAt"]}, f)
 
-    print("\n-------------------------")
+    print("\n" + "="*50)
     print(" SCAN SUMMARY")
-    print("-------------------------")
-    print(f" Total Scanned:      {STATS['scanned']}")
-    print(f" SAVED:              {STATS['saved']}")
-    print(f" Skipped (Location): {STATS['skipped_loc']}")
-    print(f" Skipped (Sold):     {STATS['skipped_sold']}")
-    print(f" Skipped (Mansion):  {STATS['skipped_mansion']}")
-    print("-------------------------")
-    print(counts)
+    print("="*50)
+    print(f" Total Scanned:        {STATS['scanned']}")
+    print(f" ✓ SAVED:              {STATS['saved']}")
+    print(f" ✗ Skipped (Location): {STATS['skipped_loc']}")
+    print(f" ✗ Skipped (Sold):     {STATS['skipped_sold']}")
+    print(f" ✗ Skipped (Mansion):  {STATS['skipped_mansion']}")
+    print(f" ✗ Errors:             {STATS['error']}")
+    print("="*50)
+    print(" Breakdown by Source:")
+    for source, count in sorted(counts.items()):
+        print(f"   {source}: {count}")
+    print("="*50)
+
+    if STATS['saved'] == 0:
+        print("\n⚠️  WARNING: No listings saved!")
+        print("   This may indicate:")
+        print("   - Website structure has changed")
+        print("   - Network connectivity issues")
+        print("   - Filters are too restrictive")
+    elif STATS['saved'] < 10:
+        print("\n⚠️  WARNING: Very few listings saved ({})".format(STATS['saved']))
+        print("   Expected: 50+ listings")
+        print("   Check the website structure and filters")
 
 if __name__ == "__main__":
     main()
