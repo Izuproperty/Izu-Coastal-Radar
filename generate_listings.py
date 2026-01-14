@@ -551,12 +551,13 @@ class IzuTaiyo(BaseScraper):
                 sea_score = 2
             # Just generic "海" mention without view or proximity = score 0
 
-        # 5. Sea View/Proximity Required - Filter out properties with no sea connection
+        # 5. Sea View/Proximity Scoring (but don't filter - all target cities are coastal)
+        # Note: Properties with sea_score=0 are still included as all target cities are coastal areas
+        # Users can filter by seaViewScore in the UI if they want ocean views specifically
         if sea_score == 0:
             title_preview = title if len(title) < 40 else title[:37] + "..."
-            print(f"  [SEA VIEW FILTERED] No sea view or proximity: {title_preview}")
-            STATS["skipped_loc"] += 1  # Using skipped_loc for now, could add new stat
-            return
+            print(f"  [INFO] No explicit sea view keywords: {title_preview} (sea_score=0)")
+        # DON'T FILTER - keep all coastal area properties
 
         # Extract price from multiple possible locations
         price = 0
@@ -781,11 +782,10 @@ class Maple(BaseScraper):
             if any(k in full_text for k in PROXIMITY_KEYWORDS):
                 sea_score = 2
 
-        # Filter out properties with no sea connection
+        # Sea View Scoring (but don't filter - all target cities are coastal)
         if sea_score == 0:
-            print(f"  [SEA VIEW FILTERED] No sea view or proximity: {url}")
-            STATS["skipped_loc"] += 1
-            return
+            print(f"  [INFO] Maple - No explicit sea view keywords: {url[:60]} (sea_score=0)")
+        # DON'T FILTER - keep all coastal area properties
 
         price = extract_price(full_text)
         print(f"  [DEBUG] Maple - Extracted price for {url[:60]}: {price}")
@@ -990,11 +990,10 @@ class Aoba(BaseScraper):
         else:
             print(f"  [DEBUG] Aoba - No sea-related keywords found")
 
-        # Filter out properties with no sea connection
+        # Sea View Scoring (but don't filter - all target cities are coastal)
         if sea_score == 0:
-            print(f"  [SEA VIEW FILTERED] Aoba - No sea view or proximity: {url[:80]}")
-            STATS["skipped_loc"] += 1
-            return
+            print(f"  [INFO] Aoba - No explicit sea view keywords: {url[:60]} (sea_score=0)")
+        # DON'T FILTER - keep all coastal area properties
 
         price = extract_price(full_text)
         print(f"  [DEBUG] Aoba - Extracted price for {url[:60]}: {price}")
