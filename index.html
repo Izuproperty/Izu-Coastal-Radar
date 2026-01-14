@@ -215,7 +215,7 @@
 
   function fmtPrice(p) {
     if (!p) return "-";
-    if (STATE.curr === 'JPY') return "¥" + (p/10000).toLocaleString() + "万";
+    if (STATE.curr === 'JPY') return "¥" + Math.round(p/10000).toLocaleString() + "万";
     if (STATE.curr === 'USD') return "$" + Math.round(p / FX_USD).toLocaleString();
     return p;
   }
@@ -257,8 +257,10 @@
         sEl.innerText = Math.round(avgS).toLocaleString() + " m²";
         subEl.innerText = "";
         const ppSqm = avgP / avgS;
+        const sqft = avgS * 10.764;
+        const ppSqft = (avgP / FX_USD) / sqft;
         uEl.innerText = "¥" + Math.round(ppSqm/10000).toLocaleString() + "万 /m²";
-        uSubEl.innerText = "";
+        uSubEl.innerText = `($${Math.round(ppSqft)} /ft²)`;
       }
     } else {
       // No size data available
