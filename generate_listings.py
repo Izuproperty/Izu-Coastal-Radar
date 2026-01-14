@@ -140,73 +140,146 @@ def determine_type(title, text):
 
 def get_best_image(soup, url):
     """Robust image finder: OG Tag -> Main ID -> First Large Image"""
-    # 1. Meta Tag (Best quality usually)
+    # 1. Meta Tag (Best quality usually) - but skip if it's a logo
     og = soup.find("meta", attrs={"property": "og:image"})
     if og and og.get("content"):
-        return urljoin(url, og.get("content"))
+        og_url = og.get("content")
+        og_lower = og_url.lower()
+        # Skip if it's obviously a logo
+        if not any(skip in og_lower for skip in ["logo", "rogo", "icon", "og.png", "og.jpg"]):
+            return urljoin(url, og_url)
 
     # 2. Known ID/Classes
     selectors = ["#main_img", ".main_img", ".wp-post-image", ".item_img img", ".swiper-slide img"]
     for sel in selectors:
         el = soup.select_one(sel)
         if el and el.get("src"):
-            return urljoin(url, el.get("src"))
+            src = el.get("src")
+            src_lower = src.lower()
+            # Skip logos and banners
+            if not any(skip in src_lower for skip in ["logo", "rogo", "icon", "bnr", "banner", "tel.gif"]):
+                return urljoin(url, src)
 
     # 3. Fallback: First image that looks like a photo (jpg/png) and not a logo
     for img in soup.find_all("img"):
         src = img.get("src", "")
         if not src: continue
         lower = src.lower()
-        if "logo" in lower or "icon" in lower or "map" in lower: continue
+        if any(skip in lower for skip in ["logo", "rogo", "icon", "map", "banner", "bnr", "nav", "/title/", "tel.gif"]): continue
         if ".jpg" in lower or ".jpeg" in lower or ".png" in lower:
             return urljoin(url, src)
 
     return ""
 
 def get_izutaiyo_image(soup, url, property_id):
-    """Izu Taiyo-specific image finder based on property ID"""
-    # First, look for images on the page that contain the property ID
-    for img in soup.find_all("img"):
-        src = img.get("src", "")
-        # Check if image contains property ID or looks like a property photo
-        if property_id.lower() in src.lower():
-            return urljoin(url, src)
-        # Also check for numbered photo patterns (common for properties)
-        if any(pattern in src.lower() for pattern in ["photo", "p01", "_1.", "_01.", "img01"]):
-            # Skip logos and icons
-            if not any(skip in src.lower() for skip in ["logo", "icon", "map", "button"]):
-                full_url = urljoin(url, src)
-                # Make sure it's a real image file
-                if any(ext in full_url.lower() for ext in [".jpg", ".jpeg", ".png"]):
-                    return full_url
+    """Izu Taiyo-specific image finder - constructs image URLs from property ID"""
+    # Izu Taiyo images follow a predictable pattern:
+    # Property ID: SMB410H -> Images at: bb/sm/smb410ha.jpg, bb/sm/smb410hb.jpg, etc.
 
-    # Try to find the main property image div/section
-    main_img_selectors = ["#mainimage img", ".mainimage img", "#photo img", ".photo img", ".bukken-image img"]
-    for selector in main_img_selectors:
-        img = soup.select_one(selector)
-        if img and img.get("src"):
-            src = img.get("src")
-            if "logo" not in src.lower():
-                return urljoin(url, src)
+    if property_id:
+        # Convert property ID to lowercase for image path
+        prop_lower = property_id.lower()
+        # Get first 2 characters for directory
+        dir_name = prop_lower[:2]
 
-    # Last resort: find first large image that's not a logo
-    for img in soup.find_all("img"):
+        # Try constructing image URLs (a, b, c variants)
+        for letter in ['a', 'b', 'c']:
+            img_path = f"bb/{dir_name}/{prop_lower}{letter}.jpg"
+            img_url = urljoin(url, img_path)
+            print(f"  [DEBUG] Constructed Izu Taiyo image URL: {img_url}")
+            # Return the first one (they can check others on the site)
+            return img_url
+
+    # Fallback to searching the page
+    print(f"  [DEBUG] No property ID available for image construction")
+
+    # Strategy 1: Look for image URLs in noscript or commented sections
+    # Check for images in pattern bb/{dir}/{id}{letter}.jpg
+    import re
+    page_text = str(soup)
+    img_pattern = r'bb/\w+/\w+[a-z]\.jpg'
+    img_matches = re.findall(img_pattern, page_text)
+
+    if img_matches:
+        # Use the first match
+        img_url = urljoin(url, img_matches[0])
+        print(f"  [DEBUG] Found Izu Taiyo image in HTML: {img_url}")
+        return img_url
+    # Strategy 2: Fall back to img tags as last resort
+    all_imgs = soup.find_all("img")
+    candidates = []
+
+    print(f"  [DEBUG] Falling back to img tag search, found {len(all_imgs)} img tags")
+
+    for img in all_imgs:
         src = img.get("src", "")
         if not src:
             continue
-        # Skip small images (likely logos/icons)
-        width = img.get("width", "")
-        if width and width.isdigit() and int(width) < 100:
-            continue
-        # Skip logos and navigation
-        if any(skip in src.lower() for skip in ["logo", "icon", "nav", "button", "arrow", "banner"]):
-            continue
-        # Must be a valid image
-        if any(ext in src.lower() for ext in [".jpg", ".jpeg", ".png"]):
-            return urljoin(url, src)
 
-    # Fallback to generic image finder
-    return get_best_image(soup, url)
+        # Get full URL
+        full_url = urljoin(url, src)
+        lower_src = src.lower()
+
+        # Debug: show what we're examining
+        print(f"  [DEBUG]   Examining: {src[:60]}")
+
+        # Skip obvious non-property images (EXPLICIT rogo.jpg check)
+        skip_keywords = ["logo", "rogo", "icon", "banner", "bnr", "nav", "button", "arrow", "spacer", "bg_", "/title/", "tel.gif"]
+        should_skip = any(skip in lower_src for skip in skip_keywords)
+        if should_skip:
+            print(f"  [DEBUG]     -> SKIP (contains excluded keyword)")
+            continue
+
+        # Must be an image file
+        if not any(ext in lower_src for ext in [".jpg", ".jpeg", ".png", ".gif"]):
+            print(f"  [DEBUG]     -> SKIP (not image extension)")
+            continue
+
+        # Prefer images that look like property photos
+        priority = 10  # Base priority for any valid image
+
+        if property_id and property_id.lower() in lower_src:
+            priority = 100  # Highest priority
+            print(f"  [DEBUG]     -> MATCH property ID! Priority: {priority}")
+        elif any(pattern in lower_src for pattern in ["photo", "img", "pic", "image", "_1", "_01", "p01"]):
+            priority = 50
+            print(f"  [DEBUG]     -> Looks like photo. Priority: {priority}")
+        else:
+            print(f"  [DEBUG]     -> Generic image. Priority: {priority}")
+
+        # Check size if available
+        width = img.get("width", "")
+        height = img.get("height", "")
+        if width and width.isdigit():
+            w = int(width)
+            if w >= 200:  # Prefer larger images
+                priority += 20
+                print(f"  [DEBUG]     -> Large image ({w}px), bonus +20")
+            elif w < 100:  # Penalize tiny images
+                priority -= 30
+                print(f"  [DEBUG]     -> Tiny image ({w}px), penalty -30")
+
+        if priority > 0:  # Only add if priority is positive
+            candidates.append((priority, full_url))
+            print(f"  [DEBUG]     -> Added as candidate with priority {priority}")
+
+    # Sort by priority and return best match
+    if candidates:
+        candidates.sort(reverse=True, key=lambda x: x[0])
+        best_priority, best_url = candidates[0]
+        print(f"  [DEBUG] ✓ Selected image for {property_id}: priority={best_priority}")
+        print(f"  [DEBUG]   URL: {best_url}")
+        return best_url
+
+    # Fallback - but log it
+    print(f"  [DEBUG] ✗ No valid image candidates for {property_id} (found {len(all_imgs)} total images)")
+    print(f"  [DEBUG]   Trying generic fallback...")
+    fallback_img = get_best_image(soup, url)
+    if fallback_img:
+        print(f"  [DEBUG]   Fallback found: {fallback_img}")
+    else:
+        print(f"  [DEBUG]   No fallback image found either!")
+    return fallback_img
 
 def extract_actual_city_from_title(title):
     """
@@ -499,9 +572,9 @@ class IzuTaiyo(BaseScraper):
             price = extract_price(full_text)
 
         # 6. Price validation - Exclude properties with no price (likely sold/unavailable)
-        if price == 0:
+        if not price or price <= 0:
             title_preview = title if len(title) < 40 else title[:37] + "..."
-            print(f"  [PRICE FILTERED] No valid price found: {title_preview}")
+            print(f"  [PRICE FILTERED] No valid price found: {title_preview} (price={price})")
             STATS["skipped_sold"] += 1
             return
 
@@ -592,8 +665,11 @@ class Maple(BaseScraper):
                     category_pages = ["house", "estate", "office", "lease", "mansion", "land"]
                     if len(parts) == 2 and parts[1] in category_pages:
                         continue
+                    # ALSO exclude if URL ends with a category page (with trailing slash)
+                    if full.rstrip('/').endswith(tuple(f'/estate_db/{cat}' for cat in category_pages)):
+                        continue
                     # Also exclude if it contains these keywords anywhere
-                    if any(cat in full for cat in ["/office/", "/lease/", "/mansion/"]):
+                    if any(cat in full.lower() for cat in ["/office", "/lease", "/mansion"]):
                         continue
                     candidates.add(full)
 
@@ -604,6 +680,14 @@ class Maple(BaseScraper):
             sleep_jitter()
 
     def parse_detail(self, url):
+        # IMMEDIATE REJECTION: Category pages (bulletproof check)
+        url_lower = url.lower().rstrip('/')
+        if url_lower.endswith('estate_db/office') or url_lower.endswith('estate_db/lease') or \
+           url_lower.endswith('estate_db/mansion') or url_lower.endswith('estate_db/house') or \
+           url_lower.endswith('estate_db/estate') or url_lower.endswith('estate_db/land'):
+            print(f"  [CATEGORY PAGE FILTERED] {url}")
+            return
+
         STATS["scanned"] += 1
         soup = self.fetch(url)
         if not soup: return
@@ -621,28 +705,52 @@ class Maple(BaseScraper):
                     break
 
         # If we got generic title, try to decode from URL
-        if not title or "メープルハウジング" in title:
+        is_generic = not title or "メープルハウジング" in title or "伊豆の不動産" in title
+        if is_generic:
             try:
                 from urllib.parse import unquote
                 # URL like: .../6763%ef%bc%9a%e8%87%aa%e7%84%b6...
                 # Extract the encoded part after estate_db/
                 url_parts = url.split('/estate_db/')
                 if len(url_parts) > 1:
-                    encoded_title = url_parts[1].rstrip('/')
-                    decoded = unquote(encoded_title)
-                    # Extract property description after the ID and colon
-                    if ':' in decoded or '：' in decoded:
-                        # Split on either : or ：
-                        for sep in ['：', ':']:
-                            if sep in decoded:
-                                title = decoded.split(sep, 1)[1].strip()
-                                break
-                    else:
-                        title = decoded
-            except:
-                pass
+                    # Get everything between estate_db/ and the next / or end
+                    path_after_db = url_parts[1].strip('/')
+                    # Get first path segment (the property slug)
+                    encoded_title = path_after_db.split('/')[0] if '/' in path_after_db else path_after_db
 
-        if not title: title = "Maple Property"
+                    print(f"  [DEBUG] Decoding title from URL segment: {encoded_title[:50]}...")
+                    decoded = unquote(encoded_title)
+                    print(f"  [DEBUG] Decoded to: {decoded[:80]}")
+
+                    # Extract property description after the ID and colon
+                    if '：' in decoded:
+                        title = decoded.split('：', 1)[1].strip()
+                        print(f"  [DEBUG] Extracted after ：: {title[:80]}")
+                    elif ':' in decoded:
+                        title = decoded.split(':', 1)[1].strip()
+                        print(f"  [DEBUG] Extracted after :: {title[:80]}")
+                    else:
+                        # No colon, check if it starts with digits (property ID)
+                        # and try to extract meaningful part
+                        if decoded[:4].isdigit():
+                            title = decoded[4:].strip()  # Skip property ID
+                            print(f"  [DEBUG] Removed ID prefix: {title[:80]}")
+                        else:
+                            title = decoded
+                            print(f"  [DEBUG] Using full decoded: {title[:80]}")
+
+                    # If title is still generic or empty, keep original
+                    if not title or len(title) < 3 or "メープルハウジング" in title:
+                        print(f"  [DEBUG] Decoded title still generic or empty, keeping fallback")
+                        title = None
+            except Exception as e:
+                print(f"  [DEBUG] Title decode failed for {url}: {e}")
+                import traceback
+                traceback.print_exc()
+                title = None
+
+        if not title:
+            title = "Maple Property"
 
         full_text = clean_text(soup.get_text())
 
@@ -680,10 +788,11 @@ class Maple(BaseScraper):
             return
 
         price = extract_price(full_text)
+        print(f"  [DEBUG] Maple - Extracted price for {url[:60]}: {price}")
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
-        if price == 0:
-            print(f"  [PRICE FILTERED] No valid price found: {url}")
+        if not price or price <= 0:
+            print(f"  [PRICE FILTERED] No valid price found: {url} (price={price})")
             STATS["skipped_sold"] += 1
             return
 
@@ -706,19 +815,29 @@ class Maple(BaseScraper):
 class Aoba(BaseScraper):
     def run(self):
         print("--- Scanning Aoba ---")
-        # Scan general listing pages, but filter by area code in URLs
+        # Target area codes (Shimoda, Kawazu, Higashi-Izu, Minami-Izu)
+        target_codes = {
+            "ao22219": "下田",      # Shimoda
+            "ao22301": "河津",      # Kawazu
+            "ao22302": "東伊豆",    # Higashi-Izu
+            "ao22304": "南伊豆"     # Minami-Izu
+        }
+        # Exclude these known wrong area codes (Ito, Atami, Izu city)
+        exclude_codes = ["ao22208", "ao22222", "ao22205"]
+
+        # Scan both general listing pages AND area-specific pages
         urls = [
             "https://www.aoba-resort.com/house/",
             "https://www.aoba-resort.com/house/page/2/",
             "https://www.aoba-resort.com/land/",
             "https://www.aoba-resort.com/land/page/2/",
         ]
-        candidates = set()
 
-        # Target area codes (Shimoda, Kawazu, Higashi-Izu, Minami-Izu)
-        target_codes = ["ao22219", "ao22301", "ao22302", "ao22304"]
-        # Exclude these known wrong area codes (Ito, Atami, Izu city)
-        exclude_codes = ["ao22208", "ao22222", "ao22205"]
+        # Add area-specific pages for each target city
+        for code in target_codes.keys():
+            urls.append(f"https://www.aoba-resort.com/area-b2/bknarea-{code}/")
+
+        candidates = set()
 
         for u in urls:
             soup = self.fetch(u)
@@ -763,30 +882,51 @@ class Aoba(BaseScraper):
 
             print(f"    Found {len(candidates)} candidate property links (before location filtering)")
 
-        print(f"  > Found {len(candidates)} property pages")
+        print(f"  > Found {len(candidates)} property pages total")
+
+        if len(candidates) == 0:
+            print(f"  [WARNING] Aoba: No property links found on any pages!")
+            print(f"  [WARNING] This could indicate:")
+            print(f"             - Website structure has changed")
+            print(f"             - No properties currently listed")
+            print(f"             - Link detection logic needs updating")
+            return
+
         print(f"  > Processing {len(candidates)} candidates (will filter by city later)...")
 
         # Process all candidates - parse_detail will filter by city
+        aoba_before = len(self.items)
         for link in list(candidates)[:60]:  # Cap at 60 to avoid timeout
             self.parse_detail(link)
             sleep_jitter()
 
+        aoba_after = len(self.items)
+        aoba_saved = aoba_after - aoba_before
+        print(f"  > Aoba: Saved {aoba_saved} out of {len(candidates)} candidates")
+        if aoba_saved == 0 and len(candidates) > 0:
+            print(f"  [WARNING] All Aoba properties were filtered out!")
+            print(f"  [WARNING] Check: sea view requirements, location matching, price validation")
+
     def parse_detail(self, url):
         STATS["scanned"] += 1
+        print(f"  [DEBUG] Aoba - Parsing: {url[:80]}")
         soup = self.fetch(url)
-        if not soup: return
+        if not soup:
+            print(f"  [DEBUG] Aoba - Failed to fetch")
+            return
 
         # Extract city from URL as context (Aoba uses area codes in URLs)
         url_city_map = {
-            "ao22219": "下田",
-            "ao22301": "河津",
-            "ao22302": "東伊豆",
-            "ao22304": "南伊豆"
+            "ao22219": "下田",      # Shimoda
+            "ao22301": "河津",      # Kawazu
+            "ao22302": "東伊豆",    # Higashi-Izu
+            "ao22304": "南伊豆"     # Minami-Izu
         }
         url_city = None
         for code, city_name in url_city_map.items():
             if code in url:
                 url_city = city_name
+                print(f"  [DEBUG] Aoba - Detected area code {code} ({city_name}) in URL")
                 break
 
         # Try multiple title selectors
@@ -834,25 +974,34 @@ class Aoba(BaseScraper):
         sea_score = 0
         if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
             sea_score = 0
+            print(f"  [DEBUG] Aoba - Explicit 'no sea view' found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
+            print(f"  [DEBUG] Aoba - High confidence sea view detected")
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
+            print(f"  [DEBUG] Aoba - Medium confidence (beach name) detected")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
             if any(k in full_text for k in PROXIMITY_KEYWORDS):
                 sea_score = 2
+                print(f"  [DEBUG] Aoba - Sea proximity detected")
+            else:
+                print(f"  [DEBUG] Aoba - Generic sea mention without proximity")
+        else:
+            print(f"  [DEBUG] Aoba - No sea-related keywords found")
 
         # Filter out properties with no sea connection
         if sea_score == 0:
-            print(f"  [SEA VIEW FILTERED] No sea view or proximity: {url}")
+            print(f"  [SEA VIEW FILTERED] Aoba - No sea view or proximity: {url[:80]}")
             STATS["skipped_loc"] += 1
             return
 
         price = extract_price(full_text)
+        print(f"  [DEBUG] Aoba - Extracted price for {url[:60]}: {price}")
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
-        if price == 0:
-            print(f"  [PRICE FILTERED] No valid price found: {url}")
+        if not price or price <= 0:
+            print(f"  [PRICE FILTERED] No valid price found: {url} (price={price})")
             STATS["skipped_sold"] += 1
             return
 
