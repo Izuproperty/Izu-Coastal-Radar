@@ -1,92 +1,8 @@
 {
-  "generatedAt": "2026-01-13T13:13:33.867244",
+  "generatedAt": "2026-01-14T03:02:51.543713",
   "listings": [
     {
-      "id": "izutaiyo-2163688768880834805",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
-      "title": "下田市 田牛（2300万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 23000000,
-      "seaViewScore": 2,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009ha.jpg"
-    },
-    {
-      "id": "izutaiyo-44522889784930620",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
-      "title": "南伊豆町 子浦（830万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Minami-Izu Property",
-      "propertyType": "house",
-      "city": "南伊豆",
-      "priceJpy": 8300000,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg"
-    },
-    {
-      "id": "izutaiyo-5714433124084752564",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
-      "title": "河津町 桜坂温泉別荘地（580万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Kawazu Property",
-      "propertyType": "house",
-      "city": "河津",
-      "priceJpy": 5800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235ha.jpg"
-    },
-    {
-      "id": "izutaiyo-3878982303034152419",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
-      "title": "下田市 白浜（1500万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 15000000,
-      "seaViewScore": 3,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010ha.jpg"
-    },
-    {
-      "id": "izutaiyo-3674025357185568356",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
-      "title": "下田市 白浜（1280万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 12800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg"
-    },
-    {
-      "id": "izutaiyo-7195672440792904142",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
-      "title": "下田市 武ガ浜（1080万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 10800000,
-      "seaViewScore": 2,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg"
-    },
-    {
-      "id": "izutaiyo-2643921250178978300",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
-      "title": "下田市 須崎（1780万円）の家情報はこちら！2026.1.8下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 17800000,
-      "seaViewScore": 2,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2003ha.jpg"
-    },
-    {
-      "id": "izutaiyo-3711044618257618894",
+      "id": "izutaiyo-268059953072454",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP593H",
       "title": "東伊豆町 熱川台（1380万円）の家情報はこちら！2026.1.9熱海店 山口 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
@@ -98,7 +14,7 @@
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip593ha.jpg"
     },
     {
-      "id": "izutaiyo-2091577906238146410",
+      "id": "izutaiyo-3980428769525097351",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB391H",
       "title": "下田市 パレスサイドヴィラ（680万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
@@ -110,7 +26,91 @@
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb391ha.jpg"
     },
     {
-      "id": "izutaiyo-2852444118523751882",
+      "id": "izutaiyo-4425442757151352503",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2009H",
+      "title": "下田市 田牛（2300万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 23000000,
+      "seaViewScore": 2,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009ha.jpg"
+    },
+    {
+      "id": "izutaiyo-3417472948258344451",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2003H",
+      "title": "下田市 須崎（1780万円）の家情報はこちら！2026.1.8下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 17800000,
+      "seaViewScore": 2,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2003ha.jpg"
+    },
+    {
+      "id": "izutaiyo-2119459095241798131",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KWB235H",
+      "title": "河津町 桜坂温泉別荘地（580万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Kawazu Property",
+      "propertyType": "house",
+      "city": "河津",
+      "priceJpy": 5800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235ha.jpg"
+    },
+    {
+      "id": "izutaiyo-2040592135236674821",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2010H",
+      "title": "下田市 白浜（1500万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 15000000,
+      "seaViewScore": 3,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010ha.jpg"
+    },
+    {
+      "id": "izutaiyo-4100457373931385619",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SM2008H",
+      "title": "下田市 須崎（1280万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 12800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2008ha.jpg"
+    },
+    {
+      "id": "izutaiyo-275416955148466633",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=MI2001H",
+      "title": "南伊豆町 子浦（830万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Minami-Izu Property",
+      "propertyType": "house",
+      "city": "南伊豆",
+      "priceJpy": 8300000,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg"
+    },
+    {
+      "id": "izutaiyo-1014432205915916346",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB409H",
+      "title": "下田市 白浜（1280万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 12800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg"
+    },
+    {
+      "id": "izutaiyo-842491072369761223",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KW2002H",
       "title": "河津町 笹原（3000万円）の家情報はこちら！2026.1.9下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
@@ -122,7 +122,7 @@
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kw2002ha.jpg"
     },
     {
-      "id": "izutaiyo-5429036533383373904",
+      "id": "izutaiyo-2040388103278703674",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB392H",
       "title": "下田市 柿崎（19800万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
@@ -134,103 +134,19 @@
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb392ha.jpg"
     },
     {
-      "id": "maple-1795915281729085554",
-      "source": "Maple Housing",
-      "sourceUrl": "https://www.maple-h.co.jp/estate_db/6750%ef%bc%9a%e6%b8%a9%e6%b3%89%e3%81%a8%e3%82%b5%e3%82%a6%e3%83%8a%e3%81%ae%e3%81%82%e3%82%8b%e5%b1%b1%e8%8d%98%e9%a2%a83ldk/",
-      "title": "温泉とサウナのある山荘風3ldk",
-      "titleEn": "Higashi-Izu Property",
+      "id": "izutaiyo-6979044114321486446",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
+      "title": "下田市 武ガ浜（1080万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Shimoda Property",
       "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 14500000,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/08/6750-1.jpg"
-    },
-    {
-      "id": "aoba-4065287176892355983",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room82765668.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 12000000,
+      "city": "下田",
+      "priceJpy": 10800000,
       "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/82765668_1_500_500_3.jpg?t=01767847987"
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg"
     },
     {
-      "id": "aoba-9087159258268184732",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room99255589.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 9800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/99255589_1_500_500_3.jpg?t=01767848012"
-    },
-    {
-      "id": "aoba-1769232679896184189",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room81521946.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 13800000,
-      "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/81521946_1_500_500_3.jpg?t=01767847987"
-    },
-    {
-      "id": "aoba-4360043922580861533",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94642399.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 7800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01767848011"
-    },
-    {
-      "id": "aoba-6549242627638887384",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 12800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01767917718"
-    },
-    {
-      "id": "aoba-7319131985788889267",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room86455043.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 30000000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/86455043_1_500_500_3.jpg?t=01767847986"
-    },
-    {
-      "id": "aoba-3205534706379553352",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room90903322.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 8900000,
-      "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/90903322_1_500_500_3.jpg?t=01767847971"
-    },
-    {
-      "id": "aoba-6284816528789555910",
+      "id": "aoba-7357942470734776578",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room75420316.html",
       "title": "地図MAP",
@@ -242,55 +158,55 @@
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01767848018"
     },
     {
-      "id": "aoba-565250375366640564",
+      "id": "aoba-5051451679606145047",
       "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room90362329.html",
       "title": "地図MAP",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 6200000,
       "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01767847987"
+      "imageUrl": "https://cdn.img-asp.jp/bkn/90362329_1_500_500_3.jpg?t=01767847986"
     },
     {
-      "id": "aoba-8561316192195930931",
+      "id": "aoba-4278689748913096992",
       "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room93599047.html",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room99255589.html",
       "title": "地図MAP",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 9800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/99255589_1_500_500_3.jpg?t=01767848012"
+    },
+    {
+      "id": "aoba-441739770232917038",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room82765668.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 12000000,
       "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/93599047_1_500_500_3.jpg?t=01767847988"
+      "imageUrl": "https://cdn.img-asp.jp/bkn/82765668_1_500_500_3.jpg?t=01767847987"
     },
     {
-      "id": "aoba-3685386023256057938",
+      "id": "aoba-6981302986656738001",
       "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room80136217.html",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room86455043.html",
       "title": "地図MAP",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "東伊豆",
-      "priceJpy": 8600000,
+      "priceJpy": 30000000,
       "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01767847984"
+      "imageUrl": "https://cdn.img-asp.jp/bkn/86455043_1_500_500_3.jpg?t=01767847986"
     },
     {
-      "id": "aoba-1408552443526281306",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
-      "title": "地図MAP",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 16800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01767847755"
-    },
-    {
-      "id": "aoba-893599101214156122",
+      "id": "aoba-7892527723153548240",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98995661.html",
       "title": "地図MAP",
@@ -302,7 +218,43 @@
       "imageUrl": "https://cdn.img-asp.jp/bkn/98995661_1_500_500_3.jpg?t=01767847756"
     },
     {
-      "id": "aoba-4140706298225426082",
+      "id": "aoba-3895283484502046388",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room81521946.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 13800000,
+      "seaViewScore": 2,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/81521946_1_500_500_3.jpg?t=01767847987"
+    },
+    {
+      "id": "aoba-3277741295003897033",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room90761537.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 13000000,
+      "seaViewScore": 2,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/90761537_1_500_500_3.jpg?t=01767848020"
+    },
+    {
+      "id": "aoba-2061302091592158402",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94642399.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 7800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01767848011"
+    },
+    {
+      "id": "aoba-1979641240420110785",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room93461714.html",
       "title": "地図MAP",
@@ -314,7 +266,19 @@
       "imageUrl": "https://cdn.img-asp.jp/bkn/93461714_1_500_500_3.jpg?t=01767848020"
     },
     {
-      "id": "aoba-2447867878686470927",
+      "id": "aoba-8899921742556747184",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 6200000,
+      "seaViewScore": 2,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01767847987"
+    },
+    {
+      "id": "aoba-6914113468603822423",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94930761.html",
       "title": "地図MAP",
@@ -326,7 +290,19 @@
       "imageUrl": "https://cdn.img-asp.jp/bkn/94930761_1_500_500_3.jpg?t=01767847989"
     },
     {
-      "id": "aoba-5478475626812901644",
+      "id": "aoba-3987824365357297758",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 12800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01767917718"
+    },
+    {
+      "id": "aoba-1074414913110305568",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
       "title": "地図MAP",
@@ -338,7 +314,31 @@
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01767848015"
     },
     {
-      "id": "aoba-6090105762024506248",
+      "id": "aoba-3469210112910849177",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 16800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01767847755"
+    },
+    {
+      "id": "aoba-7953687690712643179",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room90903322.html",
+      "title": "地図MAP",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 8900000,
+      "seaViewScore": 2,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/90903322_1_500_500_3.jpg?t=01767847971"
+    },
+    {
+      "id": "aoba-3244349629790449164",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room89640081.html",
       "title": "地図MAP",
@@ -350,16 +350,16 @@
       "imageUrl": "https://cdn.img-asp.jp/bkn/89640081_1_500_500_3.jpg?t=01767847973"
     },
     {
-      "id": "aoba-3125315406363657603",
+      "id": "aoba-7684588692354099962",
       "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room90362329.html",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room80136217.html",
       "title": "地図MAP",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "東伊豆",
-      "priceJpy": 6200000,
-      "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/90362329_1_500_500_3.jpg?t=01767847986"
+      "priceJpy": 8600000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01767847984"
     }
   ]
 }
