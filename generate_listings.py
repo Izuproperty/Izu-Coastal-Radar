@@ -428,38 +428,65 @@ class IzuTaiyo(BaseScraper):
 
         for code, city_name in city_map.items():
             for hpkind in property_types:
-                search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind={hpkind}"
                 type_name = "House" if hpkind == 1 else "Land"
-                print(f"  Fetching {city_name} {type_name}...")
-                soup = self.fetch(search_url)
-                if not soup:
-                    print(f"  [WARNING] Failed to fetch {city_name} {type_name}")
-                    continue
 
-                # Look for onclick handlers with property IDs
-                for tag in soup.find_all(True, onclick=True):
-                    onclick = tag.get("onclick", "")
-                    # Extract hpno from onclick like: location.href='d.php?hpno=12345'
-                    match = re.search(r"d\.php\?hpno=(\d+)", onclick)
-                    if match:
-                        prop_id = match.group(1)
-                        d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
-                        found_links[d_link] = city_name
+                # Pagination: Loop through pages until no more results
+                page = 1
+                max_pages = 10  # Safety limit
 
-                    # Also check for hpbunno
-                    match = re.search(r"d\.php\?hpbunno=([^'\"&]+)", onclick)
-                    if match:
-                        prop_id = match.group(1).strip()
-                        d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
-                        found_links[d_link] = city_name
+                while page <= max_pages:
+                    search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind={hpkind}"
+                    if page > 1:
+                        search_url += f"&page={page}"
 
-                # Also try direct links
-                for a in soup.find_all("a", href=True):
-                    href = a['href']
-                    if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
-                        full = urljoin("https://www.izutaiyo.co.jp", href)
-                        # Extract the city context
-                        found_links[full] = city_name
+                    print(f"  Fetching {city_name} {type_name} (page {page})...")
+                    soup = self.fetch(search_url)
+                    if not soup:
+                        print(f"  [WARNING] Failed to fetch {city_name} {type_name} page {page}")
+                        break
+
+                    # Track if we found any properties on this page
+                    page_found_count = 0
+
+                    # Look for onclick handlers with property IDs
+                    for tag in soup.find_all(True, onclick=True):
+                        onclick = tag.get("onclick", "")
+                        # Extract hpno from onclick like: location.href='d.php?hpno=12345'
+                        match = re.search(r"d\.php\?hpno=(\d+)", onclick)
+                        if match:
+                            prop_id = match.group(1)
+                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
+                            if d_link not in found_links:
+                                found_links[d_link] = city_name
+                                page_found_count += 1
+
+                        # Also check for hpbunno
+                        match = re.search(r"d\.php\?hpbunno=([^'\"&]+)", onclick)
+                        if match:
+                            prop_id = match.group(1).strip()
+                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
+                            if d_link not in found_links:
+                                found_links[d_link] = city_name
+                                page_found_count += 1
+
+                    # Also try direct links
+                    for a in soup.find_all("a", href=True):
+                        href = a['href']
+                        if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
+                            full = urljoin("https://www.izutaiyo.co.jp", href)
+                            if full not in found_links:
+                                # Extract the city context
+                                found_links[full] = city_name
+                                page_found_count += 1
+
+                    # If no properties found on this page, stop pagination for this search
+                    if page_found_count == 0:
+                        print(f"    No new properties on page {page}, ending pagination")
+                        break
+                    else:
+                        print(f"    Found {page_found_count} new properties on page {page}")
+
+                    page += 1
 
         print(f"  > Processing {len(found_links)} unique listings...")
 
