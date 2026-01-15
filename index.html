@@ -88,22 +88,7 @@
 
 <div class="container">
   
-  <div class="stats-bar" id="stats-panel">
-    <div class="stat-item">
-      <div class="stat-val" id="stat-price">-</div>
-      <div class="stat-label">Avg Price</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-size">-</div>
-      <div class="stat-label">Avg Size</div>
-      <div class="stat-sub" id="stat-size-sub"></div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-unit">-</div>
-      <div class="stat-label">Unit Price</div>
-      <div class="stat-sub" id="stat-unit-sub"></div>
-    </div>
-  </div>
+  <!-- Stats bar removed per user request -->
 
   <div class="controls">
     <div class="toggle-group">
@@ -133,6 +118,9 @@
 
 <footer>
   <a href="links.html" class="footer-link" id="link-useful">Useful Izu Links</a>
+  <div style="margin-top: 10px; font-size: 0.75rem; color: #666;">
+    USD conversions at ¥155/$1
+  </div>
 </footer>
 
 <script>
@@ -315,13 +303,23 @@
       const pType = TXT[STATE.lang][l.propertyType] || l.propertyType;
       const img = l.imageUrl || "https://placehold.co/600x400?text=No+Image";
 
+      // Determine badge text based on seaViewScore
+      let badgeText = "Sea View";
+      if (l.seaViewScore === 4) {
+        badgeText = "Sea View";
+      } else if (l.seaViewScore === 3) {
+        badgeText = "Beach Area";
+      } else if (l.seaViewScore === 2) {
+        badgeText = "Close to Sea";
+      }
+
       const html = `
         <div class="card">
           <div class="card-img-wrap">
             <a href="${l.sourceUrl}" target="_blank">
               <img src="${img}" class="card-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Error'">
             </a>
-            <div class="tag tag-sea">Sea View</div>
+            <div class="tag tag-sea">${badgeText}</div>
           </div>
           <div class="card-body">
             <div class="price">${fmtPrice(l.priceJpy)}</div>
