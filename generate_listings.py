@@ -77,6 +77,29 @@ STATS = {
     "error": 0
 }
 
+# --- FOREX RATE ---
+
+def get_usd_jpy_rate():
+    """
+    Fetch current USD/JPY exchange rate from free API.
+    Falls back to 155 if API fails.
+    """
+    try:
+        # Using frankfurter.app - free, no API key required
+        response = requests.get("https://api.frankfurter.app/latest?from=USD&to=JPY", timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            rate = data.get("rates", {}).get("JPY")
+            if rate:
+                print(f"  [FOREX] Fetched USD/JPY rate: ¥{rate:.2f}/$1")
+                return round(rate, 2)
+    except Exception as e:
+        print(f"  [FOREX] Failed to fetch rate: {e}")
+
+    # Fallback
+    print(f"  [FOREX] Using fallback rate: ¥155/$1")
+    return 155
+
 # --- HELPERS ---
 
 def sleep_jitter():
@@ -531,7 +554,7 @@ class IzuTaiyo(BaseScraper):
             property_id = url.split("hpbunno=")[1].split("&")[0]
 
         # Special debug logging for specific properties
-        is_special = property_id in ["KW2002H", "SMB240H"]
+        is_special = property_id in ["KW2002H", "SMB240H", "SMB225H", "SMB368H", "SMB195H"]
         if is_special:
             print(f"\n{'='*60}")
             print(f"SPECIAL PROPERTY DEBUG: {property_id}")
@@ -1254,9 +1277,15 @@ class Aoba(BaseScraper):
 # --- MAIN ---
 
 def main():
+    # Fetch current forex rate
+    print("\n" + "="*50)
+    print(" FETCHING FOREX RATE")
+    print("="*50)
+    forex_rate = get_usd_jpy_rate()
+
     scrapers = [IzuTaiyo(), Maple(), Aoba()]
     all_data = []
-    
+
     for s in scrapers:
         s.run()
         all_data.extend(s.items)
@@ -1272,9 +1301,13 @@ def main():
     counts = {}
     for i in all_data:
         counts[i['source']] = counts.get(i['source'], 0) + 1
-    
+
     with open(OUT_BUILDINFO, "w", encoding="utf-8") as f:
-        json.dump({"counts": counts, "generatedAt": out["generatedAt"]}, f)
+        json.dump({
+            "counts": counts,
+            "generatedAt": out["generatedAt"],
+            "forexRate": forex_rate
+        }, f)
 
     print("\n" + "="*50)
     print(" SCAN SUMMARY")

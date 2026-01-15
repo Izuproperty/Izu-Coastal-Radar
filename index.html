@@ -110,7 +110,7 @@
 
 <footer>
   <a href="links.html" class="footer-link" id="link-useful">Useful Izu Links</a>
-  <div style="margin-top: 10px; font-size: 0.75rem; color: #666;">
+  <div id="forex-rate" style="margin-top: 10px; font-size: 0.75rem; color: #666;">
     USD conversions at ¥155/$1
   </div>
 </footer>
@@ -118,7 +118,7 @@
 <script>
   let DATA = [];
   let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all' };
-  const FX_USD = 155; 
+  let FX_USD = 155; // Default fallback, will be updated from buildInfo.json
 
   const TXT = {
     EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land", useful: "Useful Izu Links" },
@@ -128,10 +128,32 @@
 
   async function init() {
     try {
+      // Load listings
       const res = await fetch(`listings.json?t=${Date.now()}`);
       if (!res.ok) throw new Error("Failed to load listings");
       const json = await res.json();
       DATA = json.listings || [];
+
+      // Load forex rate from buildInfo
+      try {
+        const buildRes = await fetch(`buildInfo.json?t=${Date.now()}`);
+        if (buildRes.ok) {
+          const buildInfo = await buildRes.json();
+          if (buildInfo.forexRate) {
+            FX_USD = buildInfo.forexRate;
+            console.log(`Loaded forex rate: ¥${FX_USD}/$1`);
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to load forex rate, using default:", e);
+      }
+
+      // Update footer with current rate
+      const footerRateEl = document.getElementById('forex-rate');
+      if (footerRateEl) {
+        footerRateEl.innerText = `USD conversions at ¥${FX_USD}/$1`;
+      }
+
       populateFilters();
       render();
     } catch (e) {
