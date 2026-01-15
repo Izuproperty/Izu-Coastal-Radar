@@ -1013,7 +1013,18 @@ class Aoba(BaseScraper):
 
     def parse_detail(self, url):
         STATS["scanned"] += 1
-        print(f"  [DEBUG] Aoba - Parsing: {url[:80]}")
+
+        # Special debug logging for specific properties
+        is_special = "room94930761" in url or "room98586218" in url or "room95327115" in url or "room82946986" in url
+
+        if is_special:
+            print(f"\n{'='*60}")
+            print(f"SPECIAL AOBA PROPERTY DEBUG")
+            print(f"URL: {url}")
+            print(f"{'='*60}")
+        else:
+            print(f"  [DEBUG] Aoba - Parsing: {url[:80]}")
+
         soup = self.fetch(url)
         if not soup:
             print(f"  [DEBUG] Aoba - Failed to fetch")
@@ -1030,7 +1041,10 @@ class Aoba(BaseScraper):
         for code, city_name in url_city_map.items():
             if code in url:
                 url_city = city_name
-                print(f"  [DEBUG] Aoba - Detected area code {code} ({city_name}) in URL")
+                if is_special:
+                    print(f"  Area code detected: {code} ({city_name})")
+                else:
+                    print(f"  [DEBUG] Aoba - Detected area code {code} ({city_name}) in URL")
                 break
 
         # Try multiple title selectors
@@ -1060,17 +1074,25 @@ class Aoba(BaseScraper):
 
         # Use URL city as context if available
         city = get_location_trust(soup, full_text, url_city)
+        if is_special:
+            print(f"  City detected: {city} (context: {url_city})")
         if city == "WRONG_CITY":
             # Property is explicitly from wrong city
             print(f"  [LOCATION FILTERED] Wrong city detected: {url}")
+            if is_special:
+                print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: Wrong city")
             STATS["skipped_loc"] += 1
             return
         if not city:
             # If URL had area code, trust it
             if url_city:
                 city = url_city
+                if is_special:
+                    print(f"  Using URL city as fallback: {city}")
             else:
                 print(f"  [WARNING] Could not determine city for: {url}")
+                if is_special:
+                    print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: Could not determine city")
                 STATS["skipped_loc"] += 1
                 return
 
@@ -1081,10 +1103,20 @@ class Aoba(BaseScraper):
             print(f"  [DEBUG] Aoba - Explicit 'no sea view' found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
-            print(f"  [DEBUG] Aoba - High confidence sea view detected")
+            if is_special:
+                matched = [k for k in HIGH_SEA_KEYWORDS if k in full_text]
+                print(f"  Sea view score: 4 - HIGH confidence")
+                print(f"    Matched keywords: {matched}")
+            else:
+                print(f"  [DEBUG] Aoba - High confidence sea view detected")
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
-            print(f"  [DEBUG] Aoba - Medium confidence (beach name) detected")
+            if is_special:
+                matched = [k for k in MEDIUM_SEA_KEYWORDS if k in full_text]
+                print(f"  Sea view score: 3 - MEDIUM confidence (beach names)")
+                print(f"    Matched keywords: {matched}")
+            else:
+                print(f"  [DEBUG] Aoba - Medium confidence (beach name) detected")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
             # More specific proximity patterns to reduce false positives
             proximity_patterns = [
@@ -1092,32 +1124,63 @@ class Aoba(BaseScraper):
                 "海から.*[0-9]+.*m", "海から.*[0-9]+.*メートル",
                 "海 徒歩", "海 歩", "ビーチまで", "Beach.*walk"
             ]
-            if any(re.search(pattern, full_text) for pattern in proximity_patterns):
+            matched_patterns = [p for p in proximity_patterns if re.search(p, full_text)]
+            if matched_patterns:
                 sea_score = 2
-                print(f"  [DEBUG] Aoba - Sea proximity detected")
+                if is_special:
+                    print(f"  Sea view score: 2 - Proximity detected")
+                    print(f"    Matched patterns: {matched_patterns}")
+                    # Show actual matched text snippets
+                    for pattern in matched_patterns[:2]:  # Show first 2 matches
+                        match = re.search(f".{{0,20}}{pattern}.{{0,20}}", full_text)
+                        if match:
+                            print(f"    Context: ...{match.group()}...")
+                else:
+                    print(f"  [DEBUG] Aoba - Sea proximity detected")
             else:
-                print(f"  [DEBUG] Aoba - Generic sea mention without clear proximity")
+                if is_special:
+                    print(f"  Sea view score: 0 - Generic sea mention without clear proximity")
+                    print(f"    Contains '海' but no proximity patterns matched")
+                else:
+                    print(f"  [DEBUG] Aoba - Generic sea mention without clear proximity")
         else:
-            print(f"  [DEBUG] Aoba - No sea-related keywords found")
+            if is_special:
+                print(f"  Sea view score: 0 - No sea-related keywords found")
+            else:
+                print(f"  [DEBUG] Aoba - No sea-related keywords found")
 
         # Filter by sea view score - only include properties with clear sea connection
         MIN_SEA_SCORE = 2
+        if is_special:
+            print(f"  Minimum sea score required: {MIN_SEA_SCORE}")
         if sea_score < MIN_SEA_SCORE:
             print(f"  [SEA VIEW FILTERED] Aoba - Insufficient sea connection (score={sea_score}): {url[:60]}")
+            if is_special:
+                print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: Sea view score too low ({sea_score} < {MIN_SEA_SCORE})")
             STATS["skipped_loc"] += 1
             return
 
         price = extract_price(full_text)
-        print(f"  [DEBUG] Aoba - Extracted price for {url[:60]}: {price}")
+        if is_special:
+            print(f"  Price extracted: {price} JPY")
+        else:
+            print(f"  [DEBUG] Aoba - Extracted price for {url[:60]}: {price}")
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
         if not price or price <= 0:
             print(f"  [PRICE FILTERED] No valid price found: {url} (price={price})")
+            if is_special:
+                print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: No valid price")
             STATS["skipped_sold"] += 1
             return
 
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
+
+        if is_special:
+            print(f"  >>> SPECIAL AOBA PROPERTY PASSED ALL FILTERS")
+            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}")
+            print(f"{'='*60}\n")
 
         self.add_item({
             "id": f"aoba-{abs(hash(url))}",
