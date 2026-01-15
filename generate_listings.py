@@ -613,16 +613,20 @@ class IzuTaiyo(BaseScraper):
             sea_score = 3
         # LOW: Walking distance to sea (stricter check to avoid false positives)
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            # More specific proximity patterns to reduce false positives
-            # Look for explicit phrases like "海まで徒歩", "海まで5分", "海から100m" etc.
+            # Require explicit distance/time measurements to avoid false positives
+            # Must have numbers: "海まで徒歩5分", "海から100m", etc.
             proximity_patterns = [
-                "海まで徒歩", "海まで歩", "海まで車", "海まで",
-                "海から.*[0-9]+.*m", "海から.*[0-9]+.*メートル",
-                "海 徒歩", "海 歩", "ビーチまで", "Beach.*walk"
+                r"海まで徒歩[0-9０-９]",          # 海まで徒歩5分
+                r"海まで.*[0-9０-９]+.*分",       # 海まで約5分
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",  # 海まで100m
+                r"海から[0-9０-９]+.*[mｍメートル]",    # 海から100m
+                r"徒歩[0-9０-９]+.*分.*海",       # 徒歩5分で海
+                r"ビーチまで.*[0-9０-９]+",      # ビーチまで5分
+                r"海.*徒歩圏",                    # 海が徒歩圏内
             ]
             if any(re.search(pattern, full_text) for pattern in proximity_patterns):
                 sea_score = 2
-            # Just generic "海" mention without clear proximity = score 0
+            # Just generic "海" mention without distance/time = score 0
 
         # 5. Filter by sea view score - only include properties with clear sea connection
         # Minimum score of 2 required (explicit proximity or better)
@@ -875,11 +879,15 @@ class Maple(BaseScraper):
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            # More specific proximity patterns to reduce false positives
+            # Require explicit distance/time measurements to avoid false positives
             proximity_patterns = [
-                "海まで徒歩", "海まで歩", "海まで車", "海まで",
-                "海から.*[0-9]+.*m", "海から.*[0-9]+.*メートル",
-                "海 徒歩", "海 歩", "ビーチまで", "Beach.*walk"
+                r"海まで徒歩[0-9０-９]",          # 海まで徒歩5分
+                r"海まで.*[0-9０-９]+.*分",       # 海まで約5分
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",  # 海まで100m
+                r"海から[0-9０-９]+.*[mｍメートル]",    # 海から100m
+                r"徒歩[0-9０-９]+.*分.*海",       # 徒歩5分で海
+                r"ビーチまで.*[0-9０-９]+",      # ビーチまで5分
+                r"海.*徒歩圏",                    # 海が徒歩圏内
             ]
             if any(re.search(pattern, full_text) for pattern in proximity_patterns):
                 sea_score = 2
@@ -1118,11 +1126,16 @@ class Aoba(BaseScraper):
             else:
                 print(f"  [DEBUG] Aoba - Medium confidence (beach name) detected")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            # More specific proximity patterns to reduce false positives
+            # Require explicit distance/time measurements to avoid false positives
+            # Must have numbers: "海まで徒歩5分", "海から100m", etc.
             proximity_patterns = [
-                "海まで徒歩", "海まで歩", "海まで車", "海まで",
-                "海から.*[0-9]+.*m", "海から.*[0-9]+.*メートル",
-                "海 徒歩", "海 歩", "ビーチまで", "Beach.*walk"
+                r"海まで徒歩[0-9０-９]",          # 海まで徒歩5分
+                r"海まで.*[0-9０-９]+.*分",       # 海まで約5分
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",  # 海まで100m
+                r"海から[0-9０-９]+.*[mｍメートル]",    # 海から100m
+                r"徒歩[0-9０-９]+.*分.*海",       # 徒歩5分で海
+                r"ビーチまで.*[0-9０-９]+",      # ビーチまで5分
+                r"海.*徒歩圏",                    # 海が徒歩圏内
             ]
             matched_patterns = [p for p in proximity_patterns if re.search(p, full_text)]
             if matched_patterns:
