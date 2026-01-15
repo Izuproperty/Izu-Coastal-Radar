@@ -45,7 +45,8 @@ HIGH_SEA_KEYWORDS = [
 
 # MEDIUM CONFIDENCE: Beach names, ocean names (score 3)
 MEDIUM_SEA_KEYWORDS = [
-    "白浜", "吉佐美", "入田", "多々戸", "相模湾", "太平洋", "オーシャン", "Ocean"
+    "白浜", "吉佐美", "入田", "多々戸", "相模湾", "太平洋", "オーシャン", "Ocean",
+    "城ヶ崎海岸"  # Jogasaki Coast
 ]
 
 # For proximity scoring - used with "海" mention
@@ -789,7 +790,16 @@ class Maple(BaseScraper):
             print(f"  [CATEGORY PAGE FILTERED] {url}")
             return
 
+        # Special debug logging for specific properties (false positives)
+        is_special = "6780" in url or "6831" in url
+
         STATS["scanned"] += 1
+        if is_special:
+            print(f"\n{'='*60}")
+            print(f"SPECIAL MAPLE PROPERTY DEBUG")
+            print(f"URL: {url}")
+            print(f"{'='*60}")
+
         soup = self.fetch(url)
         if not soup: return
 
@@ -874,10 +884,20 @@ class Maple(BaseScraper):
         sea_score = 0
         if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
             sea_score = 0
+            if is_special:
+                print(f"  Sea view score: 0 - Explicit 'no sea view' found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
+            if is_special:
+                matched = [k for k in HIGH_SEA_KEYWORDS if k in full_text]
+                print(f"  Sea view score: 4 - HIGH confidence")
+                print(f"    Matched keywords: {matched}")
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
+            if is_special:
+                matched = [k for k in MEDIUM_SEA_KEYWORDS if k in full_text]
+                print(f"  Sea view score: 3 - MEDIUM confidence (beach/coast names)")
+                print(f"    Matched keywords: {matched}")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
             # Require explicit distance/time measurements to avoid false positives
             proximity_patterns = [
@@ -889,18 +909,36 @@ class Maple(BaseScraper):
                 r"ビーチまで.*[0-9０-９]+",      # ビーチまで5分
                 r"海.*徒歩圏",                    # 海が徒歩圏内
             ]
-            if any(re.search(pattern, full_text) for pattern in proximity_patterns):
+            matched_patterns = [p for p in proximity_patterns if re.search(p, full_text)]
+            if matched_patterns:
                 sea_score = 2
+                if is_special:
+                    print(f"  Sea view score: 2 - Proximity detected")
+                    print(f"    Matched patterns: {matched_patterns}")
+                    for pattern in matched_patterns[:2]:
+                        match = re.search(f".{{0,20}}{pattern}.{{0,20}}", full_text)
+                        if match:
+                            print(f"    Context: ...{match.group()}...")
+            else:
+                if is_special:
+                    print(f"  Sea view score: 0 - Generic sea mention without clear proximity")
 
         # Filter by sea view score - only include properties with clear sea connection
         MIN_SEA_SCORE = 2
+        if is_special:
+            print(f"  Minimum sea score required: {MIN_SEA_SCORE}")
         if sea_score < MIN_SEA_SCORE:
             print(f"  [SEA VIEW FILTERED] Maple - Insufficient sea connection (score={sea_score}): {url[:60]}")
+            if is_special:
+                print(f"  >>> SPECIAL MAPLE PROPERTY REJECTED: Sea view score too low ({sea_score} < {MIN_SEA_SCORE})")
             STATS["skipped_loc"] += 1
             return
 
         price = extract_price(full_text)
-        print(f"  [DEBUG] Maple - Extracted price for {url[:60]}: {price}")
+        if is_special:
+            print(f"  Price extracted: {price} JPY")
+        else:
+            print(f"  [DEBUG] Maple - Extracted price for {url[:60]}: {price}")
 
         # Price validation - Exclude properties with no price (likely sold/unavailable)
         if not price or price <= 0:
@@ -910,6 +948,11 @@ class Maple(BaseScraper):
 
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
+
+        if is_special:
+            print(f"  >>> SPECIAL MAPLE PROPERTY PASSED ALL FILTERS")
+            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}")
+            print(f"{'='*60}\n")
 
         self.add_item({
             "id": f"maple-{abs(hash(url))}",
@@ -1023,7 +1066,7 @@ class Aoba(BaseScraper):
         STATS["scanned"] += 1
 
         # Special debug logging for specific properties
-        is_special = "room94930761" in url or "room98586218" in url or "room95327115" in url or "room82946986" in url
+        is_special = "room94930761" in url or "room98586218" in url or "room95327115" in url or "room82946986" in url or "room95106919" in url
 
         if is_special:
             print(f"\n{'='*60}")
