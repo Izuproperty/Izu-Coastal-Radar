@@ -473,6 +473,10 @@ class IzuTaiyo(BaseScraper):
         # hpkind: 0=Mansion(skip), 1=House, 2=Land
         property_types = [1, 2]  # We want Houses and Land only
 
+        # Track specific properties we're looking for
+        target_properties = ["SMB240H", "SMB225H", "SMB368H", "SMB195H", "SMB392H"]
+        target_found = {prop: False for prop in target_properties}
+
         for code, city_name in city_map.items():
             for hpkind in property_types:
                 type_name = "House" if hpkind == 1 else "Land"
@@ -495,8 +499,16 @@ class IzuTaiyo(BaseScraper):
                     # Track if we found any properties on this page
                     page_found_count = 0
 
+                    # DEBUG: For Shimoda searches, capture ALL property IDs found
+                    if city_name == "下田":
+                        debug_property_ids = []
+
                     # Look for onclick handlers with property IDs
-                    for tag in soup.find_all(True, onclick=True):
+                    onclick_tags = soup.find_all(True, onclick=True)
+                    if city_name == "下田":
+                        print(f"    [DEBUG] Found {len(onclick_tags)} tags with onclick handlers")
+
+                    for tag in onclick_tags:
                         onclick = tag.get("onclick", "")
                         # Extract hpno from onclick like: location.href='d.php?hpno=12345' or 'hpno=SMB240H'
                         # Changed \d+ to \w+ to capture alphanumeric IDs
@@ -504,6 +516,15 @@ class IzuTaiyo(BaseScraper):
                         if match:
                             prop_id = match.group(1)
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
+
+                            # DEBUG: Track all Shimoda property IDs
+                            if city_name == "下田":
+                                debug_property_ids.append(prop_id)
+                                # Check if this is one of our target properties
+                                if prop_id in target_properties:
+                                    print(f"    [DEBUG] *** FOUND TARGET PROPERTY: {prop_id} ***")
+                                    target_found[prop_id] = True
+
                             if d_link not in found_links:
                                 found_links[d_link] = city_name
                                 page_found_count += 1
@@ -513,19 +534,51 @@ class IzuTaiyo(BaseScraper):
                         if match:
                             prop_id = match.group(1).strip()
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
+
+                            # DEBUG: Track Shimoda properties with hpbunno
+                            if city_name == "下田":
+                                debug_property_ids.append(f"{prop_id}(bunno)")
+                                if prop_id in target_properties:
+                                    print(f"    [DEBUG] *** FOUND TARGET PROPERTY (bunno): {prop_id} ***")
+                                    target_found[prop_id] = True
+
                             if d_link not in found_links:
                                 found_links[d_link] = city_name
                                 page_found_count += 1
 
                     # Also try direct links
-                    for a in soup.find_all("a", href=True):
+                    direct_links = soup.find_all("a", href=True)
+                    d_php_links = [a for a in direct_links if "d.php" in a.get("href", "")]
+                    if city_name == "下田":
+                        print(f"    [DEBUG] Found {len(d_php_links)} direct d.php links")
+
+                    for a in direct_links:
                         href = a['href']
                         if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
                             full = urljoin("https://www.izutaiyo.co.jp", href)
+
+                            # DEBUG: Extract property ID from direct link
+                            if city_name == "下田":
+                                if "hpno=" in href:
+                                    prop_id_match = re.search(r"hpno=(\w+)", href)
+                                    if prop_id_match:
+                                        link_prop_id = prop_id_match.group(1)
+                                        if link_prop_id not in debug_property_ids:
+                                            debug_property_ids.append(link_prop_id + "(direct)")
+                                        if link_prop_id in target_properties:
+                                            print(f"    [DEBUG] *** FOUND TARGET PROPERTY (direct link): {link_prop_id} ***")
+                                            target_found[link_prop_id] = True
+
                             if full not in found_links:
                                 # Extract the city context
                                 found_links[full] = city_name
                                 page_found_count += 1
+
+                    # DEBUG: Show all property IDs found on this page for Shimoda
+                    if city_name == "下田" and debug_property_ids:
+                        print(f"    [DEBUG] Property IDs on this page ({len(debug_property_ids)}): {', '.join(debug_property_ids[:20])}")
+                        if len(debug_property_ids) > 20:
+                            print(f"    [DEBUG] ... and {len(debug_property_ids) - 20} more")
 
                     # If no properties found on this page, stop pagination for this search
                     if page_found_count == 0:
@@ -537,6 +590,15 @@ class IzuTaiyo(BaseScraper):
                     page += 1
 
         print(f"  > Processing {len(found_links)} unique listings...")
+
+        # DEBUG: Report on target properties
+        print("\n" + "="*60)
+        print("TARGET PROPERTY SEARCH RESULTS:")
+        print("="*60)
+        for prop, found in target_found.items():
+            status = "✓ FOUND" if found else "✗ NOT FOUND"
+            print(f"  {prop}: {status}")
+        print("="*60 + "\n")
 
         for link, city_ctx in found_links.items():
             self.parse_detail(link, city_ctx)
