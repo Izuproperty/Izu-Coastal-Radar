@@ -478,15 +478,32 @@ class IzuTaiyo(BaseScraper):
         target_found = {prop: False for prop in target_properties}
 
         for code, city_name in city_map.items():
+            # For Shimoda, also search WITHOUT hpkind filter to catch all properties
+            search_configs = []
             for hpkind in property_types:
                 type_name = "House" if hpkind == 1 else "Land"
+                search_configs.append((hpkind, type_name))
+
+            # Add a search without hpkind filter specifically for Shimoda
+            if code == "22219":  # Shimoda city code
+                search_configs.append((None, "All Types"))
+                print(f"  [DEBUG] Adding extra 'All Types' search for Shimoda to catch missing properties")
+
+            for config in search_configs:
+                hpkind, type_name = config
 
                 # Pagination: Loop through pages until no more results
                 page = 1
                 max_pages = 10  # Safety limit
 
                 while page <= max_pages:
-                    search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind={hpkind}"
+                    if hpkind is None:
+                        # Search without hpkind filter
+                        search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}"
+                    else:
+                        # Normal search with hpkind
+                        search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind={hpkind}"
+
                     if page > 1:
                         search_url += f"&page={page}"
 
