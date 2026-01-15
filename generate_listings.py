@@ -106,19 +106,42 @@ def normalize_city(text):
 def extract_price(text):
     if not text: return 0
     t = clean_text(text)
+
+    # Limit search to first 3000 chars to avoid concatenating page-wide digits
+    t = t[:3000]
+
     try:
         # Pattern: 1億 2800万
         if "億" in t:
             parts = t.split("億")
-            oku = safe_int(parts[0]) * 100000000
-            man = safe_int(parts[1]) * 10000 if len(parts)>1 else 0
-            return oku + man
+            # Only look at first 20 chars of each part to avoid digit concatenation
+            oku_text = parts[0][-20:] if len(parts[0]) > 20 else parts[0]
+            oku = safe_int(oku_text) * 100000000
+            man = 0
+            if len(parts) > 1:
+                man_text = parts[1][:20]
+                man = safe_int(man_text) * 10000
+            price = oku + man
+            # Sanity check: max 10億円 (1 billion yen, ~$7M USD)
+            if price > 0 and price <= 1000000000:
+                return price
+            return 0
+
         # Pattern: 3500万円
         m = re.search(r"([\d,]+)万", t)
-        if m: return safe_int(m.group(1)) * 10000
+        if m:
+            price = safe_int(m.group(1)) * 10000
+            # Sanity check: max 10億円
+            if price > 0 and price <= 1000000000:
+                return price
+
         # Pattern: 12000000円
         m = re.search(r"([\d,]+)円", t)
-        if m: return safe_int(m.group(1))
+        if m:
+            price = safe_int(m.group(1))
+            # Sanity check: max 10億円
+            if price > 0 and price <= 1000000000:
+                return price
     except: pass
     return 0
 
@@ -506,6 +529,14 @@ class IzuTaiyo(BaseScraper):
         elif "hpbunno=" in url:
             property_id = url.split("hpbunno=")[1].split("&")[0]
 
+        # Special debug logging for specific properties
+        is_special = property_id in ["KW2002H", "SMB240H"]
+        if is_special:
+            print(f"\n{'='*60}")
+            print(f"SPECIAL PROPERTY DEBUG: {property_id}")
+            print(f"URL: {url}")
+            print(f"{'='*60}")
+
         # Remove footer and nav (can contain misleading location info)
         for tag in soup.find_all(["footer", "nav", ".footer", ".navigation"]):
             tag.decompose()
@@ -515,6 +546,8 @@ class IzuTaiyo(BaseScraper):
 
         # 1. Location FIRST - Filter wrong cities before anything else
         city = get_location_trust(soup, full_text, city_ctx)
+        if is_special:
+            print(f"  City detected: {city}")
         if city == "WRONG_CITY" or not city:
             # Extract city name from title for debug
             title_preview = title if len(title) < 40 else title[:37] + "..."
@@ -532,11 +565,15 @@ class IzuTaiyo(BaseScraper):
                     print(f"  [LOCATION FILTERED] Not in target area: {title_preview}")
             else:
                 print(f"  [LOCATION FILTERED] Could not determine city: {title_preview}")
+            if is_special:
+                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Location check failed")
             STATS["skipped_loc"] += 1
             return
 
         # 2. Sold?
         if is_contracted(title, full_text):
+            if is_special:
+                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Property is sold/contracted")
             STATS["skipped_sold"] += 1
             return
 
@@ -557,6 +594,8 @@ class IzuTaiyo(BaseScraper):
 
         if is_mansion:
             print(f"  [MANSION FILTERED] {city} - {title[:60]}")
+            if is_special:
+                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Mansion/condo")
             STATS["skipped_mansion"] += 1
             return
 
@@ -572,19 +611,40 @@ class IzuTaiyo(BaseScraper):
         # MEDIUM: Famous beach names or ocean names
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
-        # LOW: Walking distance to sea (proximity + sea mention)
+        # LOW: Walking distance to sea (stricter check to avoid false positives)
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            if any(k in full_text for k in PROXIMITY_KEYWORDS):
+            # More specific proximity patterns to reduce false positives
+            # Look for explicit phrases like "海まで徒歩", "海まで5分", "海から100m" etc.
+            proximity_patterns = [
+                "海まで徒歩", "海まで歩", "海まで車", "海まで",
+                "海から.*[0-9]+.*m", "海から.*[0-9]+.*メートル",
+                "海 徒歩", "海 歩", "ビーチまで", "Beach.*walk"
+            ]
+            if any(re.search(pattern, full_text) for pattern in proximity_patterns):
                 sea_score = 2
-            # Just generic "海" mention without view or proximity = score 0
+            # Just generic "海" mention without clear proximity = score 0
 
-        # 5. Sea View/Proximity Scoring (but don't filter - all target cities are coastal)
-        # Note: Properties with sea_score=0 are still included as all target cities are coastal areas
-        # Users can filter by seaViewScore in the UI if they want ocean views specifically
-        if sea_score == 0:
+        # 5. Filter by sea view score - only include properties with clear sea connection
+        # Minimum score of 2 required (explicit proximity or better)
+        MIN_SEA_SCORE = 2
+        if is_special:
+            print(f"  Sea view score: {sea_score} (minimum required: {MIN_SEA_SCORE})")
+            # Show which keywords matched
+            if sea_score == 4:
+                matched = [k for k in HIGH_SEA_KEYWORDS if k in full_text]
+                print(f"    Matched HIGH keywords: {matched[:3]}")
+            elif sea_score == 3:
+                matched = [k for k in MEDIUM_SEA_KEYWORDS if k in full_text]
+                print(f"    Matched MEDIUM keywords: {matched[:3]}")
+            elif sea_score == 2:
+                print(f"    Matched proximity patterns")
+        if sea_score < MIN_SEA_SCORE:
             title_preview = title if len(title) < 40 else title[:37] + "..."
-            print(f"  [INFO] No explicit sea view keywords: {title_preview} (sea_score=0)")
-        # DON'T FILTER - keep all coastal area properties
+            print(f"  [SEA VIEW FILTERED] Insufficient sea connection (score={sea_score}): {title_preview}")
+            if is_special:
+                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Sea view score too low ({sea_score} < {MIN_SEA_SCORE})")
+            STATS["skipped_loc"] += 1  # Count as location filter
+            return
 
         # Extract price from multiple possible locations
         price = 0
@@ -600,9 +660,13 @@ class IzuTaiyo(BaseScraper):
             price = extract_price(full_text)
 
         # 6. Price validation - Exclude properties with no price (likely sold/unavailable)
+        if is_special:
+            print(f"  Price extracted: {price} JPY")
         if not price or price <= 0:
             title_preview = title if len(title) < 40 else title[:37] + "..."
             print(f"  [PRICE FILTERED] No valid price found: {title_preview} (price={price})")
+            if is_special:
+                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: No valid price")
             STATS["skipped_sold"] += 1
             return
 
@@ -613,6 +677,11 @@ class IzuTaiyo(BaseScraper):
             img = get_best_image(soup, url)
 
         ptype = determine_type(title, full_text)
+
+        if is_special:
+            print(f"  >>> SPECIAL PROPERTY {property_id} PASSED ALL FILTERS")
+            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}")
+            print(f"{'='*60}\n")
 
         self.add_item({
             "id": f"izutaiyo-{abs(hash(url))}",
@@ -806,13 +875,21 @@ class Maple(BaseScraper):
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            if any(k in full_text for k in PROXIMITY_KEYWORDS):
+            # More specific proximity patterns to reduce false positives
+            proximity_patterns = [
+                "海まで徒歩", "海まで歩", "海まで車", "海まで",
+                "海から.*[0-9]+.*m", "海から.*[0-9]+.*メートル",
+                "海 徒歩", "海 歩", "ビーチまで", "Beach.*walk"
+            ]
+            if any(re.search(pattern, full_text) for pattern in proximity_patterns):
                 sea_score = 2
 
-        # Sea View Scoring (but don't filter - all target cities are coastal)
-        if sea_score == 0:
-            print(f"  [INFO] Maple - No explicit sea view keywords: {url[:60]} (sea_score=0)")
-        # DON'T FILTER - keep all coastal area properties
+        # Filter by sea view score - only include properties with clear sea connection
+        MIN_SEA_SCORE = 2
+        if sea_score < MIN_SEA_SCORE:
+            print(f"  [SEA VIEW FILTERED] Maple - Insufficient sea connection (score={sea_score}): {url[:60]}")
+            STATS["skipped_loc"] += 1
+            return
 
         price = extract_price(full_text)
         print(f"  [DEBUG] Maple - Extracted price for {url[:60]}: {price}")
@@ -1009,18 +1086,26 @@ class Aoba(BaseScraper):
             sea_score = 3
             print(f"  [DEBUG] Aoba - Medium confidence (beach name) detected")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            if any(k in full_text for k in PROXIMITY_KEYWORDS):
+            # More specific proximity patterns to reduce false positives
+            proximity_patterns = [
+                "海まで徒歩", "海まで歩", "海まで車", "海まで",
+                "海から.*[0-9]+.*m", "海から.*[0-9]+.*メートル",
+                "海 徒歩", "海 歩", "ビーチまで", "Beach.*walk"
+            ]
+            if any(re.search(pattern, full_text) for pattern in proximity_patterns):
                 sea_score = 2
                 print(f"  [DEBUG] Aoba - Sea proximity detected")
             else:
-                print(f"  [DEBUG] Aoba - Generic sea mention without proximity")
+                print(f"  [DEBUG] Aoba - Generic sea mention without clear proximity")
         else:
             print(f"  [DEBUG] Aoba - No sea-related keywords found")
 
-        # Sea View Scoring (but don't filter - all target cities are coastal)
-        if sea_score == 0:
-            print(f"  [INFO] Aoba - No explicit sea view keywords: {url[:60]} (sea_score=0)")
-        # DON'T FILTER - keep all coastal area properties
+        # Filter by sea view score - only include properties with clear sea connection
+        MIN_SEA_SCORE = 2
+        if sea_score < MIN_SEA_SCORE:
+            print(f"  [SEA VIEW FILTERED] Aoba - Insufficient sea connection (score={sea_score}): {url[:60]}")
+            STATS["skipped_loc"] += 1
+            return
 
         price = extract_price(full_text)
         print(f"  [DEBUG] Aoba - Extracted price for {url[:60]}: {price}")
