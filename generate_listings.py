@@ -498,8 +498,9 @@ class IzuTaiyo(BaseScraper):
                     # Look for onclick handlers with property IDs
                     for tag in soup.find_all(True, onclick=True):
                         onclick = tag.get("onclick", "")
-                        # Extract hpno from onclick like: location.href='d.php?hpno=12345'
-                        match = re.search(r"d\.php\?hpno=(\d+)", onclick)
+                        # Extract hpno from onclick like: location.href='d.php?hpno=12345' or 'hpno=SMB240H'
+                        # Changed \d+ to \w+ to capture alphanumeric IDs
+                        match = re.search(r"d\.php\?hpno=(\w+)", onclick)
                         if match:
                             prop_id = match.group(1)
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
