@@ -6,6 +6,8 @@ Izu Coastal Radar - Generator v16 (Failsafe & Context Trust)
 """
 
 from __future__ import annotations
+import sys
+sys.path.insert(0, '/usr/local/lib/python3.11/site-packages')
 import datetime as dt
 import json
 import os
@@ -457,52 +459,41 @@ class BaseScraper:
 class IzuTaiyo(BaseScraper):
     def run(self):
         print("--- Scanning Izu Taiyo ---")
-        # Map City Codes to Names for Context Trust
-        # 22219=Shimoda, 22301=Kawazu, 22302=Higashi, 22304=Minami
-        city_map = {
-            "22219": "下田",
-            "22301": "河津",
-            "22302": "東伊豆",
-            "22304": "南伊豆"
+        # Location codes for the search endpoint (s.php)
+        # These are used in the search form with format: 下田市[sm]
+        location_codes = {
+            "sm": "下田",    # Shimoda
+            "kw": "河津",    # Kawazu
+            "hi": "東伊豆",  # Higashi-Izu
+            "mi": "南伊豆"   # Minami-Izu
         }
 
         found_links = {} # url -> city_context
-
-        # Strategy: Scan their main pages directly - they use onclick JavaScript
-        # Let's try the search result pages and parse onclick attributes
-        # hpkind: 0=Mansion(skip), 1=House, 2=Land
-        property_types = [1, 2]  # We want Houses and Land only
 
         # Track specific properties we're looking for
         target_properties = ["SMB240H", "SMB225H", "SMB368H", "SMB195H", "SMB392H"]
         target_found = {prop: False for prop in target_properties}
 
-        for code, city_name in city_map.items():
-            # For Shimoda, also search WITHOUT hpkind filter to catch all properties
-            search_configs = []
-            for hpkind in property_types:
-                type_name = "House" if hpkind == 1 else "Land"
-                search_configs.append((hpkind, type_name))
+        # Strategy: Use the regular search endpoint (s.php) instead of featured (tokusen.php)
+        # The search form allows filtering by location and sea view conditions
+        # Property types: 家 (House) and 土地 (Land) - must be searched separately
 
-            # Add a search without hpkind filter specifically for Shimoda
-            if code == "22219":  # Shimoda city code
-                search_configs.append((None, "All Types"))
-                print(f"  [DEBUG] Adding extra 'All Types' search for Shimoda to catch missing properties")
+        property_types = [
+            ("家", "House"),
+            ("土地", "Land")
+        ]
 
-            for config in search_configs:
-                hpkind, type_name = config
-
+        for loc_code, city_name in location_codes.items():
+            for prop_type, type_name in property_types:
                 # Pagination: Loop through pages until no more results
                 page = 1
                 max_pages = 10  # Safety limit
 
                 while page <= max_pages:
-                    if hpkind is None:
-                        # Search without hpkind filter
-                        search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}"
-                    else:
-                        # Normal search with hpkind
-                        search_url = f"https://www.izutaiyo.co.jp/tokusen.php?hpcity[]={code}&hpkind={hpkind}"
+                    # Build search URL with sea view filters
+                    # The s.php endpoint uses location codes like [sm], [kw], etc.
+                    # and includes sea view conditions
+                    search_url = f"https://www.izutaiyo.co.jp/s.php?ar[]={loc_code}&mk[]=海が見える&mk[]=海へ歩いて行ける&kd={prop_type}"
 
                     if page > 1:
                         search_url += f"&page={page}"
@@ -528,7 +519,6 @@ class IzuTaiyo(BaseScraper):
                     for tag in onclick_tags:
                         onclick = tag.get("onclick", "")
                         # Extract hpno from onclick like: location.href='d.php?hpno=12345' or 'hpno=SMB240H'
-                        # Changed \d+ to \w+ to capture alphanumeric IDs
                         match = re.search(r"d\.php\?hpno=(\w+)", onclick)
                         if match:
                             prop_id = match.group(1)
