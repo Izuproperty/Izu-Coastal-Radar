@@ -6,6 +6,8 @@ Izu Coastal Radar - Generator v16 (Failsafe & Context Trust)
 """
 
 from __future__ import annotations
+import sys
+sys.path.insert(0, '/usr/local/lib/python3.11/site-packages')
 import datetime as dt
 import json
 import os
