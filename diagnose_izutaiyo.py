@@ -17,7 +17,8 @@ HEADERS = {
 }
 
 # Test the search with proper params
-url = "https://www.izutaiyo.co.jp/s.php"
+# IMPORTANT: sa.php is the search action (results), s.php is just the form
+url = "https://www.izutaiyo.co.jp/sa.php"
 params = {
     'ar[]': 'sm',
     'mk[]': ['海が見える', '海へ歩いて行ける'],

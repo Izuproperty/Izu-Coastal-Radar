@@ -490,9 +490,10 @@ class IzuTaiyo(BaseScraper):
                 max_pages = 10  # Safety limit
 
                 while page <= max_pages:
-                    # Build search parameters for s.php endpoint
+                    # Build search parameters for sa.php endpoint (search action/results)
+                    # Note: s.php is the search form, sa.php returns actual results
                     # Use params dictionary for proper URL encoding of Japanese characters
-                    search_url = "https://www.izutaiyo.co.jp/s.php"
+                    search_url = "https://www.izutaiyo.co.jp/sa.php"
                     params = {
                         'ar[]': loc_code,
                         'mk[]': ['海が見える', '海へ歩いて行ける'],
