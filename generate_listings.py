@@ -442,9 +442,9 @@ class BaseScraper:
         self.session.headers.update(HEADERS)
         self.items = []
 
-    def fetch(self, url):
+    def fetch(self, url, params=None):
         try:
-            r = self.session.get(url, timeout=15, verify=False)
+            r = self.session.get(url, params=params, timeout=15, verify=False)
             if r.status_code != 200: return None
             r.encoding = r.apparent_encoding
             return BeautifulSoup(r.text, "html.parser")
@@ -490,19 +490,40 @@ class IzuTaiyo(BaseScraper):
                 max_pages = 10  # Safety limit
 
                 while page <= max_pages:
-                    # Build search URL with sea view filters
-                    # The s.php endpoint uses location codes like [sm], [kw], etc.
-                    # and includes sea view conditions
-                    search_url = f"https://www.izutaiyo.co.jp/s.php?ar[]={loc_code}&mk[]=海が見える&mk[]=海へ歩いて行ける&kd={prop_type}"
+                    # Build search parameters for s.php endpoint
+                    # Use params dictionary for proper URL encoding of Japanese characters
+                    search_url = "https://www.izutaiyo.co.jp/s.php"
+                    params = {
+                        'ar[]': loc_code,
+                        'mk[]': ['海が見える', '海へ歩いて行ける'],
+                        'kd': prop_type
+                    }
 
                     if page > 1:
-                        search_url += f"&page={page}"
+                        params['page'] = page
 
                     print(f"  Fetching {city_name} {type_name} (page {page})...")
-                    soup = self.fetch(search_url)
+
+                    # DEBUG: Show the URL for Shimoda searches
+                    if city_name == "下田":
+                        # Construct a sample URL to show what we're requesting
+                        from urllib.parse import urlencode
+                        query_string = urlencode(params, doseq=True)
+                        full_url = f"{search_url}?{query_string}"
+                        print(f"    [DEBUG] Request URL: {full_url}")
+
+                    soup = self.fetch(search_url, params=params)
                     if not soup:
                         print(f"  [WARNING] Failed to fetch {city_name} {type_name} page {page}")
                         break
+
+                    # DEBUG: Check for "no results" message for Shimoda
+                    if city_name == "下田":
+                        page_text = soup.get_text()
+                        if '見つかりませんでした' in page_text or '該当する物件がありません' in page_text:
+                            print(f"    [DEBUG] ⚠️  Page returned 'NO RESULTS' message!")
+                        if '検索結果' in page_text:
+                            print(f"    [DEBUG] ✓ Page contains '検索結果' (search results)")
 
                     # Track if we found any properties on this page
                     page_found_count = 0
