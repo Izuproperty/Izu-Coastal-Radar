@@ -517,13 +517,18 @@ class IzuTaiyo(BaseScraper):
                         print(f"  [WARNING] Failed to fetch {city_name} {type_name} page {page}")
                         break
 
-                    # DEBUG: Check for "no results" message for Shimoda
+                    # DEBUG: Check for "no results" message
+                    page_text = soup.get_text()
                     if city_name == "下田":
-                        page_text = soup.get_text()
-                        if '見つかりませんでした' in page_text or '該当する物件がありません' in page_text:
+                        if '見つかりませんでした' in page_text or '該当する物件がありません' in page_text or '該当物件はありません' in page_text:
                             print(f"    [DEBUG] ⚠️  Page returned 'NO RESULTS' message!")
+                            break  # No point continuing pagination
                         if '検索結果' in page_text:
                             print(f"    [DEBUG] ✓ Page contains '検索結果' (search results)")
+
+                        # Count how many property-like elements we see
+                        property_containers = soup.find_all("div", class_=re.compile(r"property|item|listing|card", re.I))
+                        print(f"    [DEBUG] Found {len(property_containers)} potential property container divs")
 
                     # Track if we found any properties on this page
                     page_found_count = 0
@@ -536,11 +541,24 @@ class IzuTaiyo(BaseScraper):
                     onclick_tags = soup.find_all(True, onclick=True)
                     if city_name == "下田":
                         print(f"    [DEBUG] Found {len(onclick_tags)} tags with onclick handlers")
+                        # Show first few onclick values to debug
+                        for i, tag in enumerate(onclick_tags[:3]):
+                            onclick_val = tag.get("onclick", "")
+                            print(f"    [DEBUG]   onclick[{i}]: {onclick_val[:100]}")
 
                     for tag in onclick_tags:
                         onclick = tag.get("onclick", "")
-                        # Extract hpno from onclick like: location.href='d.php?hpno=12345' or 'hpno=SMB240H'
+
+                        # Try multiple patterns for property IDs
+                        # Pattern 1: d.php?hpno=XXX
                         match = re.search(r"d\.php\?hpno=(\w+)", onclick)
+                        if not match:
+                            # Pattern 2: 'hpno=XXX' (without d.php)
+                            match = re.search(r"['\"]hpno=(\w+)", onclick)
+                        if not match:
+                            # Pattern 3: hpno = 'XXX'
+                            match = re.search(r"hpno\s*=\s*['\"](\w+)", onclick)
+
                         if match:
                             prop_id = match.group(1)
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
@@ -559,6 +577,11 @@ class IzuTaiyo(BaseScraper):
 
                         # Also check for hpbunno
                         match = re.search(r"d\.php\?hpbunno=([^'\"&]+)", onclick)
+                        if not match:
+                            match = re.search(r"['\"]hpbunno=([^'\"&]+)", onclick)
+                        if not match:
+                            match = re.search(r"hpbunno\s*=\s*['\"]([^'\"&]+)", onclick)
+
                         if match:
                             prop_id = match.group(1).strip()
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
@@ -574,11 +597,15 @@ class IzuTaiyo(BaseScraper):
                                 found_links[d_link] = city_name
                                 page_found_count += 1
 
-                    # Also try direct links
+                    # Also try direct links in <a> tags
                     direct_links = soup.find_all("a", href=True)
                     d_php_links = [a for a in direct_links if "d.php" in a.get("href", "")]
                     if city_name == "下田":
                         print(f"    [DEBUG] Found {len(d_php_links)} direct d.php links")
+                        if len(d_php_links) > 0:
+                            # Show sample links
+                            for i, a in enumerate(d_php_links[:3]):
+                                print(f"    [DEBUG]   d.php link[{i}]: {a.get('href', '')[:80]}")
 
                     for a in direct_links:
                         href = a['href']
@@ -601,6 +628,35 @@ class IzuTaiyo(BaseScraper):
                                 # Extract the city context
                                 found_links[full] = city_name
                                 page_found_count += 1
+
+                    # FALLBACK: Search page HTML source for any d.php links (might be in JavaScript)
+                    if city_name == "下田" and page_found_count == 0:
+                        html_str = str(soup)
+                        # Find all d.php?hpno= or d.php?hpbunno= patterns in the entire HTML
+                        hpno_matches = re.findall(r'd\.php\?hpno=(\w+)', html_str)
+                        hpbunno_matches = re.findall(r'd\.php\?hpbunno=([^\'\"&\s]+)', html_str)
+
+                        print(f"    [DEBUG] FALLBACK HTML search found:")
+                        print(f"    [DEBUG]   hpno patterns: {len(hpno_matches)}")
+                        print(f"    [DEBUG]   hpbunno patterns: {len(hpbunno_matches)}")
+
+                        if len(hpno_matches) > 0:
+                            print(f"    [DEBUG]   Sample hpno IDs: {hpno_matches[:5]}")
+
+                        # Add these as fallback
+                        for prop_id in hpno_matches:
+                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
+                            if d_link not in found_links:
+                                found_links[d_link] = city_name
+                                page_found_count += 1
+                                debug_property_ids.append(prop_id + "(html)")
+
+                        for prop_id in hpbunno_matches:
+                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
+                            if d_link not in found_links:
+                                found_links[d_link] = city_name
+                                page_found_count += 1
+                                debug_property_ids.append(prop_id + "(html)")
 
                     # DEBUG: Show all property IDs found on this page for Shimoda
                     if city_name == "下田" and debug_property_ids:
