@@ -962,6 +962,7 @@ class Maple(BaseScraper):
         # Special debug logging for specific properties (false positives)
         is_special = "6780" in url or "6831" in url
 
+        print(f"  [MAPLE] Processing property: {url[:80]}")
         STATS["scanned"] += 1
         if is_special:
             print(f"\n{'='*60}")
@@ -1044,8 +1045,26 @@ class Maple(BaseScraper):
 
         city = get_location_trust(soup, full_text)
         if city == "WRONG_CITY" or not city:
-            # Log and skip if wrong city or can't determine
-            print(f"  [WARNING] Could not determine city for: {url}")
+            # Enhanced debugging for Maple city detection
+            print(f"  [MAPLE CITY DEBUG] Property rejected - city detection result: {city}")
+            print(f"    URL: {url}")
+            print(f"    Title: {title[:80]}")
+            # Show what city-related text we can find
+            h1 = soup.find("h1")
+            if h1:
+                print(f"    H1 text: {h1.get_text()[:100]}")
+            # Check for location markers
+            location_found = False
+            for tag in soup.find_all(["th", "td", "dt", "dd"]):
+                tag_text = tag.get_text()
+                if any(marker in tag_text for marker in ["所在地", "住所", "Location", "エリア"]):
+                    location_found = True
+                    sib = tag.find_next_sibling()
+                    print(f"    Found location marker '{tag_text[:20]}': {sib.get_text()[:80] if sib else 'N/A'}")
+            if not location_found:
+                print(f"    No location markers (所在地/住所) found in page")
+            # Sample of full text to see what's there
+            print(f"    Full text sample: {full_text[:200]}")
             STATS["skipped_loc"] += 1
             return
 
