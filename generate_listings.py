@@ -490,14 +490,12 @@ class IzuTaiyo(BaseScraper):
                 max_pages = 10  # Safety limit
 
                 while page <= max_pages:
-                    # Build search parameters for s.php endpoint
-                    # Use params dictionary for proper URL encoding of Japanese characters
-                    search_url = "https://www.izutaiyo.co.jp/s.php"
-                    # NOTE: Removed sea view keywords from search as it was too restrictive
-                    # We filter for sea views in our code using the sea_score system instead
+                    # Build search parameters for sa.php endpoint (the actual results page)
+                    # The search form at s.php submits to sa.php with GET parameters
+                    search_url = "https://www.izutaiyo.co.jp/sa.php"
                     params = {
-                        'ar[]': loc_code,
-                        'kd': prop_type
+                        'hps[]': prop_type,  # Property type: 家 or 土地
+                        'hpcity[]': city_name  # City name from the form
                     }
 
                     if page > 1:
