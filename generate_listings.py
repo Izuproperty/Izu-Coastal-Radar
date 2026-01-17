@@ -493,9 +493,10 @@ class IzuTaiyo(BaseScraper):
                     # Build search parameters for s.php endpoint
                     # Use params dictionary for proper URL encoding of Japanese characters
                     search_url = "https://www.izutaiyo.co.jp/s.php"
+                    # NOTE: Removed sea view keywords from search as it was too restrictive
+                    # We filter for sea views in our code using the sea_score system instead
                     params = {
                         'ar[]': loc_code,
-                        'mk[]': ['海が見える', '海へ歩いて行ける'],
                         'kd': prop_type
                     }
 
