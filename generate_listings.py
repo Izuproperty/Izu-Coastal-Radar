@@ -783,7 +783,14 @@ class IzuTaiyo(BaseScraper):
         sea_score = 0
 
         # Check for explicit "no sea view" statements first
-        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+        # Also reject if requires car to reach sea (too far for coastal property)
+        no_sea_phrases = ["海は見えません", "海眺望なし", "海見えず", "海：見えない", "海： 見えない", "海が見えない"]
+        car_patterns = [r"車で.*海", r"海へ.*車", r"海まで.*車"]
+
+        is_no_sea = any(phrase in full_text for phrase in no_sea_phrases)
+        is_car_distance = any(re.search(pattern, full_text) for pattern in car_patterns)
+
+        if is_no_sea or is_car_distance:
             sea_score = 0
         # HIGH: Explicit sea view language
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
@@ -1087,10 +1094,18 @@ class Maple(BaseScraper):
 
         # Sea View Scoring (Tiered for accuracy)
         sea_score = 0
-        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+
+        # Check for explicit "no sea view" statements or car-based distances (too far)
+        no_sea_phrases = ["海は見えません", "海眺望なし", "海見えず", "海：見えない", "海： 見えない", "海が見えない"]
+        car_patterns = [r"車で.*海", r"海へ.*車", r"海まで.*車"]
+
+        is_no_sea = any(phrase in full_text for phrase in no_sea_phrases)
+        is_car_distance = any(re.search(pattern, full_text) for pattern in car_patterns)
+
+        if is_no_sea or is_car_distance:
             sea_score = 0
             if is_special:
-                print(f"  Sea view score: 0 - Explicit 'no sea view' found")
+                print(f"  Sea view score: 0 - Explicit 'no sea view' or car distance found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
             if is_special:
@@ -1354,9 +1369,17 @@ class Aoba(BaseScraper):
 
         # Sea View Scoring (Tiered for accuracy)
         sea_score = 0
-        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+
+        # Check for explicit "no sea view" statements or car-based distances (too far)
+        no_sea_phrases = ["海は見えません", "海眺望なし", "海見えず", "海：見えない", "海： 見えない", "海が見えない"]
+        car_patterns = [r"車で.*海", r"海へ.*車", r"海まで.*車"]
+
+        is_no_sea = any(phrase in full_text for phrase in no_sea_phrases)
+        is_car_distance = any(re.search(pattern, full_text) for pattern in car_patterns)
+
+        if is_no_sea or is_car_distance:
             sea_score = 0
-            print(f"  [DEBUG] Aoba - Explicit 'no sea view' found")
+            print(f"  [DEBUG] Aoba - Explicit 'no sea view' or car distance found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
             if is_special:
