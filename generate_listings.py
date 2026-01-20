@@ -498,8 +498,9 @@ class IzuTaiyo(BaseScraper):
                         'hpcity[]': city_name  # City name from the form
                     }
 
+                    # Pagination: page 1 = no param (or page=0), page 2 = page=1, page 3 = page=2
                     if page > 1:
-                        params['page'] = page
+                        params['page'] = page - 1
 
                     print(f"  Fetching {city_name} {type_name} (page {page})...")
 
