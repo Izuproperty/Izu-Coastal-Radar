@@ -101,7 +101,8 @@
       <option value="house">House</option>
       <option value="land">Land</option>
     </select>
-    
+    <select id="price-select" onchange="render()"></select>
+
     <div class="results-count" id="count">...</div>
   </div>
 
@@ -117,7 +118,7 @@
 
 <script>
   let DATA = [];
-  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all' };
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all', price: 'all' };
   let FX_USD = 155; // Default fallback, will be updated from buildInfo.json
 
   const TXT = {
@@ -155,6 +156,7 @@
       }
 
       populateFilters();
+      populatePriceFilter();
       render();
     } catch (e) {
       document.getElementById('grid').innerHTML = `<div style="padding:20px; color:red">Error: ${e.message}</div>`;
@@ -196,15 +198,37 @@
     if ([...srcSel.options].some(o => o.value === oldSrc)) srcSel.value = oldSrc;
   }
 
+  function populatePriceFilter() {
+    const priceSel = document.getElementById('price-select');
+    const oldPrice = priceSel.value;
+
+    // Define price ranges in JPY (万円 = 10,000 yen units)
+    const ranges = [
+      { value: 'all', labelJPY: 'All Prices', labelUSD: 'All Prices' },
+      { value: '0-3000', labelJPY: '~¥30M', labelUSD: '~$190k', max: 30000000 },
+      { value: '3000-6000', labelJPY: '¥30-60M', labelUSD: '$190-380k', min: 30000000, max: 60000000 },
+      { value: '6000-10000', labelJPY: '¥60-100M', labelUSD: '$380-632k', min: 60000000, max: 100000000 },
+      { value: '10000+', labelJPY: '¥100M+', labelUSD: '$632k+', min: 100000000 }
+    ];
+
+    priceSel.innerHTML = '';
+    ranges.forEach(r => {
+      const label = STATE.curr === 'JPY' ? r.labelJPY : r.labelUSD;
+      priceSel.innerHTML += `<option value="${r.value}">${label}</option>`;
+    });
+
+    if ([...priceSel.options].some(o => o.value === oldPrice)) priceSel.value = oldPrice;
+  }
+
   function setLang(l, btn) {
     STATE.lang = l;
     document.querySelectorAll('.toggle-group:first-child .toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    
+
     // Update footer link text
     document.getElementById('link-useful').innerText = TXT[l].useful;
-    
-    populateFilters(); 
+
+    populateFilters();
     render();
   }
 
@@ -212,6 +236,7 @@
     STATE.curr = c;
     document.querySelectorAll('.toggle-group:nth-child(2) .toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    populatePriceFilter(); // Update price filter labels when currency changes
     render();
   }
 
@@ -296,11 +321,22 @@
     STATE.loc = document.getElementById('loc-select').value;
     STATE.type = document.getElementById('type-select').value;
     STATE.source = document.getElementById('source-select').value;
+    STATE.price = document.getElementById('price-select').value;
 
     const filtered = DATA.filter(l => {
       if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
       if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
       if (STATE.source !== 'all' && l.source !== STATE.source) return false;
+
+      // Price filtering
+      if (STATE.price !== 'all') {
+        const price = l.priceJpy || 0;
+        if (STATE.price === '0-3000' && price >= 30000000) return false;
+        if (STATE.price === '3000-6000' && (price < 30000000 || price >= 60000000)) return false;
+        if (STATE.price === '6000-10000' && (price < 60000000 || price >= 100000000)) return false;
+        if (STATE.price === '10000+' && price < 100000000) return false;
+      }
+
       return true;
     });
 
