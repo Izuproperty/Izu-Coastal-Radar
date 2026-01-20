@@ -153,21 +153,30 @@ def extract_price(text):
                 return price
             return 0
 
-        # Pattern: 3500万円
-        m = re.search(r"([\d,]+)万", t)
+        # Pattern: 3500万円 or 868.6万円 (handle decimals for land per-unit pricing)
+        m = re.search(r"([\d,\.]+)万", t)
         if m:
-            price = safe_int(m.group(1)) * 10000
-            # Sanity check: max 10億円
-            if price > 0 and price <= 1000000000:
-                return price
+            # Handle both integers and decimals (e.g., "3500" or "868.6")
+            price_str = m.group(1).replace(',', '')
+            try:
+                price = int(float(price_str) * 10000)
+                # Sanity check: max 10億円
+                if price > 0 and price <= 1000000000:
+                    return price
+            except:
+                pass
 
         # Pattern: 12000000円
-        m = re.search(r"([\d,]+)円", t)
+        m = re.search(r"([\d,\.]+)円", t)
         if m:
-            price = safe_int(m.group(1))
-            # Sanity check: max 10億円
-            if price > 0 and price <= 1000000000:
-                return price
+            price_str = m.group(1).replace(',', '')
+            try:
+                price = int(float(price_str))
+                # Sanity check: max 10億円
+                if price > 0 and price <= 1000000000:
+                    return price
+            except:
+                pass
     except: pass
     return 0
 
@@ -823,14 +832,21 @@ class IzuTaiyo(BaseScraper):
 
         # Extract price from multiple possible locations
         price = 0
-        # Try table rows first
-        for tr in soup.find_all("tr"):
-            tr_text = tr.get_text()
-            if any(k in tr_text for k in ["価格", "販売価格", "売買価格", "Price"]):
-                price = extract_price(tr_text)
-                if price > 0: break
 
-        # If not found, try full text
+        # Try h1 first (most reliable for Izu Taiyo - contains the main price)
+        h1 = soup.find("h1")
+        if h1:
+            price = extract_price(h1.get_text())
+
+        # Try table rows with price keywords
+        if price == 0:
+            for tr in soup.find_all("tr"):
+                tr_text = tr.get_text()
+                if any(k in tr_text for k in ["価格", "販売価格", "売買価格", "Price"]):
+                    price = extract_price(tr_text)
+                    if price > 0: break
+
+        # If not found, try full text (last resort - may pick up wrong prices)
         if price == 0:
             price = extract_price(full_text)
 
