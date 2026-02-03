@@ -1465,6 +1465,17 @@ def main():
     print("="*50)
     forex_rate = get_usd_jpy_rate()
 
+    # Load existing listings to preserve firstSeen dates
+    existing_first_seen = {}
+    try:
+        with open(OUT_LISTINGS, "r", encoding="utf-8") as f:
+            old_data = json.load(f)
+            for listing in old_data.get("listings", []):
+                if listing.get("id") and listing.get("firstSeen"):
+                    existing_first_seen[listing["id"]] = listing["firstSeen"]
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass  # No existing file or invalid JSON
+
     scrapers = [IzuTaiyo(), Maple(), Aoba()]
     all_data = []
 
@@ -1472,6 +1483,16 @@ def main():
         s.run()
         all_data.extend(s.items)
         STATS["saved"] += len(s.items)
+
+    # Add firstSeen dates - preserve existing or set to today
+    today = dt.datetime.now().strftime("%Y-%m-%d")
+    new_count = 0
+    for item in all_data:
+        if item["id"] in existing_first_seen:
+            item["firstSeen"] = existing_first_seen[item["id"]]
+        else:
+            item["firstSeen"] = today
+            new_count += 1
 
     out = {
         "generatedAt": dt.datetime.now().isoformat(),
@@ -1496,6 +1517,7 @@ def main():
     print("="*50)
     print(f" Total Scanned:        {STATS['scanned']}")
     print(f" ✓ SAVED:              {STATS['saved']}")
+    print(f"   (New listings:      {new_count})")
     print(f" ✗ Skipped (Location): {STATS['skipped_loc']}")
     print(f" ✗ Skipped (Sold):     {STATS['skipped_sold']}")
     print(f" ✗ Skipped (Mansion):  {STATS['skipped_mansion']}")
