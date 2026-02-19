@@ -77,8 +77,6 @@
     
     .tag { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #fff; backdrop-filter: blur(5px); background: rgba(0,0,0,0.6); }
     .tag-sea { background: var(--accent); }
-    .tag-new { position: absolute; top: 10px; right: 10px; background: #ff3b30; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
     .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
     .price { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
@@ -126,9 +124,6 @@
       <option value="house">House</option>
       <option value="land">Land</option>
     </select>
-    <div class="toggle-group">
-      <button class="toggle-btn" id="new-toggle" onclick="toggleNew(this)">NEW!</button>
-    </div>
     <div class="price-slider">
       <div class="slider-values">
         <span id="price-min-label">¥0</span>
@@ -158,23 +153,8 @@
 
 <script>
   let DATA = [];
-  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all', newOnly: false };
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all' };
   let FX_USD = 155; // Default fallback, will be updated from buildInfo.json
-  const NEW_DAYS = 7; // Listings added within this many days are "NEW!"
-
-  function isNewListing(listing) {
-    if (!listing.firstSeen) return false;
-    const firstSeen = new Date(listing.firstSeen);
-    const now = new Date();
-    const diffDays = (now - firstSeen) / (1000 * 60 * 60 * 24);
-    return diffDays <= NEW_DAYS;
-  }
-
-  function toggleNew(btn) {
-    STATE.newOnly = !STATE.newOnly;
-    btn.classList.toggle('active', STATE.newOnly);
-    render();
-  }
 
   const TXT = {
     EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land", useful: "Useful Izu Links" },
@@ -418,7 +398,6 @@
       if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
       if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
       if (STATE.source !== 'all' && l.source !== STATE.source) return false;
-      if (STATE.newOnly && !isNewListing(l)) return false;
 
       // Price filtering (slider)
       const price = l.priceJpy || 0;
@@ -454,9 +433,6 @@
         badgeText = "Close to Sea";
       }
 
-      const isNew = isNewListing(l);
-      const newBadge = isNew ? '<div class="tag tag-new">NEW!</div>' : '';
-
       const html = `
         <div class="card">
           <div class="card-img-wrap">
@@ -464,7 +440,6 @@
               <img src="${img}" class="card-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Error'">
             </a>
             <div class="tag tag-sea">${badgeText}</div>
-            ${newBadge}
           </div>
           <div class="card-body">
             <div class="price">${fmtPrice(l.priceJpy)}</div>
