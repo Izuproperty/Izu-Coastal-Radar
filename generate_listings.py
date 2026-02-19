@@ -76,6 +76,7 @@ STATS = {
     "skipped_mansion": 0,
     "skipped_sold": 0,
     "skipped_loc": 0,
+    "skipped_dup": 0,
     "error": 0
 }
 
@@ -1456,6 +1457,193 @@ class Aoba(BaseScraper):
             "imageUrl": img
         })
 
+class Suumo(BaseScraper):
+    """
+    Scraper for SUUMO (suumo.jp), Japan's largest real estate aggregator.
+    Searches for houses and land in the target Izu coastal areas.
+    SUUMO may block automated access (HTTP 403); if so, the scraper logs a
+    warning and exits gracefully without affecting the rest of the run.
+    """
+    BASE = "https://suumo.jp"
+    SEARCH = "https://suumo.jp/jj/bukken/ichiran/JJ012FJ001/"
+
+    # SUUMO area/sc codes for target municipalities (Shizuoka-ken = ta=22, ar=030)
+    CITY_SC = {
+        "22325": "下田",    # 下田市
+        "22341": "河津",    # 賀茂郡河津町
+        "22342": "東伊豆",  # 賀茂郡東伊豆町
+        "22344": "南伊豆",  # 賀茂郡南伊豆町
+    }
+
+    def run(self):
+        print("--- Scanning SUUMO ---")
+        candidates = {}  # url -> city_ctx
+
+        for bs, kind in [("011", "House"), ("021", "Land")]:
+            page = 1
+            while page <= 10:
+                params = [
+                    ("ar", "030"), ("bs", bs), ("ta", "22"),
+                    ("pc", "30"), ("pn", str(page)),
+                ]
+                for sc in self.CITY_SC:
+                    params.append(("sc", sc))
+
+                print(f"  SUUMO {kind} page {page}...")
+                try:
+                    r = self.session.get(self.SEARCH, params=params, timeout=15, verify=False)
+                except Exception as e:
+                    print(f"  [SUUMO] Network error: {e}")
+                    break
+
+                if r.status_code == 403:
+                    print("  [SUUMO] Access denied (403) – site blocks automated requests, skipping.")
+                    return
+                if r.status_code != 200:
+                    print(f"  [SUUMO] HTTP {r.status_code}, stopping.")
+                    break
+
+                r.encoding = r.apparent_encoding
+                soup = BeautifulSoup(r.text, "html.parser")
+
+                links = self._extract_links(soup)
+                if not links:
+                    print(f"    No listings on page {page}, stopping.")
+                    break
+
+                new = {u: c for u, c in links.items() if u not in candidates}
+                candidates.update(new)
+                print(f"    +{len(new)} new links (total {len(candidates)})")
+
+                # Stop if there is no "next page" control
+                if not soup.find("a", string=re.compile(r"次へ|次の\d|›|>")):
+                    break
+                page += 1
+                sleep_jitter()
+
+        print(f"  > Visiting {min(len(candidates), 80)} SUUMO detail pages...")
+        for url, city_ctx in list(candidates.items())[:80]:
+            self.parse_detail(url, city_ctx)
+            sleep_jitter()
+
+    def _extract_links(self, soup):
+        """Pull property detail-page URLs out of a SUUMO search results page."""
+        found = {}
+        for a in soup.find_all("a", href=re.compile(r"shosai|JJ012FD|JJ010FD")):
+            href = a["href"]
+            full = urljoin(self.BASE, href)
+            # Try to grab city context from the surrounding card element
+            card = a.find_parent(True)
+            city_ctx = normalize_city(card.get_text()) if card else None
+            found[full] = city_ctx
+        return found
+
+    def parse_detail(self, url, city_ctx):
+        STATS["scanned"] += 1
+        soup = self.fetch(url)
+        if not soup:
+            return
+
+        for tag in soup.find_all(["footer", "nav", "header"]):
+            tag.decompose()
+
+        h = soup.find("h1") or soup.find("h2")
+        title = clean_text(h.get_text()) if h else "SUUMO Property"
+        full_text = clean_text(soup.get_text())
+
+        if is_contracted(title, full_text):
+            STATS["skipped_sold"] += 1
+            return
+        if any(k in title for k in MANSION_KEYWORDS):
+            STATS["skipped_mansion"] += 1
+            return
+
+        city = get_location_trust(soup, full_text, city_ctx)
+        if city == "WRONG_CITY" or not city:
+            STATS["skipped_loc"] += 1
+            return
+
+        # Sea view scoring (same thresholds as other scrapers)
+        sea_score = 0
+        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+            sea_score = 0
+        elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
+            sea_score = 4
+        elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
+            sea_score = 3
+        elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            proximity_patterns = [
+                r"海まで徒歩[0-9０-９]",
+                r"海まで.*[0-9０-９]+.*分",
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",
+                r"海から[0-9０-９]+.*[mｍメートル]",
+                r"徒歩[0-9０-９]+.*分.*海",
+                r"ビーチまで.*[0-9０-９]+",
+                r"海.*徒歩圏",
+            ]
+            if any(re.search(p, full_text) for p in proximity_patterns):
+                sea_score = 2
+
+        if sea_score < 2:
+            print(f"  [SEA VIEW FILTERED] SUUMO score={sea_score}: {url[:60]}")
+            STATS["skipped_loc"] += 1
+            return
+
+        price = extract_price(full_text)
+        if not price:
+            STATS["skipped_sold"] += 1
+            return
+
+        self.add_item({
+            "id": f"suumo-{abs(hash(url))}",
+            "source": "SUUMO",
+            "sourceUrl": url,
+            "title": title,
+            "titleEn": f"{CITY_EN_MAP.get(city, city)} Property",
+            "propertyType": determine_type(title, full_text),
+            "city": city,
+            "priceJpy": price,
+            "seaViewScore": sea_score,
+            "imageUrl": get_best_image(soup, url),
+        })
+
+
+def deduplicate(listings):
+    """
+    Remove listings that represent the same physical property appearing on
+    multiple sources (e.g. a broker listing that also shows up on SUUMO).
+
+    Fingerprint: (city, propertyType, price rounded to nearest ¥100,000).
+    When duplicates collide, the source with higher priority is kept:
+        Izu Taiyo > Maple Housing > Aoba Resort > SUUMO
+    """
+    SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "SUUMO": 3}
+
+    # Process preferred sources first so they "win" the fingerprint slot
+    ranked = sorted(listings, key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 99))
+    seen = set()
+    out = []
+
+    for item in ranked:
+        price = item.get("priceJpy", 0)
+        # Round to nearest ¥100,000 to tolerate minor display rounding between sites
+        price_bucket = round(price / 100000) if price else 0
+        fp = (item.get("city", ""), item.get("propertyType", ""), price_bucket)
+
+        if fp in seen:
+            src = item.get("source", "?")
+            city = item.get("city", "")
+            ptype = item.get("propertyType", "")
+            man = price // 10000 if price else 0
+            print(f"  [DEDUP] Removed duplicate from {src}: {city} {ptype} ¥{man}万")
+            STATS["skipped_dup"] += 1
+        else:
+            seen.add(fp)
+            out.append(item)
+
+    return out
+
+
 # --- MAIN ---
 
 def main():
@@ -1476,13 +1664,18 @@ def main():
     except (FileNotFoundError, json.JSONDecodeError):
         pass  # No existing file or invalid JSON
 
-    scrapers = [IzuTaiyo(), Maple(), Aoba()]
+    scrapers = [IzuTaiyo(), Maple(), Aoba(), Suumo()]
     all_data = []
 
     for s in scrapers:
         s.run()
         all_data.extend(s.items)
         STATS["saved"] += len(s.items)
+
+    # Remove cross-source duplicates (same property on multiple sites)
+    before_dedup = len(all_data)
+    all_data = deduplicate(all_data)
+    print(f"\n  [DEDUP] {before_dedup} listings → {len(all_data)} after deduplication ({STATS['skipped_dup']} removed)")
 
     # Add firstSeen dates - preserve existing or set to today
     today = dt.datetime.now().strftime("%Y-%m-%d")
@@ -1516,8 +1709,9 @@ def main():
     print(" SCAN SUMMARY")
     print("="*50)
     print(f" Total Scanned:        {STATS['scanned']}")
-    print(f" ✓ SAVED:              {STATS['saved']}")
+    print(f" ✓ SAVED:              {len(all_data)}")
     print(f"   (New listings:      {new_count})")
+    print(f" ✗ Skipped (Dupes):    {STATS['skipped_dup']}")
     print(f" ✗ Skipped (Location): {STATS['skipped_loc']}")
     print(f" ✗ Skipped (Sold):     {STATS['skipped_sold']}")
     print(f" ✗ Skipped (Mansion):  {STATS['skipped_mansion']}")
@@ -1528,14 +1722,15 @@ def main():
         print(f"   {source}: {count}")
     print("="*50)
 
-    if STATS['saved'] == 0:
+    final_count = len(all_data)
+    if final_count == 0:
         print("\n⚠️  WARNING: No listings saved!")
         print("   This may indicate:")
         print("   - Website structure has changed")
         print("   - Network connectivity issues")
         print("   - Filters are too restrictive")
-    elif STATS['saved'] < 10:
-        print("\n⚠️  WARNING: Very few listings saved ({})".format(STATS['saved']))
+    elif final_count < 10:
+        print(f"\n⚠️  WARNING: Very few listings saved ({final_count})")
         print("   Expected: 50+ listings")
         print("   Check the website structure and filters")
 
