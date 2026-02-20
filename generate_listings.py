@@ -234,22 +234,37 @@ def get_best_image(soup, url):
 def get_suumo_image(soup, url):
     """SUUMO-specific image finder.
 
-    SUUMO lazy-loads property photos: the real URL is in data-src / data-lazy,
-    not src.  We also need to skip navigation buttons ("ページの先頭へ") and
-    broker/company headshots that appear lower on the page.
+    SUUMO lazy-loads property photos — the real URL lives in data-src (or
+    data-original / data-lazy-src depending on the lazy-load library in use).
+    We skip UI chrome and broker-document images.
     """
-    SKIP = ["logo", "rogo", "icon", "map", "banner", "bnr", "nav", "pagetop",
-            "noimage", "no_image", "default", "agent", "staff", "company",
-            "tel.gif", "btn", "button", "arrow", "bg_", "kaisha"]
+    # Note: "map" intentionally omitted — land listings often only have an
+    # aerial/map photo, which is still the best available image.
+    SKIP = ["logo", "rogo", "icon", "banner", "bnr", "pagetop",
+            "noimage", "no_image", "default", "agent", "staff",
+            "tel.gif", "btn", "button", "arrow", "bg_",
+            "shiryo", "report", "gazo_bukken_report"]  # broker flyer/document images
 
-    # 1. og:image is the most reliable when present
+    # All lazy-load attribute variants used by common JS libraries
+    LAZY_ATTRS = ["data-src", "data-lazy", "data-original", "data-lazy-src", "data-ll-src"]
+
+    def best_src(el):
+        for attr in LAZY_ATTRS:
+            v = el.get(attr, "")
+            if v: return v
+        return el.get("src", "")
+
+    # 1. og:image (reliable when the property has photos)
     og = soup.find("meta", attrs={"property": "og:image"})
     if og and og.get("content"):
         og_url = og.get("content")
         if not any(skip in og_url.lower() for skip in SKIP):
+            print(f"  [SUUMO IMG] og:image → {og_url[:80]}")
             return urljoin(url, og_url)
+        else:
+            print(f"  [SUUMO IMG] og:image skipped (matched skip keyword): {og_url[:80]}")
 
-    # 2. SUUMO-specific property photo containers (check data-src for lazy loads)
+    # 2. SUUMO-specific property photo containers
     photo_selectors = [
         ".property_view_main-image img",
         ".property_view_photo img",
@@ -262,20 +277,33 @@ def get_suumo_image(soup, url):
     for sel in photo_selectors:
         el = soup.select_one(sel)
         if el:
-            src = el.get("data-src") or el.get("data-lazy") or el.get("src", "")
+            src = best_src(el)
             if src and not any(skip in src.lower() for skip in SKIP):
+                print(f"  [SUUMO IMG] selector '{sel}' → {src[:80]}")
                 return urljoin(url, src)
 
-    # 3. Scan all images, preferring data-src over src (lazy-load aware)
+    # 3. Full-page scan — check lazy attrs before src
+    all_candidates = []
     for img in soup.find_all("img"):
-        src = img.get("data-src") or img.get("data-lazy") or img.get("src", "")
+        src = best_src(img)
         if not src:
             continue
         lower = src.lower()
         if any(skip in lower for skip in SKIP):
             continue
         if ".jpg" in lower or ".jpeg" in lower or ".png" in lower:
-            return urljoin(url, src)
+            all_candidates.append(src)
+
+    if all_candidates:
+        print(f"  [SUUMO IMG] fallback scan found {len(all_candidates)} candidate(s): {all_candidates[0][:80]}")
+        return urljoin(url, all_candidates[0])
+
+    # Nothing found — log all img URLs to help diagnose
+    all_srcs = [best_src(img) for img in soup.find_all("img") if best_src(img)]
+    print(f"  [SUUMO IMG] NO IMAGE FOUND for {url}")
+    print(f"  [SUUMO IMG] All img URLs on page ({len(all_srcs)}):")
+    for s in all_srcs[:15]:
+        print(f"    {s[:100]}")
 
     return ""
 
