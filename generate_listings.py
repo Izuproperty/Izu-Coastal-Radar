@@ -243,7 +243,8 @@ def get_suumo_image(soup, url):
     SKIP = ["logo", "rogo", "icon", "banner", "bnr", "pagetop",
             "noimage", "no_image", "default", "agent", "staff",
             "tel.gif", "btn", "button", "arrow", "bg_",
-            "shiryo", "report", "gazo_bukken_report"]  # broker flyer/document images
+            "shiryo", "report", "gazo_bukken_report",
+            "gazo/kaisha", "gazo%2fkaisha"]  # company/agency photos, not property
 
     # All lazy-load attribute variants used by common JS libraries
     LAZY_ATTRS = ["data-src", "data-lazy", "data-original", "data-lazy-src", "data-ll-src"]
@@ -1613,30 +1614,45 @@ class Suumo(BaseScraper):
                 sleep_jitter()
 
         print(f"  > Visiting {min(len(candidates), 80)} SUUMO detail pages...")
-        for url, city_ctx in list(candidates.items())[:80]:
-            self.parse_detail(url, city_ctx)
+        for url, (city_ctx, thumb_url) in list(candidates.items())[:80]:
+            self.parse_detail(url, city_ctx, thumb_url)
             sleep_jitter()
 
     def _extract_links(self, soup, city_hint=None):
         """Pull property detail-page URLs out of a SUUMO search results page.
 
         SUUMO detail pages use the path pattern /nc_XXXXXXXXXX/.
+        Also captures the card thumbnail image — these are present in static HTML
+        on search result pages even though detail pages load photos via JS.
         """
         found = {}
         for a in soup.find_all("a", href=re.compile(r"/nc_\d+")):
             href = a["href"]
             full = urljoin(self.BASE, href)
+            if full in found:
+                continue
             # Try to detect city from surrounding card; fall back to page hint
             city_ctx = city_hint
+            thumb_url = ""
             card = a.find_parent(class_=re.compile(r"cassette|item|property", re.I))
             if card:
                 detected = normalize_city(card.get_text())
                 if detected:
                     city_ctx = detected
-            found[full] = city_ctx
+                # Grab the first property image from the card thumbnail area.
+                # SUUMO search result pages include gazo/bukken images in static HTML.
+                for img in card.find_all("img"):
+                    for attr in ["src", "data-src", "data-lazy", "data-original"]:
+                        v = img.get(attr, "")
+                        if v and "img01.suumo.com" in v and "gazo/bukken" in v:
+                            thumb_url = v
+                            break
+                    if thumb_url:
+                        break
+            found[full] = (city_ctx, thumb_url)
         return found
 
-    def parse_detail(self, url, city_ctx):
+    def parse_detail(self, url, city_ctx, thumb_url=""):
         STATS["scanned"] += 1
         soup = self.fetch(url)
         if not soup:
@@ -1702,7 +1718,7 @@ class Suumo(BaseScraper):
             "city": city,
             "priceJpy": price,
             "seaViewScore": sea_score,
-            "imageUrl": get_suumo_image(soup, url),
+            "imageUrl": get_suumo_image(soup, url) or thumb_url,
         })
 
 
