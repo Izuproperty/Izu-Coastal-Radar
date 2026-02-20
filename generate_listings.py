@@ -1644,7 +1644,7 @@ class Suumo(BaseScraper):
                 for img in card.find_all("img"):
                     for attr in ["src", "data-src", "data-lazy", "data-original"]:
                         v = img.get(attr, "")
-                        if v and "img01.suumo.com" in v and "gazo/bukken" in v:
+                        if v and "img01.suumo.com" in v and ("gazo/bukken" in v or "gazo%2fbukken" in v.lower()):
                             thumb_url = v
                             break
                     if thumb_url:
