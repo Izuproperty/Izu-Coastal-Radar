@@ -1304,16 +1304,30 @@ class Aoba(BaseScraper):
                     print(f"  [DEBUG] Aoba - Detected area code {code} ({city_name}) in URL")
                 break
 
-        # Try multiple title selectors
+        # Extract title: prefer h1, then h2 (skipping map-section headers like "地図MAP")
         title = ""
-        for selector in ["h2", "h1", ".property-title", ".entry-title"]:
-            if isinstance(selector, str) and selector.startswith("."):
+        h1 = soup.find("h1")
+        if h1:
+            candidate = clean_text(h1.get_text())
+            if candidate and "地図" not in candidate:
+                title = candidate
+
+        if not title:
+            # h1 was absent or a map header — scan all h2 elements, skip "地図" ones
+            for h2 in soup.find_all("h2"):
+                candidate = clean_text(h2.get_text())
+                if candidate and "地図" not in candidate:
+                    title = candidate
+                    break
+
+        if not title:
+            for selector in [".property-title", ".entry-title"]:
                 elem = soup.select_one(selector)
-            else:
-                elem = soup.find(selector)
-            if elem:
-                title = clean_text(elem.get_text())
-                if title: break
+                if elem:
+                    candidate = clean_text(elem.get_text())
+                    if candidate:
+                        title = candidate
+                        break
 
         if not title:
             title_tag = soup.find("title")
@@ -1465,33 +1479,33 @@ class Suumo(BaseScraper):
     warning and exits gracefully without affecting the rest of the run.
     """
     BASE = "https://suumo.jp"
-    SEARCH = "https://suumo.jp/jj/bukken/ichiran/JJ012FJ001/"
 
-    # SUUMO area/sc codes for target municipalities (Shizuoka-ken = ta=22, ar=030)
-    CITY_SC = {
-        "22325": "下田",    # 下田市
-        "22341": "河津",    # 賀茂郡河津町
-        "22342": "東伊豆",  # 賀茂郡東伊豆町
-        "22344": "南伊豆",  # 賀茂郡南伊豆町
-    }
+    # Path-based search pages for target areas.
+    # Shimoda is a city (sc_shimoda); Kawazu/Higashi-Izu/Minami-Izu are towns
+    # in Kamo district (sc_kamogun).  city_hint=None means we'll detect from page.
+    SEARCH_PAGES = [
+        ("/chukoikkodate/shizuoka/sc_shimoda/", "下田"),
+        ("/chukoikkodate/shizuoka/sc_kamogun/", None),
+        ("/tochi/shizuoka/sc_shimoda/", "下田"),
+        ("/tochi/shizuoka/sc_kamogun/", None),
+    ]
 
     def run(self):
         print("--- Scanning SUUMO ---")
         candidates = {}  # url -> city_ctx
 
-        for bs, kind in [("011", "House"), ("021", "Land")]:
+        for path, city_hint in self.SEARCH_PAGES:
+            kind = "House" if "chukoikkodate" in path else "Land"
+            area = city_hint or "Kamo district"
             page = 1
             while page <= 10:
-                params = [
-                    ("ar", "030"), ("bs", bs), ("ta", "22"),
-                    ("pc", "30"), ("pn", str(page)),
-                ]
-                for sc in self.CITY_SC:
-                    params.append(("sc", sc))
+                url = self.BASE + path
+                if page > 1:
+                    url = f"{url}?page={page}"
 
-                print(f"  SUUMO {kind} page {page}...")
+                print(f"  SUUMO {kind} {area} page {page}: {url}")
                 try:
-                    r = self.session.get(self.SEARCH, params=params, timeout=15, verify=False)
+                    r = self.session.get(url, timeout=15, verify=False)
                 except Exception as e:
                     print(f"  [SUUMO] Network error: {e}")
                     break
@@ -1500,13 +1514,13 @@ class Suumo(BaseScraper):
                     print("  [SUUMO] Access denied (403) – site blocks automated requests, skipping.")
                     return
                 if r.status_code != 200:
-                    print(f"  [SUUMO] HTTP {r.status_code}, stopping.")
+                    print(f"  [SUUMO] HTTP {r.status_code} for {url}, stopping.")
                     break
 
                 r.encoding = r.apparent_encoding
                 soup = BeautifulSoup(r.text, "html.parser")
 
-                links = self._extract_links(soup)
+                links = self._extract_links(soup, city_hint)
                 if not links:
                     print(f"    No listings on page {page}, stopping.")
                     break
@@ -1516,7 +1530,7 @@ class Suumo(BaseScraper):
                 print(f"    +{len(new)} new links (total {len(candidates)})")
 
                 # Stop if there is no "next page" control
-                if not soup.find("a", string=re.compile(r"次へ|次の\d|›|>")):
+                if not soup.find("a", string=re.compile(r"次へ|次のページ|›|>")):
                     break
                 page += 1
                 sleep_jitter()
@@ -1526,15 +1540,22 @@ class Suumo(BaseScraper):
             self.parse_detail(url, city_ctx)
             sleep_jitter()
 
-    def _extract_links(self, soup):
-        """Pull property detail-page URLs out of a SUUMO search results page."""
+    def _extract_links(self, soup, city_hint=None):
+        """Pull property detail-page URLs out of a SUUMO search results page.
+
+        SUUMO detail pages use the path pattern /nc_XXXXXXXXXX/.
+        """
         found = {}
-        for a in soup.find_all("a", href=re.compile(r"shosai|JJ012FD|JJ010FD")):
+        for a in soup.find_all("a", href=re.compile(r"/nc_\d+")):
             href = a["href"]
             full = urljoin(self.BASE, href)
-            # Try to grab city context from the surrounding card element
-            card = a.find_parent(True)
-            city_ctx = normalize_city(card.get_text()) if card else None
+            # Try to detect city from surrounding card; fall back to page hint
+            city_ctx = city_hint
+            card = a.find_parent(class_=re.compile(r"cassette|item|property", re.I))
+            if card:
+                detected = normalize_city(card.get_text())
+                if detected:
+                    city_ctx = detected
             found[full] = city_ctx
         return found
 
@@ -1611,17 +1632,20 @@ class Suumo(BaseScraper):
 def deduplicate(listings):
     """
     Remove listings that represent the same physical property appearing on
-    multiple sources (e.g. a broker listing that also shows up on SUUMO).
+    MULTIPLE DIFFERENT sources (e.g. a broker listing that also shows up on SUUMO).
+
+    Same-source listings with identical fingerprints are KEPT — they may be
+    genuinely different properties at the same price point in the same city.
 
     Fingerprint: (city, propertyType, price rounded to nearest ¥100,000).
-    When duplicates collide, the source with higher priority is kept:
+    When cross-source duplicates collide, the source with higher priority wins:
         Izu Taiyo > Maple Housing > Aoba Resort > SUUMO
     """
     SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "SUUMO": 3}
 
     # Process preferred sources first so they "win" the fingerprint slot
     ranked = sorted(listings, key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 99))
-    seen = set()
+    seen = {}  # fp -> source that first claimed it
     out = []
 
     for item in ranked:
@@ -1629,16 +1653,19 @@ def deduplicate(listings):
         # Round to nearest ¥100,000 to tolerate minor display rounding between sites
         price_bucket = round(price / 100000) if price else 0
         fp = (item.get("city", ""), item.get("propertyType", ""), price_bucket)
+        src = item.get("source", "?")
 
-        if fp in seen:
-            src = item.get("source", "?")
+        if fp in seen and seen[fp] != src:
+            # Cross-source duplicate: same fingerprint, different site → drop lower-priority one
             city = item.get("city", "")
             ptype = item.get("propertyType", "")
             man = price // 10000 if price else 0
-            print(f"  [DEDUP] Removed duplicate from {src}: {city} {ptype} ¥{man}万")
+            print(f"  [DEDUP] Removed cross-source duplicate from {src}: {city} {ptype} ¥{man}万 (kept {seen[fp]})")
             STATS["skipped_dup"] += 1
         else:
-            seen.add(fp)
+            # New fingerprint OR same source with same price — keep it
+            if fp not in seen:
+                seen[fp] = src
             out.append(item)
 
     return out
