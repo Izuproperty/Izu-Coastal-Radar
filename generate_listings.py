@@ -199,13 +199,12 @@ def determine_type(title, text):
 
 def get_best_image(soup, url):
     """Robust image finder: OG Tag -> Main ID -> First Large Image"""
-    # 1. Meta Tag (Best quality usually) - but skip if it's a logo
+    # 1. Meta Tag (Best quality usually) - but skip if it's a logo or placeholder
     og = soup.find("meta", attrs={"property": "og:image"})
     if og and og.get("content"):
         og_url = og.get("content")
         og_lower = og_url.lower()
-        # Skip if it's obviously a logo
-        if not any(skip in og_lower for skip in ["logo", "rogo", "icon", "og.png", "og.jpg"]):
+        if not any(skip in og_lower for skip in ["logo", "rogo", "icon", "og.png", "og.jpg", "noimage", "no_image"]):
             return urljoin(url, og_url)
 
     # 2. Known ID/Classes
@@ -215,16 +214,66 @@ def get_best_image(soup, url):
         if el and el.get("src"):
             src = el.get("src")
             src_lower = src.lower()
-            # Skip logos and banners
             if not any(skip in src_lower for skip in ["logo", "rogo", "icon", "bnr", "banner", "tel.gif"]):
                 return urljoin(url, src)
 
-    # 3. Fallback: First image that looks like a photo (jpg/png) and not a logo
+    # 3. Fallback: First image that looks like a photo (jpg/png) and not a UI element
+    SKIP = ["logo", "rogo", "icon", "map", "banner", "bnr", "nav", "/title/", "tel.gif",
+            "pagetop", "noimage", "no_image", "btn", "button", "arrow", "bg_"]
     for img in soup.find_all("img"):
         src = img.get("src", "")
         if not src: continue
         lower = src.lower()
-        if any(skip in lower for skip in ["logo", "rogo", "icon", "map", "banner", "bnr", "nav", "/title/", "tel.gif"]): continue
+        if any(skip in lower for skip in SKIP): continue
+        if ".jpg" in lower or ".jpeg" in lower or ".png" in lower:
+            return urljoin(url, src)
+
+    return ""
+
+
+def get_suumo_image(soup, url):
+    """SUUMO-specific image finder.
+
+    SUUMO lazy-loads property photos: the real URL is in data-src / data-lazy,
+    not src.  We also need to skip navigation buttons ("ページの先頭へ") and
+    broker/company headshots that appear lower on the page.
+    """
+    SKIP = ["logo", "rogo", "icon", "map", "banner", "bnr", "nav", "pagetop",
+            "noimage", "no_image", "default", "agent", "staff", "company",
+            "tel.gif", "btn", "button", "arrow", "bg_", "kaisha"]
+
+    # 1. og:image is the most reliable when present
+    og = soup.find("meta", attrs={"property": "og:image"})
+    if og and og.get("content"):
+        og_url = og.get("content")
+        if not any(skip in og_url.lower() for skip in SKIP):
+            return urljoin(url, og_url)
+
+    # 2. SUUMO-specific property photo containers (check data-src for lazy loads)
+    photo_selectors = [
+        ".property_view_main-image img",
+        ".property_view_photo img",
+        ".cassetteItem-photoInner img",
+        "#bukken_mainphoto img",
+        ".bukken_photo img",
+        ".mainPhoto img",
+        ".photo_list img",
+    ]
+    for sel in photo_selectors:
+        el = soup.select_one(sel)
+        if el:
+            src = el.get("data-src") or el.get("data-lazy") or el.get("src", "")
+            if src and not any(skip in src.lower() for skip in SKIP):
+                return urljoin(url, src)
+
+    # 3. Scan all images, preferring data-src over src (lazy-load aware)
+    for img in soup.find_all("img"):
+        src = img.get("data-src") or img.get("data-lazy") or img.get("src", "")
+        if not src:
+            continue
+        lower = src.lower()
+        if any(skip in lower for skip in SKIP):
+            continue
         if ".jpg" in lower or ".jpeg" in lower or ".png" in lower:
             return urljoin(url, src)
 
@@ -1625,7 +1674,7 @@ class Suumo(BaseScraper):
             "city": city,
             "priceJpy": price,
             "seaViewScore": sea_score,
-            "imageUrl": get_best_image(soup, url),
+            "imageUrl": get_suumo_image(soup, url),
         })
 
 
