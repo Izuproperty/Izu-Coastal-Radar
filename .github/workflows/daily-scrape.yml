@@ -30,4 +30,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add listings.json buildInfo.json
           git diff --cached --quiet || git commit -m "Daily refresh listings"
+          git pull --rebase origin main
           git push
