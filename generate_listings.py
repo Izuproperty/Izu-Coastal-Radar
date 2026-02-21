@@ -246,8 +246,10 @@ def get_suumo_image(soup, url):
             "shiryo", "report", "gazo_bukken_report",
             "gazo/kaisha", "gazo%2fkaisha"]  # company/agency photos, not property
 
-    # All lazy-load attribute variants used by common JS libraries
-    LAZY_ATTRS = ["data-src", "data-lazy", "data-original", "data-lazy-src", "data-ll-src"]
+    # All lazy-load attribute variants used by common JS libraries.
+    # SUUMO uses a non-standard `rel` attribute on <img class="js-scrollLazy-image">
+    # elements to store the real photo URL — checked first since it takes priority.
+    LAZY_ATTRS = ["rel", "data-src", "data-lazy", "data-original", "data-lazy-src", "data-ll-src"]
 
     def best_src(el):
         for attr in LAZY_ATTRS:
@@ -286,6 +288,10 @@ def get_suumo_image(soup, url):
     # 3. Full-page scan — check lazy attrs before src
     all_candidates = []
     for img in soup.find_all("img"):
+        # Skip brochure/pamphlet images (e.g. "こんなパンフレットが届きます")
+        alt = img.get("alt", "")
+        if "パンフレット" in alt or "pamphlet" in alt.lower():
+            continue
         src = best_src(img)
         if not src:
             continue
@@ -1708,13 +1714,23 @@ class Suumo(BaseScraper):
             STATS["skipped_sold"] += 1
             return
 
+        # Determine property type: URL path is the most reliable signal for SUUMO.
+        # /tochi/ = 土地 (land), /chukoikkodate/ or /kodate/ = 中古一戸建て (house).
+        # Fall back to text-based detection when URL path is ambiguous.
+        if "/tochi/" in url:
+            prop_type = "land"
+        elif "/chukoikkodate/" in url or "/kodate/" in url:
+            prop_type = "house"
+        else:
+            prop_type = determine_type(title, full_text)
+
         self.add_item({
             "id": f"suumo-{abs(hash(url))}",
             "source": "SUUMO",
             "sourceUrl": url,
             "title": title,
             "titleEn": f"{CITY_EN_MAP.get(city, city)} Property",
-            "propertyType": determine_type(title, full_text),
+            "propertyType": prop_type,
             "city": city,
             "priceJpy": price,
             "seaViewScore": sea_score,
