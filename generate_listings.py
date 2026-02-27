@@ -197,6 +197,47 @@ def determine_type(title, text):
     # Fallback default
     return "house"
 
+# Japanese era → Gregorian year offsets
+_ERA_OFFSET = {"昭和": 1925, "平成": 1988, "令和": 2018}
+
+def extract_year_built(soup, full_text):
+    """Extract construction year (築年) from an Izu Taiyo detail page.
+    Returns an integer year (e.g. 1995) or None if not found."""
+    # Patterns to search in text:
+    # "築昭和50年", "築平成10年", "築令和5年", "築1995年", "築年月：昭和50年3月"
+    era_pattern = re.compile(r'築[年月\s:：]*(?:([昭平令]和|令和)(\d{1,2})年|(\d{4})年)')
+    # Also handle table row with 築年月 label
+    for row in soup.find_all("tr"):
+        cells = row.find_all(["th", "td"])
+        if len(cells) >= 2:
+            label = cells[0].get_text(strip=True)
+            if "築年" in label or "建築年" in label:
+                val = cells[1].get_text(strip=True)
+                m = re.search(r'([昭平令]和|令和)(\d{1,2})年', val)
+                if m:
+                    era, yr = m.group(1), int(m.group(2))
+                    # Normalize era key to 2-char prefix
+                    era_key = era[:2]
+                    if era_key in _ERA_OFFSET:
+                        return _ERA_OFFSET[era_key] + yr
+                m2 = re.search(r'(\d{4})年', val)
+                if m2:
+                    y = int(m2.group(1))
+                    if 1950 <= y <= 2026:
+                        return y
+    # Fallback: scan full text
+    for m in era_pattern.finditer(full_text):
+        era, era_yr, western_yr = m.group(1), m.group(2), m.group(3)
+        if western_yr:
+            y = int(western_yr)
+            if 1950 <= y <= 2026:
+                return y
+        if era and era_yr:
+            era_key = era[:2]
+            if era_key in _ERA_OFFSET:
+                return _ERA_OFFSET[era_key] + int(era_yr)
+    return None
+
 def get_best_image(soup, url):
     """Robust image finder: OG Tag -> Main ID -> First Large Image"""
     # 1. Meta Tag (Best quality usually) - but skip if it's a logo or placeholder
@@ -953,13 +994,14 @@ class IzuTaiyo(BaseScraper):
             img = get_best_image(soup, url)
 
         ptype = determine_type(title, full_text)
+        year_built = extract_year_built(soup, full_text)
 
         if is_special:
             print(f"  >>> SPECIAL PROPERTY {property_id} PASSED ALL FILTERS")
-            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}")
+            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}, Year Built: {year_built}")
             print(f"{'='*60}\n")
 
-        self.add_item({
+        item = {
             "id": f"izutaiyo-{abs(hash(url))}",
             "source": "Izu Taiyo",
             "sourceUrl": url,
@@ -970,7 +1012,10 @@ class IzuTaiyo(BaseScraper):
             "priceJpy": price,
             "seaViewScore": sea_score,
             "imageUrl": img
-        })
+        }
+        if year_built:
+            item["yearBuilt"] = year_built
+        self.add_item(item)
 
 class Maple(BaseScraper):
     def run(self):

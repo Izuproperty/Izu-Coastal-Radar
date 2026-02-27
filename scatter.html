@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Property Scatter — Izu Coastal Radar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #151517;
+      --border: #2a2a2c;
+      --text: #e5e5e7;
+      --muted: #86868b;
+      --accent: #2997ff;
+      --highlight: #ff9f0a;
+      --highlight-ring: rgba(255,159,10,0.25);
+      --dot: rgba(41,151,255,0.7);
+      --dot-hover: #2997ff;
+      --grid: rgba(255,255,255,0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #000;
+      border-bottom: 1px solid var(--border);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; }
+    header .sub { color: var(--muted); margin-top: 4px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+    .nav { margin-top: 10px; }
+    .nav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+    .nav a:hover { color: var(--text); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; width: 100%; }
+
+    /* Legend */
+    .legend {
+      display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 18px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--muted); }
+    .dot-swatch {
+      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-swatch.regular { background: var(--dot); }
+    .dot-swatch.highlight { background: var(--highlight); }
+    .dot-swatch.nodata { background: rgba(150,150,160,0.5); border: 1px solid #444; }
+
+    /* Chart wrapper */
+    .chart-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px 20px;
+      position: relative;
+    }
+
+    svg#scatter { width: 100%; display: block; }
+
+    /* Tooltip */
+    #tooltip {
+      position: fixed;
+      background: #1c1c1e;
+      border: 1px solid #3a3a3c;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      pointer-events: none;
+      z-index: 999;
+      max-width: 240px;
+      opacity: 0;
+      transition: opacity 0.15s;
+      line-height: 1.5;
+    }
+    #tooltip.visible { opacity: 1; }
+    #tooltip .tt-price { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    #tooltip .tt-sub { color: var(--muted); }
+    #tooltip .tt-link { color: var(--accent); font-weight: 600; margin-top: 6px; display: block; }
+    #tooltip .tt-highlight { color: var(--highlight); font-weight: 700; margin-bottom: 4px; }
+
+    /* No-data panel */
+    .nodata-note {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .nodata-note code {
+      background: #1c1c1e;
+      border: 1px solid #333;
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-family: monospace;
+      color: #ccc;
+      font-size: 0.82rem;
+    }
+    .nodata-note strong { color: var(--text); }
+
+    /* Summary stats */
+    .stats-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      flex: 1;
+      min-width: 120px;
+    }
+    .stat-card .val { font-size: 1.3rem; font-weight: 700; color: #fff; }
+    .stat-card .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    footer { border-top: 1px solid var(--border); background: #000; padding: 28px 20px; text-align: center; }
+    footer a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+    footer a:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>IZU COASTAL RADAR — SCATTER</h1>
+  <div class="sub">Price vs. Property Age · Shimoda &amp; South Izu</div>
+  <div class="nav"><a href="index.html">← Back to Radar</a></div>
+</header>
+
+<div class="container">
+
+  <div class="stats-row" id="stats-row"></div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="dot-swatch regular"></div>
+      <span>Listing ≥ ¥1,000万 (~$64k)</span>
+    </div>
+    <div class="legend-item">
+      <div class="dot-swatch highlight"></div>
+      <span>Highlighted: Shimoda 吉佐美 ¥3,500万 (~$224k)</span>
+    </div>
+    <div class="legend-item">
+      <div class="dot-swatch nodata"></div>
+      <span>Age unknown (right column)</span>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <svg id="scatter" aria-label="Property scatter plot"></svg>
+  </div>
+
+  <div class="nodata-note" id="nodata-note" style="display:none"></div>
+
+</div>
+
+<div id="tooltip"></div>
+
+<footer>
+  <a href="index.html">← Izu Coastal Radar</a>
+</footer>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const HIGHLIGHT_URL = "https://www.izutaiyo.co.jp/d.php?hpno=SMB421H";
+const MIN_PRICE_JPY = 10_000_000;   // exclude below ¥1,000万
+const CURRENT_YEAR  = 2026;
+const NODATA_ZONE_W = 90;           // px width reserved for "age unknown" column
+const MARGIN = { top: 40, right: NODATA_ZONE_W + 30, bottom: 60, left: 80 };
+
+let FX = 156.06;  // fallback, overridden from buildInfo.json
+
+// ── Data loading ─────────────────────────────────────────────────────────────
+async function loadData() {
+  const [listingsRes, buildRes] = await Promise.all([
+    fetch(`listings.json?t=${Date.now()}`),
+    fetch(`buildInfo.json?t=${Date.now()}`).catch(() => null)
+  ]);
+  const { listings } = await listingsRes.json();
+  if (buildRes && buildRes.ok) {
+    const bi = await buildRes.json();
+    if (bi.forexRate) FX = bi.forexRate;
+  }
+  return listings;
+}
+
+// ── Formatting ───────────────────────────────────────────────────────────────
+function fmtJpy(v) {
+  const m = Math.round(v / 10_000);
+  return `¥${m.toLocaleString()}万`;
+}
+function fmtUsd(v) {
+  const u = Math.round(v / FX);
+  if (u >= 1_000_000) return `$${(u / 1_000_000).toFixed(2)}M`;
+  return `$${Math.round(u / 1000).toLocaleString()}k`;
+}
+function jpy2usd(v) { return v / FX; }
+
+// ── City labels ──────────────────────────────────────────────────────────────
+const CITY_MAP = { "下田": "Shimoda", "河津": "Kawazu", "東伊豆": "Higashi-Izu", "南伊豆": "Minami-Izu", "賀茂郡": "Minami-Izu" };
+function cityEn(c) { return CITY_MAP[c] || c; }
+
+// ── SVG helpers ──────────────────────────────────────────────────────────────
+function svgEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+function svgText(content, attrs = {}) {
+  const el = svgEl("text", attrs);
+  el.textContent = content;
+  return el;
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+async function main() {
+  const all = await loadData();
+
+  // Filter: exclude < 10mn
+  const listings = all.filter(l => (l.priceJpy || 0) >= MIN_PRICE_JPY);
+
+  const withAge    = listings.filter(l => l.yearBuilt);
+  const withoutAge = listings.filter(l => !l.yearBuilt);
+  const highlight  = listings.find(l => l.sourceUrl === HIGHLIGHT_URL);
+
+  // Stats row
+  renderStats(listings, withAge, withoutAge);
+
+  // No-data note
+  if (withoutAge.length > 0) {
+    const note = document.getElementById("nodata-note");
+    note.style.display = "";
+    note.innerHTML = `
+      <strong>${withoutAge.length} of ${listings.length} properties</strong> are missing age data and appear in the grey column on the right.<br>
+      Run <code>python3 enrich_age.py</code> from the repo root to fetch construction years from each listing page.
+      The next daily refresh will also pick these up automatically.
+    `;
+  }
+
+  drawChart(listings, withAge, withoutAge, highlight);
+}
+
+function renderStats(listings, withAge, withoutAge) {
+  const row = document.getElementById("stats-row");
+  const prices = listings.map(l => l.priceJpy).filter(Boolean);
+  const usdPrices = prices.map(p => jpy2usd(p));
+  const medianIdx = Math.floor(usdPrices.length / 2);
+  const sorted = [...usdPrices].sort((a,b) => a-b);
+  const median = sorted[medianIdx];
+
+  const ages = withAge.map(l => CURRENT_YEAR - l.yearBuilt);
+  const medianAge = ages.length ? [...ages].sort((a,b)=>a-b)[Math.floor(ages.length/2)] : null;
+
+  const stats = [
+    { val: listings.length, lbl: "Properties shown" },
+    { val: `$${Math.round(jpy2usd(Math.max(...prices))/1000)}k`, lbl: "Highest price" },
+    { val: `$${Math.round(median/1000)}k`, lbl: "Median price" },
+    { val: medianAge !== null ? `${medianAge} yrs` : "—", lbl: "Median age" },
+    { val: `¥${Math.round(FX)}`, lbl: "USD/JPY rate" },
+  ];
+  row.innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="val">${s.val}</div>
+      <div class="lbl">${s.lbl}</div>
+    </div>
+  `).join("");
+}
+
+function drawChart(listings, withAge, withoutAge, highlight) {
+  const svg = document.getElementById("scatter");
+
+  // Responsive sizing based on container width
+  const containerW = svg.parentElement.clientWidth - 40; // padding
+  const W = Math.max(400, containerW);
+  const H = Math.max(420, Math.round(W * 0.52));
+
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("height", H);
+
+  const plotW = W - MARGIN.left - MARGIN.right;
+  const plotH = H - MARGIN.top - MARGIN.bottom;
+
+  // ── Scales ──
+  const ages = withAge.map(l => CURRENT_YEAR - l.yearBuilt);
+  const allAges = ages.length ? ages : [0, 50];
+  const maxAge  = Math.max(...allAges, 50);
+  const minAge  = 0;
+
+  const prices    = listings.map(l => jpy2usd(l.priceJpy));
+  const minPriceU = 0;
+  const maxPriceU = Math.max(...prices) * 1.08;
+
+  function scaleX(age)   { return MARGIN.left + ((age - minAge) / (maxAge - minAge)) * plotW; }
+  function scaleY(usd)   { return MARGIN.top  + plotH - ((usd - minPriceU) / (maxPriceU - minPriceU)) * plotH; }
+
+  const noDataX = W - MARGIN.right + 15;  // X center for "no data" column
+
+  // ── Grid ──
+  const g = svgEl("g");
+
+  // Horizontal grid lines
+  const yTicks = niceYTicks(minPriceU, maxPriceU, 6);
+  for (const tick of yTicks) {
+    const y = scaleY(tick);
+    g.appendChild(svgEl("line", { x1: MARGIN.left, y1: y, x2: MARGIN.left + plotW, y2: y, stroke: "rgba(255,255,255,0.05)", "stroke-width": 1 }));
+    g.appendChild(svgText(fmtUsdShort(tick), {
+      x: MARGIN.left - 8, y: y + 4,
+      "text-anchor": "end", fill: "#666", "font-size": "11",
+      "font-family": "Inter, sans-serif"
+    }));
+  }
+
+  // Vertical grid lines
+  const xTicks = niceXTicks(minAge, maxAge, 6);
+  for (const tick of xTicks) {
+    const x = scaleX(tick);
+    g.appendChild(svgEl("line", { x1: x, y1: MARGIN.top, x2: x, y2: MARGIN.top + plotH, stroke: "rgba(255,255,255,0.05)", "stroke-width": 1 }));
+    g.appendChild(svgText(`${tick}y`, {
+      x, y: MARGIN.top + plotH + 18,
+      "text-anchor": "middle", fill: "#666", "font-size": "11",
+      "font-family": "Inter, sans-serif"
+    }));
+  }
+
+  // Axes
+  g.appendChild(svgEl("line", { x1: MARGIN.left, y1: MARGIN.top, x2: MARGIN.left, y2: MARGIN.top + plotH, stroke: "#444", "stroke-width": 1 }));
+  g.appendChild(svgEl("line", { x1: MARGIN.left, y1: MARGIN.top + plotH, x2: MARGIN.left + plotW, y2: MARGIN.top + plotH, stroke: "#444", "stroke-width": 1 }));
+
+  // Axis labels
+  g.appendChild(svgText("Price (USD)", {
+    x: MARGIN.left - 55, y: MARGIN.top + plotH / 2,
+    transform: `rotate(-90, ${MARGIN.left - 55}, ${MARGIN.top + plotH / 2})`,
+    "text-anchor": "middle", fill: "#888", "font-size": "12", "font-family": "Inter, sans-serif"
+  }));
+  g.appendChild(svgText("Property Age (years)", {
+    x: MARGIN.left + plotW / 2, y: H - 8,
+    "text-anchor": "middle", fill: "#888", "font-size": "12", "font-family": "Inter, sans-serif"
+  }));
+
+  // "No Data" column divider
+  g.appendChild(svgEl("line", { x1: W - MARGIN.right + 5, y1: MARGIN.top, x2: W - MARGIN.right + 5, y2: MARGIN.top + plotH, stroke: "#333", "stroke-dasharray": "4 4", "stroke-width": 1 }));
+  g.appendChild(svgText("Age", { x: noDataX, y: MARGIN.top - 18, "text-anchor": "middle", fill: "#555", "font-size": "10", "font-family": "Inter, sans-serif" }));
+  g.appendChild(svgText("Unknown", { x: noDataX, y: MARGIN.top - 6, "text-anchor": "middle", fill: "#555", "font-size": "10", "font-family": "Inter, sans-serif" }));
+
+  svg.appendChild(g);
+
+  // ── Dots ──
+  const tooltip = document.getElementById("tooltip");
+
+  function makeDot(l, cx, cy, isHighlight) {
+    const r = isHighlight ? 9 : 6;
+    const color  = isHighlight ? "var(--highlight)" : "rgba(41,151,255,0.65)";
+    const hcolor = isHighlight ? "var(--highlight)" : "#2997ff";
+
+    if (isHighlight) {
+      // Glow ring
+      const ring = svgEl("circle", { cx, cy, r: r + 6, fill: "var(--highlight-ring)" });
+      svg.appendChild(ring);
+    }
+
+    const dot = svgEl("circle", {
+      cx, cy, r,
+      fill: color,
+      stroke: isHighlight ? "var(--highlight)" : "rgba(41,151,255,0.9)",
+      "stroke-width": isHighlight ? 2 : 0.8,
+      style: "cursor:pointer; transition: r 0.1s;"
+    });
+
+    dot.addEventListener("mouseenter", e => {
+      dot.setAttribute("r", r + 3);
+      dot.setAttribute("fill", hcolor);
+      showTooltip(e, l, isHighlight);
+    });
+    dot.addEventListener("mousemove", e => moveTooltip(e));
+    dot.addEventListener("mouseleave", () => {
+      dot.setAttribute("r", r);
+      dot.setAttribute("fill", color);
+      hideTooltip();
+    });
+    dot.addEventListener("click", () => window.open(l.sourceUrl, "_blank"));
+
+    svg.appendChild(dot);
+  }
+
+  // "No data" dots: jitter Y based on price, pack horizontally in the column
+  const noDataDots = withoutAge.map(l => ({
+    l,
+    cy: scaleY(jpy2usd(l.priceJpy)),
+    cx: noDataX + (Math.random() - 0.5) * 24
+  }));
+
+  for (const { l, cx, cy } of noDataDots) {
+    const isHL = l.sourceUrl === HIGHLIGHT_URL;
+    const r = isHL ? 9 : 5;
+    const fillColor = isHL ? "var(--highlight)" : "rgba(140,140,150,0.45)";
+    const hcolor    = isHL ? "var(--highlight)" : "rgba(160,160,170,0.8)";
+
+    if (isHL) {
+      svg.appendChild(svgEl("circle", { cx, cy, r: r + 6, fill: "var(--highlight-ring)" }));
+    }
+
+    const dot = svgEl("circle", {
+      cx, cy, r,
+      fill: fillColor,
+      stroke: isHL ? "var(--highlight)" : "rgba(100,100,110,0.6)",
+      "stroke-width": isHL ? 2 : 0.6,
+      style: "cursor:pointer; transition: r 0.1s;"
+    });
+
+    dot.addEventListener("mouseenter", e => {
+      dot.setAttribute("r", r + 3);
+      dot.setAttribute("fill", hcolor);
+      showTooltip(e, l, isHL);
+    });
+    dot.addEventListener("mousemove", e => moveTooltip(e));
+    dot.addEventListener("mouseleave", () => {
+      dot.setAttribute("r", r);
+      dot.setAttribute("fill", fillColor);
+      hideTooltip();
+    });
+    dot.addEventListener("click", () => window.open(l.sourceUrl, "_blank"));
+
+    svg.appendChild(dot);
+  }
+
+  // Main scatter dots (with known age)
+  for (const l of withAge) {
+    const age = CURRENT_YEAR - l.yearBuilt;
+    const cx  = scaleX(age);
+    const cy  = scaleY(jpy2usd(l.priceJpy));
+    const isHL = l.sourceUrl === HIGHLIGHT_URL;
+    makeDot(l, cx, cy, isHL);
+  }
+
+  // ── Highlight annotation ──
+  const hl = highlight;
+  if (hl) {
+    const hlAge = hl.yearBuilt ? CURRENT_YEAR - hl.yearBuilt : null;
+    const hlX = hlAge !== null ? scaleX(hlAge) : noDataDots.find(d => d.l.sourceUrl === HIGHLIGHT_URL)?.cx ?? noDataX;
+    const hlY = scaleY(jpy2usd(hl.priceJpy));
+
+    // Label
+    const labelX = hlX + (hlX < W - 200 ? 14 : -14);
+    const labelAnchor = hlX < W - 200 ? "start" : "end";
+    const line1 = svgText("Shimoda 吉佐美", {
+      x: labelX, y: hlY - 8,
+      "text-anchor": labelAnchor,
+      fill: "var(--highlight)", "font-size": "11", "font-weight": "700",
+      "font-family": "Inter, sans-serif"
+    });
+    const line2 = svgText(`¥3,500万 · ${fmtUsd(hl.priceJpy)}${hlAge !== null ? ` · ${hlAge}y old` : " · age unknown"}`, {
+      x: labelX, y: hlY + 6,
+      "text-anchor": labelAnchor,
+      fill: "#ccc", "font-size": "10",
+      "font-family": "Inter, sans-serif"
+    });
+    svg.appendChild(line1);
+    svg.appendChild(line2);
+  }
+
+  // ── Tooltip helpers ──
+  function showTooltip(e, l, isHL) {
+    const age  = l.yearBuilt ? `${CURRENT_YEAR - l.yearBuilt} years old (built ${l.yearBuilt})` : "Age unknown";
+    const name = extractName(l);
+    tooltip.innerHTML = `
+      ${isHL ? `<div class="tt-highlight">★ Highlighted Property</div>` : ""}
+      <div class="tt-price">${fmtUsd(l.priceJpy)}</div>
+      <div class="tt-sub">${fmtJpy(l.priceJpy)}</div>
+      <div class="tt-sub" style="margin-top:4px">${name} · ${cityEn(l.city)}</div>
+      <div class="tt-sub">${age}</div>
+      <a class="tt-link" href="${l.sourceUrl}" target="_blank" rel="noopener">View listing →</a>
+    `;
+    tooltip.classList.add("visible");
+    moveTooltip(e);
+  }
+  function moveTooltip(e) {
+    const pad = 14;
+    let tx = e.clientX + pad;
+    let ty = e.clientY + pad;
+    const tw = 240, th = 130;
+    if (tx + tw > window.innerWidth)  tx = e.clientX - tw - pad;
+    if (ty + th > window.innerHeight) ty = e.clientY - th - pad;
+    tooltip.style.left = tx + "px";
+    tooltip.style.top  = ty + "px";
+  }
+  function hideTooltip() {
+    tooltip.classList.remove("visible");
+  }
+}
+
+function extractName(l) {
+  // "下田市 吉佐美（3500万円）の家..." -> "下田市 吉佐美"
+  const m = l.title?.match(/^([^（「(]+)/);
+  if (m) return m[1].trim().slice(0, 28);
+  return l.titleEn || "Property";
+}
+
+function fmtUsdShort(v) {
+  if (v === 0) return "$0";
+  if (v >= 1_000_000) return `$${(v/1_000_000).toFixed(1)}M`;
+  if (v >= 1_000)     return `$${Math.round(v/1000)}k`;
+  return `$${Math.round(v)}`;
+}
+
+function niceYTicks(min, max, count) {
+  const step = niceStep((max - min) / count);
+  const ticks = [];
+  let t = Math.ceil(min / step) * step;
+  while (t <= max) { ticks.push(t); t += step; }
+  return ticks;
+}
+function niceXTicks(min, max, count) {
+  const step = niceStep((max - min) / count);
+  const ticks = [];
+  for (let t = 0; t <= max; t += step) { if (t >= min) ticks.push(t); }
+  return ticks;
+}
+function niceStep(rawStep) {
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const norm = rawStep / mag;
+  let nice = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10;
+  return nice * mag;
+}
+
+main().catch(e => {
+  document.querySelector(".chart-wrap").innerHTML =
+    `<p style="color:#f66;padding:20px">Error loading data: ${e.message}</p>`;
+});
+</script>
+</body>
+</html>
