@@ -203,34 +203,47 @@ _ERA_OFFSET = {"昭和": 1925, "平成": 1988, "令和": 2018}
 def extract_year_built(soup, full_text):
     """Extract construction year (築年) from an Izu Taiyo detail page.
     Returns an integer year (e.g. 1995) or None if not found."""
-    # Patterns to search in text:
-    # "築昭和50年", "築平成10年", "築令和5年", "築1995年", "築年月：昭和50年3月"
+    import datetime
+    current_year = datetime.date.today().year
+
     era_pattern = re.compile(r'築[年月\s:：]*(?:([昭平令]和|令和)(\d{1,2})年|(\d{4})年)')
-    # Also handle table row with 築年月 label
+
+    # Handle table rows with 築年月, 築年数, or 建築年 labels
     for row in soup.find_all("tr"):
         cells = row.find_all(["th", "td"])
         if len(cells) >= 2:
             label = cells[0].get_text(strip=True)
             if "築年" in label or "建築年" in label:
                 val = cells[1].get_text(strip=True)
+                # "築年数：50.5年" — age in years
+                m_age = re.search(r'(\d+(?:\.\d+)?)年', val)
+                if m_age and "築年数" in label:
+                    return current_year - int(float(m_age.group(1)))
+                # Era format: 昭和50年
                 m = re.search(r'([昭平令]和|令和)(\d{1,2})年', val)
                 if m:
                     era, yr = m.group(1), int(m.group(2))
-                    # Normalize era key to 2-char prefix
                     era_key = era[:2]
                     if era_key in _ERA_OFFSET:
                         return _ERA_OFFSET[era_key] + yr
+                # Western year: 1995年
                 m2 = re.search(r'(\d{4})年', val)
                 if m2:
                     y = int(m2.group(1))
-                    if 1950 <= y <= 2026:
+                    if 1950 <= y <= current_year:
                         return y
-    # Fallback: scan full text
+
+    # Fallback: scan full text for "築年数：50.5年"
+    m_age = re.search(r'築年数[：:]\s*(\d+(?:\.\d+)?)年', full_text)
+    if m_age:
+        return current_year - int(float(m_age.group(1)))
+
+    # Fallback: era / western year patterns in full text
     for m in era_pattern.finditer(full_text):
         era, era_yr, western_yr = m.group(1), m.group(2), m.group(3)
         if western_yr:
             y = int(western_yr)
-            if 1950 <= y <= 2026:
+            if 1950 <= y <= current_year:
                 return y
         if era and era_yr:
             era_key = era[:2]
