@@ -449,6 +449,7 @@
             <div class="meta">
               <span>${pType}</span>
               <span>${getCityName(l.city)}</span>
+              ${l.propertyType !== 'land' && l.yearBuilt ? `<span>${2026 - l.yearBuilt}y old</span>` : ''}
             </div>
             <div class="card-footer">
               <span>${l.source}</span>
