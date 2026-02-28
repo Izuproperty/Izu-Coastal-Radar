@@ -99,6 +99,7 @@
     .dot-swatch { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
     .dot-swatch.regular { background: var(--dot); }
     .dot-swatch.nodata  { background: rgba(150,150,160,0.5); border: 1px solid #444; }
+    .line-swatch { width: 28px; height: 2px; flex-shrink: 0; background: repeating-linear-gradient(90deg, rgba(255,200,0,0.75) 0, rgba(255,200,0,0.75) 6px, transparent 6px, transparent 10px); }
 
     /* Chart wrapper */
     .chart-wrap {
@@ -186,6 +187,10 @@
     <div class="legend-item">
       <div class="dot-swatch nodata"></div>
       <span>Age unknown (right column)</span>
+    </div>
+    <div class="legend-item">
+      <div class="line-swatch"></div>
+      <span>Avg price &amp; age</span>
     </div>
   </div>
 
@@ -445,6 +450,36 @@ function drawChart(listings, withAge, withoutAge) {
   g.appendChild(svgEl("line", { x1: W - MARGIN.right + 5, y1: MARGIN.top, x2: W - MARGIN.right + 5, y2: MARGIN.top + plotH, stroke: "#333", "stroke-dasharray": "4 4", "stroke-width": 1 }));
   g.appendChild(svgText("Age",     { x: noDataX, y: MARGIN.top - 18, "text-anchor": "middle", fill: "#555", "font-size": "10", "font-family": "Inter, sans-serif" }));
   g.appendChild(svgText("Unknown", { x: noDataX, y: MARGIN.top - 6,  "text-anchor": "middle", fill: "#555", "font-size": "10", "font-family": "Inter, sans-serif" }));
+
+  // ── Average reference lines ──────────────────────────────────────────────────
+  if (withAge.length > 0) {
+    const avgAge   = withAge.reduce((s, l) => s + (CURRENT_YEAR - l.yearBuilt), 0) / withAge.length;
+    const avgPriceUsd = prices.reduce((s, p) => s + p, 0) / prices.length;
+    const avgAgeX    = scaleX(avgAge);
+    const avgPriceY  = scaleY(avgPriceUsd);
+    const AVG_COLOR  = "rgba(255,200,0,0.55)";
+    const AVG_LABEL  = "rgba(255,200,0,0.8)";
+
+    // Vertical line — average age
+    g.appendChild(svgEl("line", {
+      x1: avgAgeX, y1: MARGIN.top, x2: avgAgeX, y2: MARGIN.top + plotH,
+      stroke: AVG_COLOR, "stroke-width": 1.5, "stroke-dasharray": "6 4"
+    }));
+    g.appendChild(svgText(`Avg ${Math.round(avgAge)}yr`, {
+      x: avgAgeX + 4, y: MARGIN.top + 14,
+      fill: AVG_LABEL, "font-size": "10", "font-family": "Inter, sans-serif"
+    }));
+
+    // Horizontal line — average price
+    g.appendChild(svgEl("line", {
+      x1: MARGIN.left, y1: avgPriceY, x2: MARGIN.left + plotW, y2: avgPriceY,
+      stroke: AVG_COLOR, "stroke-width": 1.5, "stroke-dasharray": "6 4"
+    }));
+    g.appendChild(svgText(`Avg ${fmtUsdShort(avgPriceUsd)}`, {
+      x: MARGIN.left + 6, y: avgPriceY - 5,
+      fill: AVG_LABEL, "font-size": "10", "font-family": "Inter, sans-serif"
+    }));
+  }
 
   svg.appendChild(g);
 
