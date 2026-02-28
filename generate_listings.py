@@ -201,44 +201,85 @@ def determine_type(title, text):
 _ERA_OFFSET = {"昭和": 1925, "平成": 1988, "令和": 2018}
 
 def extract_year_built(soup, full_text):
-    """Extract construction year (築年) from an Izu Taiyo detail page.
-    Returns an integer year (e.g. 1995) or None if not found."""
+    """Extract construction year from a property detail page.
+
+    Handles multiple sources:
+    - Izu Taiyo: 築年数：50.5年  /  table <tr><th>築年月</th><td>昭和50年3月</td>
+    - SUUMO:     <dt>完成時期（築年月）</dt><dd>1987年4月</dd>  (dl/dt/dd structure)
+    - Maple / Aoba: similar table or text patterns
+
+    Returns an integer year (e.g. 1987) or None if not found.
+    """
     import datetime
     current_year = datetime.date.today().year
 
-    era_pattern = re.compile(r'築[年月\s:：]*(?:([昭平令]和|令和)(\d{1,2})年|(\d{4})年)')
+    # Labels that indicate a year-built or completion-date field
+    YEAR_LABELS   = ("築年月", "築年数", "建築年", "完成時期", "竣工年")
 
-    # Handle table rows with 築年月, 築年数, or 建築年 labels
+    def _parse_val(label, val):
+        """Given a field label and its raw text value, return a year int or None."""
+        # Age-in-years format  e.g. "50.5年" under a 築年数 label
+        if "築年数" in label:
+            m = re.search(r'(\d+(?:\.\d+)?)年', val)
+            if m:
+                return current_year - int(float(m.group(1)))
+        # Era format e.g. "昭和62年4月"
+        m = re.search(r'([昭平令]和|令和)(\d{1,2})年', val)
+        if m:
+            era_key = m.group(1)[:2]
+            if era_key in _ERA_OFFSET:
+                return _ERA_OFFSET[era_key] + int(m.group(2))
+        # Western year e.g. "1987年4月"
+        m = re.search(r'(\d{4})年', val)
+        if m:
+            y = int(m.group(1))
+            if 1950 <= y <= current_year:
+                return y
+        return None
+
+    # ── <table> rows  (<tr><th>label</th><td>value</td>) ──────────────────────
     for row in soup.find_all("tr"):
         cells = row.find_all(["th", "td"])
         if len(cells) >= 2:
             label = cells[0].get_text(strip=True)
-            if "築年" in label or "建築年" in label:
+            if any(k in label for k in YEAR_LABELS):
                 val = cells[1].get_text(strip=True)
-                # "築年数：50.5年" — age in years
-                m_age = re.search(r'(\d+(?:\.\d+)?)年', val)
-                if m_age and "築年数" in label:
-                    return current_year - int(float(m_age.group(1)))
-                # Era format: 昭和50年
-                m = re.search(r'([昭平令]和|令和)(\d{1,2})年', val)
-                if m:
-                    era, yr = m.group(1), int(m.group(2))
-                    era_key = era[:2]
-                    if era_key in _ERA_OFFSET:
-                        return _ERA_OFFSET[era_key] + yr
-                # Western year: 1995年
-                m2 = re.search(r'(\d{4})年', val)
-                if m2:
-                    y = int(m2.group(1))
-                    if 1950 <= y <= current_year:
-                        return y
+                result = _parse_val(label, val)
+                if result:
+                    return result
 
-    # Fallback: scan full text for "築年数：50.5年"
-    m_age = re.search(r'築年数[：:]\s*(\d+(?:\.\d+)?)年', full_text)
-    if m_age:
-        return current_year - int(float(m_age.group(1)))
+    # ── <dl> lists  (<dt>label</dt><dd>value</dd>)  — used by SUUMO ──────────
+    for dl in soup.find_all("dl"):
+        dts = dl.find_all("dt")
+        dds = dl.find_all("dd")
+        for dt, dd in zip(dts, dds):
+            label = dt.get_text(strip=True)
+            if any(k in label for k in YEAR_LABELS):
+                val = dd.get_text(strip=True)
+                result = _parse_val(label, val)
+                if result:
+                    return result
 
-    # Fallback: era / western year patterns in full text
+    # ── Full-text fallbacks ────────────────────────────────────────────────────
+    # "築年数：50.5年"
+    m = re.search(r'築年数[：:]\s*(\d+(?:\.\d+)?)年', full_text)
+    if m:
+        return current_year - int(float(m.group(1)))
+
+    # "完成時期（築年月）... 1987年4月" or era variant
+    m = re.search(r'完成時期[^昭平令\d]*([昭平令]和|令和)(\d{1,2})年', full_text)
+    if m:
+        era_key = m.group(1)[:2]
+        if era_key in _ERA_OFFSET:
+            return _ERA_OFFSET[era_key] + int(m.group(2))
+    m = re.search(r'完成時期[^\d]*(\d{4})年', full_text)
+    if m:
+        y = int(m.group(1))
+        if 1950 <= y <= current_year:
+            return y
+
+    # Generic 築-prefixed era / western year in running text
+    era_pattern = re.compile(r'築[年月\s:：]*(?:([昭平令]和|令和)(\d{1,2})年|(\d{4})年)')
     for m in era_pattern.finditer(full_text):
         era, era_yr, western_yr = m.group(1), m.group(2), m.group(3)
         if western_yr:
@@ -1296,13 +1337,14 @@ class Maple(BaseScraper):
 
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
+        year_built = extract_year_built(soup, full_text)
 
         if is_special:
             print(f"  >>> SPECIAL MAPLE PROPERTY PASSED ALL FILTERS")
-            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}")
+            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}, Year Built: {year_built}")
             print(f"{'='*60}\n")
 
-        self.add_item({
+        item = {
             "id": f"maple-{abs(hash(url))}",
             "source": "Maple Housing",
             "sourceUrl": url,
@@ -1313,7 +1355,10 @@ class Maple(BaseScraper):
             "priceJpy": price,
             "seaViewScore": sea_score,
             "imageUrl": img
-        })
+        }
+        if year_built:
+            item["yearBuilt"] = year_built
+        self.add_item(item)
 
 class Aoba(BaseScraper):
     def run(self):
@@ -1594,13 +1639,14 @@ class Aoba(BaseScraper):
 
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
+        year_built = extract_year_built(soup, full_text)
 
         if is_special:
             print(f"  >>> SPECIAL AOBA PROPERTY PASSED ALL FILTERS")
-            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}")
+            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}, Year Built: {year_built}")
             print(f"{'='*60}\n")
 
-        self.add_item({
+        item = {
             "id": f"aoba-{abs(hash(url))}",
             "source": "Aoba Resort",
             "sourceUrl": url,
@@ -1611,7 +1657,10 @@ class Aoba(BaseScraper):
             "priceJpy": price,
             "seaViewScore": sea_score,
             "imageUrl": img
-        })
+        }
+        if year_built:
+            item["yearBuilt"] = year_built
+        self.add_item(item)
 
 class Suumo(BaseScraper):
     """
@@ -1782,7 +1831,9 @@ class Suumo(BaseScraper):
         else:
             prop_type = determine_type(title, full_text)
 
-        self.add_item({
+        year_built = extract_year_built(soup, full_text)
+
+        item = {
             "id": f"suumo-{abs(hash(url))}",
             "source": "SUUMO",
             "sourceUrl": url,
@@ -1793,7 +1844,10 @@ class Suumo(BaseScraper):
             "priceJpy": price,
             "seaViewScore": sea_score,
             "imageUrl": get_suumo_image(soup, url) or thumb_url,
-        })
+        }
+        if year_built:
+            item["yearBuilt"] = year_built
+        self.add_item(item)
 
 
 def deduplicate(listings):
