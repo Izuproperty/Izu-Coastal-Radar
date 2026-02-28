@@ -223,8 +223,8 @@ def extract_year_built(soup, full_text):
             m = re.search(r'(\d+(?:\.\d+)?)年', val)
             if m:
                 return current_year - int(float(m.group(1)))
-        # Era format e.g. "昭和62年4月"
-        m = re.search(r'([昭平令]和|令和)(\d{1,2})年', val)
+        # Era format e.g. "昭和62年4月" / "平成12年3月" / "令和6年"
+        m = re.search(r'(昭和|平成|令和)(\d{1,2})年', val)
         if m:
             era_key = m.group(1)[:2]
             if era_key in _ERA_OFFSET:
@@ -267,7 +267,7 @@ def extract_year_built(soup, full_text):
         return current_year - int(float(m.group(1)))
 
     # "完成時期（築年月）... 1987年4月" or era variant
-    m = re.search(r'完成時期[^昭平令\d]*([昭平令]和|令和)(\d{1,2})年', full_text)
+    m = re.search(r'完成時期[^\d]*?(昭和|平成|令和)(\d{1,2})年', full_text)
     if m:
         era_key = m.group(1)[:2]
         if era_key in _ERA_OFFSET:
@@ -279,7 +279,7 @@ def extract_year_built(soup, full_text):
             return y
 
     # Generic 築-prefixed era / western year in running text
-    era_pattern = re.compile(r'築[年月\s:：]*(?:([昭平令]和|令和)(\d{1,2})年|(\d{4})年)')
+    era_pattern = re.compile(r'築[年月\s:：]*(?:(昭和|平成|令和)(\d{1,2})年|(\d{4})年)')
     for m in era_pattern.finditer(full_text):
         era, era_yr, western_yr = m.group(1), m.group(2), m.group(3)
         if western_yr:
@@ -1858,7 +1858,11 @@ def deduplicate(listings):
     Same-source listings with identical fingerprints are KEPT — they may be
     genuinely different properties at the same price point in the same city.
 
-    Fingerprint: (city, propertyType, price rounded to nearest ¥100,000).
+    Primary fingerprint:   (city, propertyType, price rounded to nearest ¥100,000).
+    Secondary fingerprint: (propertyType, price rounded to nearest ¥100,000) — catches
+      cases where city detection returns different values across sources for the same
+      property (e.g. 下賀茂 tagged as 南伊豆 by Izu Taiyo but 下田 by SUUMO).
+
     When cross-source duplicates collide, the source with higher priority wins:
         Izu Taiyo > Maple Housing > Aoba Resort > SUUMO
     """
@@ -1866,27 +1870,36 @@ def deduplicate(listings):
 
     # Process preferred sources first so they "win" the fingerprint slot
     ranked = sorted(listings, key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 99))
-    seen = {}  # fp -> source that first claimed it
+    seen       = {}  # (city, type, price_bucket) -> source  [primary]
+    seen_xsrc  = {}  # (type, price_bucket)       -> source  [secondary, cross-source only]
     out = []
 
     for item in ranked:
         price = item.get("priceJpy", 0)
         # Round to nearest ¥100,000 to tolerate minor display rounding between sites
         price_bucket = round(price / 100000) if price else 0
-        fp = (item.get("city", ""), item.get("propertyType", ""), price_bucket)
+        city  = item.get("city", "")
+        ptype = item.get("propertyType", "")
+        fp       = (city, ptype, price_bucket)
+        fp_loose = (ptype, price_bucket)
         src = item.get("source", "?")
+        man = price // 10000 if price else 0
 
         if fp in seen and seen[fp] != src:
-            # Cross-source duplicate: same fingerprint, different site → drop lower-priority one
-            city = item.get("city", "")
-            ptype = item.get("propertyType", "")
-            man = price // 10000 if price else 0
+            # Primary cross-source duplicate: same city+type+price, different site
             print(f"  [DEDUP] Removed cross-source duplicate from {src}: {city} {ptype} ¥{man}万 (kept {seen[fp]})")
             STATS["skipped_dup"] += 1
+        elif fp_loose in seen_xsrc and seen_xsrc[fp_loose] != src:
+            # Secondary cross-source duplicate: same type+price, different city label
+            # (city detection mismatch between sites for the same physical property)
+            print(f"  [DEDUP] Removed cross-source duplicate (city mismatch) from {src}: {city} {ptype} ¥{man}万 (kept {seen_xsrc[fp_loose]})")
+            STATS["skipped_dup"] += 1
         else:
-            # New fingerprint OR same source with same price — keep it
+            # New fingerprint OR same source — keep it
             if fp not in seen:
                 seen[fp] = src
+            if fp_loose not in seen_xsrc:
+                seen_xsrc[fp_loose] = src
             out.append(item)
 
     return out
