@@ -77,6 +77,7 @@
     
     .tag { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #fff; backdrop-filter: blur(5px); background: rgba(0,0,0,0.6); }
     .tag-sea { background: var(--accent); }
+    .tag-new { background: #30d158; }
 
     .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
     .price { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
@@ -124,6 +125,9 @@
       <option value="house">House</option>
       <option value="land">Land</option>
     </select>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="sort-btn" onclick="toggleSort(this)">↓ Price</button>
+    </div>
     <div class="price-slider">
       <div class="slider-values">
         <span id="price-min-label">¥0</span>
@@ -155,8 +159,10 @@
 
 <script>
   let DATA = [];
-  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all' };
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all', sortAsc: false };
   let FX_USD = 155; // Default fallback, will be updated from buildInfo.json
+  const TODAY = new Date().toISOString().slice(0, 10);
+  const TWO_WEEKS_AGO = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const TXT = {
     EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land", useful: "Useful Izu Links" },
@@ -166,31 +172,25 @@
 
   async function init() {
     try {
-      // Load listings
-      const res = await fetch(`listings.json?t=${Date.now()}`);
-      if (!res.ok) throw new Error("Failed to load listings");
-      const json = await res.json();
+      const t = Date.now();
+      const [listingsRes, buildRes] = await Promise.all([
+        fetch(`listings.json?t=${t}`),
+        fetch(`buildInfo.json?t=${t}`)
+      ]);
+
+      if (!listingsRes.ok) throw new Error("Failed to load listings");
+      const json = await listingsRes.json();
       DATA = json.listings || [];
 
-      // Load forex rate from buildInfo
-      try {
-        const buildRes = await fetch(`buildInfo.json?t=${Date.now()}`);
-        if (buildRes.ok) {
-          const buildInfo = await buildRes.json();
-          if (buildInfo.forexRate) {
-            FX_USD = buildInfo.forexRate;
-            console.log(`Loaded forex rate: ¥${FX_USD}/$1`);
-          }
+      if (buildRes.ok) {
+        const buildInfo = await buildRes.json();
+        if (buildInfo.forexRate) {
+          FX_USD = buildInfo.forexRate;
         }
-      } catch (e) {
-        console.warn("Failed to load forex rate, using default:", e);
       }
 
-      // Update footer with current rate
       const footerRateEl = document.getElementById('forex-rate');
-      if (footerRateEl) {
-        footerRateEl.innerText = `USD conversions at ¥${FX_USD}/$1`;
-      }
+      if (footerRateEl) footerRateEl.innerText = `USD conversions at ¥${FX_USD}/$1`;
 
       populateFilters();
       updateSliderTrack(0, PRICE_STEPS.length - 1);
@@ -208,9 +208,17 @@
     "南伊豆": "Minami-Izu",
     "賀茂郡": "Minami-Izu"
   };
+  const CITY_MAP_CN = {
+    "下田": "下田",
+    "河津": "河津",
+    "東伊豆": "东伊豆",
+    "南伊豆": "南伊豆",
+    "賀茂郡": "南伊豆"
+  };
 
   function getCityName(city) {
     if (STATE.lang === 'EN') return CITY_MAP[city] || city;
+    if (STATE.lang === 'CN') return CITY_MAP_CN[city] || city;
     return city;
   }
 
@@ -316,59 +324,11 @@
     return p;
   }
 
-  function getSize(l) {
-    if (l.propertyType === 'land') return l.landSqm || 0;
-    return l.buildingSqm || 0;
+  function toggleSort(btn) {
+    STATE.sortAsc = !STATE.sortAsc;
+    btn.innerText = STATE.sortAsc ? '↑ Price' : '↓ Price';
+    render();
   }
-
-  // renderStats function removed - stats bar no longer displayed
-  /*
-  function renderStats(items) {
-    const pEl = document.getElementById('stat-price');
-    const sEl = document.getElementById('stat-size');
-    const subEl = document.getElementById('stat-size-sub');
-    const uEl = document.getElementById('stat-unit');
-    const uSubEl = document.getElementById('stat-unit-sub');
-
-    if (!items.length) {
-      pEl.innerText = "-"; sEl.innerText = "-"; uEl.innerText = "-";
-      return;
-    }
-
-    const totalP = items.reduce((a,b) => a + (b.priceJpy||0), 0);
-    const totalS = items.reduce((a,b) => a + getSize(b), 0);
-    const avgP = totalP / items.length;
-    const avgS = totalS / items.length;
-
-    pEl.innerText = fmtPrice(avgP);
-
-    // Only show size stats if we have size data
-    if (avgS > 0) {
-      if (STATE.curr === 'USD') {
-        const sqft = avgS * 10.764;
-        sEl.innerText = Math.round(sqft).toLocaleString() + " ft²";
-        subEl.innerText = `(${Math.round(avgS)} m²)`;
-        const ppSqft = (avgP / FX_USD) / sqft;
-        uEl.innerText = "$" + Math.round(ppSqft) + " /ft²";
-        uSubEl.innerText = "";
-      } else {
-        sEl.innerText = Math.round(avgS).toLocaleString() + " m²";
-        subEl.innerText = "";
-        const ppSqm = avgP / avgS;
-        const sqft = avgS * 10.764;
-        const ppSqft = (avgP / FX_USD) / sqft;
-        uEl.innerText = "¥" + Math.round(ppSqm/10000).toLocaleString() + "万 /m²";
-        uSubEl.innerText = `($${Math.round(ppSqft)} /ft²)`;
-      }
-    } else {
-      // No size data available
-      sEl.innerText = "-";
-      subEl.innerText = "No data";
-      uEl.innerText = "-";
-      uSubEl.innerText = "No data";
-    }
-  }
-  */
 
   function getJPTitle(fullTitle) {
     // Extract concise property info from verbose Izu Taiyo titles
@@ -409,10 +369,10 @@
       return true;
     });
 
-    // Sort by price descending (highest first)
-    filtered.sort((a, b) => (b.priceJpy || 0) - (a.priceJpy || 0));
+    filtered.sort((a, b) => STATE.sortAsc
+      ? (a.priceJpy || 0) - (b.priceJpy || 0)
+      : (b.priceJpy || 0) - (a.priceJpy || 0));
 
-    // renderStats(filtered); // Removed - stats bar no longer displayed
     document.getElementById('count').innerText = `${filtered.length} listings`;
 
     const grid = document.getElementById('grid');
@@ -425,15 +385,12 @@
       const pType = TXT[STATE.lang][l.propertyType] || l.propertyType;
       const img = l.imageUrl || "https://placehold.co/600x400?text=No+Image";
 
-      // Determine badge text based on seaViewScore
-      let badgeText = "Sea View";
-      if (l.seaViewScore === 4) {
-        badgeText = "Sea View";
-      } else if (l.seaViewScore === 3) {
-        badgeText = "Beach Area";
-      } else if (l.seaViewScore === 2) {
-        badgeText = "Close to Sea";
-      }
+      let badgeText = "Close to Sea";
+      if (l.seaViewScore === 4) badgeText = "Ocean View";
+      else if (l.seaViewScore === 3) badgeText = "Beach Area";
+
+      const isNew = l.firstSeen && l.firstSeen >= TWO_WEEKS_AGO;
+      const currentYear = new Date().getFullYear();
 
       const html = `
         <div class="card">
@@ -442,6 +399,7 @@
               <img src="${img}" class="card-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Error'">
             </a>
             <div class="tag tag-sea">${badgeText}</div>
+            ${isNew ? '<div class="tag tag-new" style="top:10px;left:auto;right:10px;">NEW</div>' : ''}
           </div>
           <div class="card-body">
             <div class="price">${fmtPrice(l.priceJpy)}</div>
@@ -449,7 +407,7 @@
             <div class="meta">
               <span>${pType}</span>
               <span>${getCityName(l.city)}</span>
-              ${l.propertyType !== 'land' && l.yearBuilt ? `<span>${2026 - l.yearBuilt}y old</span>` : ''}
+              ${l.propertyType !== 'land' && l.yearBuilt ? `<span>${currentYear - l.yearBuilt}y old</span>` : ''}
             </div>
             <div class="card-footer">
               <span>${l.source}</span>
