@@ -6,14 +6,14 @@ Izu Coastal Radar - Generator v16 (Failsafe & Context Trust)
 """
 
 from __future__ import annotations
-import sys
-sys.path.insert(0, '/usr/local/lib/python3.11/site-packages')
 import datetime as dt
 import json
 import os
 import random
 import re
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin, parse_qs, urlparse
 import requests
 from bs4 import BeautifulSoup
@@ -79,6 +79,11 @@ STATS = {
     "skipped_dup": 0,
     "error": 0
 }
+STATS_LOCK = threading.Lock()
+
+def inc_stat(key, n=1):
+    with STATS_LOCK:
+        STATS[key] += n
 
 # --- FOREX RATE ---
 
@@ -404,127 +409,55 @@ def get_suumo_image(soup, url):
             all_candidates.append(src)
 
     if all_candidates:
-        print(f"  [SUUMO IMG] fallback scan found {len(all_candidates)} candidate(s): {all_candidates[0][:80]}")
         return urljoin(url, all_candidates[0])
-
-    # Nothing found — log all img URLs to help diagnose
-    all_srcs = [best_src(img) for img in soup.find_all("img") if best_src(img)]
-    print(f"  [SUUMO IMG] NO IMAGE FOUND for {url}")
-    print(f"  [SUUMO IMG] All img URLs on page ({len(all_srcs)}):")
-    for s in all_srcs[:15]:
-        print(f"    {s[:100]}")
 
     return ""
 
 def get_izutaiyo_image(soup, url, property_id):
-    """Izu Taiyo-specific image finder - constructs image URLs from property ID"""
-    # Izu Taiyo images follow a predictable pattern:
-    # Property ID: SMB410H -> Images at: bb/sm/smb410ha.jpg, bb/sm/smb410hb.jpg, etc.
-
+    """Izu Taiyo-specific image finder - constructs image URLs from property ID.
+    Property ID: SMB410H -> Images at: bb/sm/smb410ha.jpg, bb/sm/smb410hb.jpg, etc.
+    """
     if property_id:
-        # Convert property ID to lowercase for image path
         prop_lower = property_id.lower()
-        # Get first 2 characters for directory
         dir_name = prop_lower[:2]
-
-        # Try constructing image URLs (a, b, c variants)
-        for letter in ['a', 'b', 'c']:
-            img_path = f"bb/{dir_name}/{prop_lower}{letter}.jpg"
-            img_url = urljoin(url, img_path)
-            print(f"  [DEBUG] Constructed Izu Taiyo image URL: {img_url}")
-            # Return the first one (they can check others on the site)
-            return img_url
-
-    # Fallback to searching the page
-    print(f"  [DEBUG] No property ID available for image construction")
-
-    # Strategy 1: Look for image URLs in noscript or commented sections
-    # Check for images in pattern bb/{dir}/{id}{letter}.jpg
-    import re
-    page_text = str(soup)
-    img_pattern = r'bb/\w+/\w+[a-z]\.jpg'
-    img_matches = re.findall(img_pattern, page_text)
-
-    if img_matches:
-        # Use the first match
-        img_url = urljoin(url, img_matches[0])
-        print(f"  [DEBUG] Found Izu Taiyo image in HTML: {img_url}")
+        img_url = urljoin(url, f"bb/{dir_name}/{prop_lower}a.jpg")
         return img_url
-    # Strategy 2: Fall back to img tags as last resort
-    all_imgs = soup.find_all("img")
+
+    # Fallback: search HTML for bb/{dir}/{id}{letter}.jpg pattern
+    img_matches = re.findall(r'bb/\w+/\w+[a-z]\.jpg', str(soup))
+    if img_matches:
+        return urljoin(url, img_matches[0])
+
+    # Last resort: scored img tag search
+    skip_keywords = ["logo", "rogo", "icon", "banner", "bnr", "nav", "button", "arrow", "spacer", "bg_", "/title/", "tel.gif"]
     candidates = []
-
-    print(f"  [DEBUG] Falling back to img tag search, found {len(all_imgs)} img tags")
-
-    for img in all_imgs:
+    for img in soup.find_all("img"):
         src = img.get("src", "")
         if not src:
             continue
-
-        # Get full URL
-        full_url = urljoin(url, src)
         lower_src = src.lower()
-
-        # Debug: show what we're examining
-        print(f"  [DEBUG]   Examining: {src[:60]}")
-
-        # Skip obvious non-property images (EXPLICIT rogo.jpg check)
-        skip_keywords = ["logo", "rogo", "icon", "banner", "bnr", "nav", "button", "arrow", "spacer", "bg_", "/title/", "tel.gif"]
-        should_skip = any(skip in lower_src for skip in skip_keywords)
-        if should_skip:
-            print(f"  [DEBUG]     -> SKIP (contains excluded keyword)")
+        if any(skip in lower_src for skip in skip_keywords):
             continue
-
-        # Must be an image file
         if not any(ext in lower_src for ext in [".jpg", ".jpeg", ".png", ".gif"]):
-            print(f"  [DEBUG]     -> SKIP (not image extension)")
             continue
-
-        # Prefer images that look like property photos
-        priority = 10  # Base priority for any valid image
-
+        priority = 10
         if property_id and property_id.lower() in lower_src:
-            priority = 100  # Highest priority
-            print(f"  [DEBUG]     -> MATCH property ID! Priority: {priority}")
-        elif any(pattern in lower_src for pattern in ["photo", "img", "pic", "image", "_1", "_01", "p01"]):
+            priority = 100
+        elif any(p in lower_src for p in ["photo", "img", "pic", "image", "_1", "_01", "p01"]):
             priority = 50
-            print(f"  [DEBUG]     -> Looks like photo. Priority: {priority}")
-        else:
-            print(f"  [DEBUG]     -> Generic image. Priority: {priority}")
+        w = img.get("width", "")
+        if w and w.isdigit():
+            w = int(w)
+            if w >= 200: priority += 20
+            elif w < 100: priority -= 30
+        if priority > 0:
+            candidates.append((priority, urljoin(url, src)))
 
-        # Check size if available
-        width = img.get("width", "")
-        height = img.get("height", "")
-        if width and width.isdigit():
-            w = int(width)
-            if w >= 200:  # Prefer larger images
-                priority += 20
-                print(f"  [DEBUG]     -> Large image ({w}px), bonus +20")
-            elif w < 100:  # Penalize tiny images
-                priority -= 30
-                print(f"  [DEBUG]     -> Tiny image ({w}px), penalty -30")
-
-        if priority > 0:  # Only add if priority is positive
-            candidates.append((priority, full_url))
-            print(f"  [DEBUG]     -> Added as candidate with priority {priority}")
-
-    # Sort by priority and return best match
     if candidates:
         candidates.sort(reverse=True, key=lambda x: x[0])
-        best_priority, best_url = candidates[0]
-        print(f"  [DEBUG] ✓ Selected image for {property_id}: priority={best_priority}")
-        print(f"  [DEBUG]   URL: {best_url}")
-        return best_url
+        return candidates[0][1]
 
-    # Fallback - but log it
-    print(f"  [DEBUG] ✗ No valid image candidates for {property_id} (found {len(all_imgs)} total images)")
-    print(f"  [DEBUG]   Trying generic fallback...")
-    fallback_img = get_best_image(soup, url)
-    if fallback_img:
-        print(f"  [DEBUG]   Fallback found: {fallback_img}")
-    else:
-        print(f"  [DEBUG]   No fallback image found either!")
-    return fallback_img
+    return get_best_image(soup, url)
 
 def extract_actual_city_from_title(title):
     """
@@ -645,7 +578,7 @@ class BaseScraper:
             r.encoding = r.apparent_encoding
             return BeautifulSoup(r.text, "html.parser")
         except:
-            STATS["error"] += 1
+            inc_stat("error")
             return None
 
     def add_item(self, item):
@@ -665,10 +598,6 @@ class IzuTaiyo(BaseScraper):
         }
 
         found_links = {} # url -> city_context
-
-        # Track specific properties we're looking for
-        target_properties = ["SMB240H", "SMB225H", "SMB368H", "SMB195H", "SMB392H"]
-        target_found = {prop: False for prop in target_properties}
 
         # Strategy: Use the regular search endpoint (s.php) instead of featured (tokusen.php)
         # The search form allows filtering by location and sea view conditions
@@ -700,49 +629,19 @@ class IzuTaiyo(BaseScraper):
 
                     print(f"  Fetching {city_name} {type_name} (page {page})...")
 
-                    # DEBUG: Show the URL for Shimoda searches
-                    if city_name == "下田":
-                        # Construct a sample URL to show what we're requesting
-                        from urllib.parse import urlencode
-                        query_string = urlencode(params, doseq=True)
-                        full_url = f"{search_url}?{query_string}"
-                        print(f"    [DEBUG] Request URL: {full_url}")
-
                     soup = self.fetch(search_url, params=params)
                     if not soup:
                         print(f"  [WARNING] Failed to fetch {city_name} {type_name} page {page}")
                         break
 
-                    # DEBUG: Check for "no results" message
                     page_text = soup.get_text()
-                    if city_name == "下田":
-                        if '見つかりませんでした' in page_text or '該当する物件がありません' in page_text or '該当物件はありません' in page_text:
-                            print(f"    [DEBUG] ⚠️  Page returned 'NO RESULTS' message!")
-                            break  # No point continuing pagination
-                        if '検索結果' in page_text:
-                            print(f"    [DEBUG] ✓ Page contains '検索結果' (search results)")
+                    if '見つかりませんでした' in page_text or '該当する物件がありません' in page_text or '該当物件はありません' in page_text:
+                        break
 
-                        # Count how many property-like elements we see
-                        property_containers = soup.find_all("div", class_=re.compile(r"property|item|listing|card", re.I))
-                        print(f"    [DEBUG] Found {len(property_containers)} potential property container divs")
-
-                    # Track if we found any properties on this page
                     page_found_count = 0
 
-                    # DEBUG: For Shimoda searches, capture ALL property IDs found
-                    if city_name == "下田":
-                        debug_property_ids = []
-
                     # Look for onclick handlers with property IDs
-                    onclick_tags = soup.find_all(True, onclick=True)
-                    if city_name == "下田":
-                        print(f"    [DEBUG] Found {len(onclick_tags)} tags with onclick handlers")
-                        # Show first few onclick values to debug
-                        for i, tag in enumerate(onclick_tags[:3]):
-                            onclick_val = tag.get("onclick", "")
-                            print(f"    [DEBUG]   onclick[{i}]: {onclick_val[:100]}")
-
-                    for tag in onclick_tags:
+                    for tag in soup.find_all(True, onclick=True):
                         onclick = tag.get("onclick", "")
 
                         # Try multiple patterns for property IDs
@@ -756,17 +655,7 @@ class IzuTaiyo(BaseScraper):
                             match = re.search(r"hpno\s*=\s*['\"](\w+)", onclick)
 
                         if match:
-                            prop_id = match.group(1)
-                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
-
-                            # DEBUG: Track all Shimoda property IDs
-                            if city_name == "下田":
-                                debug_property_ids.append(prop_id)
-                                # Check if this is one of our target properties
-                                if prop_id in target_properties:
-                                    print(f"    [DEBUG] *** FOUND TARGET PROPERTY: {prop_id} ***")
-                                    target_found[prop_id] = True
-
+                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={match.group(1)}"
                             if d_link not in found_links:
                                 found_links[d_link] = city_name
                                 page_found_count += 1
@@ -779,88 +668,34 @@ class IzuTaiyo(BaseScraper):
                             match = re.search(r"hpbunno\s*=\s*['\"]([^'\"&]+)", onclick)
 
                         if match:
-                            prop_id = match.group(1).strip()
-                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
-
-                            # DEBUG: Track Shimoda properties with hpbunno
-                            if city_name == "下田":
-                                debug_property_ids.append(f"{prop_id}(bunno)")
-                                if prop_id in target_properties:
-                                    print(f"    [DEBUG] *** FOUND TARGET PROPERTY (bunno): {prop_id} ***")
-                                    target_found[prop_id] = True
-
+                            d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={match.group(1).strip()}"
                             if d_link not in found_links:
                                 found_links[d_link] = city_name
                                 page_found_count += 1
 
                     # Also try direct links in <a> tags
-                    direct_links = soup.find_all("a", href=True)
-                    d_php_links = [a for a in direct_links if "d.php" in a.get("href", "")]
-                    if city_name == "下田":
-                        print(f"    [DEBUG] Found {len(d_php_links)} direct d.php links")
-                        if len(d_php_links) > 0:
-                            # Show sample links
-                            for i, a in enumerate(d_php_links[:3]):
-                                print(f"    [DEBUG]   d.php link[{i}]: {a.get('href', '')[:80]}")
-
-                    for a in direct_links:
+                    for a in soup.find_all("a", href=True):
                         href = a['href']
                         if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
                             full = urljoin("https://www.izutaiyo.co.jp", href)
-
-                            # DEBUG: Extract property ID from direct link
-                            if city_name == "下田":
-                                if "hpno=" in href:
-                                    prop_id_match = re.search(r"hpno=(\w+)", href)
-                                    if prop_id_match:
-                                        link_prop_id = prop_id_match.group(1)
-                                        if link_prop_id not in debug_property_ids:
-                                            debug_property_ids.append(link_prop_id + "(direct)")
-                                        if link_prop_id in target_properties:
-                                            print(f"    [DEBUG] *** FOUND TARGET PROPERTY (direct link): {link_prop_id} ***")
-                                            target_found[link_prop_id] = True
-
                             if full not in found_links:
-                                # Extract the city context
                                 found_links[full] = city_name
                                 page_found_count += 1
 
-                    # FALLBACK: Search page HTML source for any d.php links (might be in JavaScript)
-                    if city_name == "下田" and page_found_count == 0:
+                    # FALLBACK: Search raw HTML for d.php links (catches JS-rendered or hidden links)
+                    if page_found_count == 0:
                         html_str = str(soup)
-                        # Find all d.php?hpno= or d.php?hpbunno= patterns in the entire HTML
-                        hpno_matches = re.findall(r'd\.php\?hpno=(\w+)', html_str)
-                        hpbunno_matches = re.findall(r'd\.php\?hpbunno=([^\'\"&\s]+)', html_str)
-
-                        print(f"    [DEBUG] FALLBACK HTML search found:")
-                        print(f"    [DEBUG]   hpno patterns: {len(hpno_matches)}")
-                        print(f"    [DEBUG]   hpbunno patterns: {len(hpbunno_matches)}")
-
-                        if len(hpno_matches) > 0:
-                            print(f"    [DEBUG]   Sample hpno IDs: {hpno_matches[:5]}")
-
-                        # Add these as fallback
-                        for prop_id in hpno_matches:
+                        for prop_id in re.findall(r'd\.php\?hpno=(\w+)', html_str):
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
                             if d_link not in found_links:
                                 found_links[d_link] = city_name
                                 page_found_count += 1
-                                debug_property_ids.append(prop_id + "(html)")
-
-                        for prop_id in hpbunno_matches:
+                        for prop_id in re.findall(r'd\.php\?hpbunno=([^\'\"&\s]+)', html_str):
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
                             if d_link not in found_links:
                                 found_links[d_link] = city_name
                                 page_found_count += 1
-                                debug_property_ids.append(prop_id + "(html)")
 
-                    # DEBUG: Show all property IDs found on this page for Shimoda
-                    if city_name == "下田" and debug_property_ids:
-                        print(f"    [DEBUG] Property IDs on this page ({len(debug_property_ids)}): {', '.join(debug_property_ids[:20])}")
-                        if len(debug_property_ids) > 20:
-                            print(f"    [DEBUG] ... and {len(debug_property_ids) - 20} more")
-
-                    # If no properties found on this page, stop pagination for this search
                     if page_found_count == 0:
                         print(f"    No new properties on page {page}, ending pagination")
                         break
@@ -871,21 +706,12 @@ class IzuTaiyo(BaseScraper):
 
         print(f"  > Processing {len(found_links)} unique listings...")
 
-        # DEBUG: Report on target properties
-        print("\n" + "="*60)
-        print("TARGET PROPERTY SEARCH RESULTS:")
-        print("="*60)
-        for prop, found in target_found.items():
-            status = "✓ FOUND" if found else "✗ NOT FOUND"
-            print(f"  {prop}: {status}")
-        print("="*60 + "\n")
-
         for link, city_ctx in found_links.items():
             self.parse_detail(link, city_ctx)
             sleep_jitter()
 
     def parse_detail(self, url, city_ctx):
-        STATS["scanned"] += 1
+        inc_stat("scanned")
         soup = self.fetch(url)
         if not soup: return
 
@@ -896,14 +722,6 @@ class IzuTaiyo(BaseScraper):
         elif "hpbunno=" in url:
             property_id = url.split("hpbunno=")[1].split("&")[0]
 
-        # Special debug logging for specific properties
-        is_special = property_id in ["KW2002H", "SMB240H", "SMB225H", "SMB368H", "SMB195H"]
-        if is_special:
-            print(f"\n{'='*60}")
-            print(f"SPECIAL PROPERTY DEBUG: {property_id}")
-            print(f"URL: {url}")
-            print(f"{'='*60}")
-
         # Remove footer and nav (can contain misleading location info)
         for tag in soup.find_all(["footer", "nav", ".footer", ".navigation"]):
             tag.decompose()
@@ -913,8 +731,6 @@ class IzuTaiyo(BaseScraper):
 
         # 1. Location FIRST - Filter wrong cities before anything else
         city = get_location_trust(soup, full_text, city_ctx)
-        if is_special:
-            print(f"  City detected: {city}")
         if city == "WRONG_CITY" or not city:
             # Extract city name from title for debug
             title_preview = title if len(title) < 40 else title[:37] + "..."
@@ -932,16 +748,12 @@ class IzuTaiyo(BaseScraper):
                     print(f"  [LOCATION FILTERED] Not in target area: {title_preview}")
             else:
                 print(f"  [LOCATION FILTERED] Could not determine city: {title_preview}")
-            if is_special:
-                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Location check failed")
-            STATS["skipped_loc"] += 1
+            inc_stat("skipped_loc")
             return
 
         # 2. Sold?
         if is_contracted(title, full_text):
-            if is_special:
-                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Property is sold/contracted")
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
 
         # 3. Mansion? - Check for specific type indicators
@@ -961,9 +773,7 @@ class IzuTaiyo(BaseScraper):
 
         if is_mansion:
             print(f"  [MANSION FILTERED] {city} - {title[:60]}")
-            if is_special:
-                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Mansion/condo")
-            STATS["skipped_mansion"] += 1
+            inc_stat("skipped_mansion")
             return
 
         # 4. Sea View Scoring (Tiered for accuracy)
@@ -998,23 +808,10 @@ class IzuTaiyo(BaseScraper):
         # 5. Filter by sea view score - only include properties with clear sea connection
         # Minimum score of 2 required (explicit proximity or better)
         MIN_SEA_SCORE = 2
-        if is_special:
-            print(f"  Sea view score: {sea_score} (minimum required: {MIN_SEA_SCORE})")
-            # Show which keywords matched
-            if sea_score == 4:
-                matched = [k for k in HIGH_SEA_KEYWORDS if k in full_text]
-                print(f"    Matched HIGH keywords: {matched[:3]}")
-            elif sea_score == 3:
-                matched = [k for k in MEDIUM_SEA_KEYWORDS if k in full_text]
-                print(f"    Matched MEDIUM keywords: {matched[:3]}")
-            elif sea_score == 2:
-                print(f"    Matched proximity patterns")
         if sea_score < MIN_SEA_SCORE:
             title_preview = title if len(title) < 40 else title[:37] + "..."
             print(f"  [SEA VIEW FILTERED] Insufficient sea connection (score={sea_score}): {title_preview}")
-            if is_special:
-                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: Sea view score too low ({sea_score} < {MIN_SEA_SCORE})")
-            STATS["skipped_loc"] += 1  # Count as location filter
+            inc_stat("skipped_loc")  # Count as location filter
             return
 
         # Extract price from multiple possible locations
@@ -1038,14 +835,10 @@ class IzuTaiyo(BaseScraper):
             price = extract_price(full_text)
 
         # 6. Price validation - Exclude properties with no price (likely sold/unavailable)
-        if is_special:
-            print(f"  Price extracted: {price} JPY")
         if not price or price <= 0:
             title_preview = title if len(title) < 40 else title[:37] + "..."
             print(f"  [PRICE FILTERED] No valid price found: {title_preview} (price={price})")
-            if is_special:
-                print(f"  >>> SPECIAL PROPERTY {property_id} REJECTED: No valid price")
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
 
         # Get image - use Izu Taiyo-specific method if we have property_id
@@ -1056,11 +849,6 @@ class IzuTaiyo(BaseScraper):
 
         ptype = determine_type(title, full_text)
         year_built = extract_year_built(soup, full_text)
-
-        if is_special:
-            print(f"  >>> SPECIAL PROPERTY {property_id} PASSED ALL FILTERS")
-            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}, Year Built: {year_built}")
-            print(f"{'='*60}\n")
 
         item = {
             "id": f"izutaiyo-{abs(hash(url))}",
@@ -1093,26 +881,8 @@ class Maple(BaseScraper):
         for u in base_urls:
             soup = self.fetch(u)
             if not soup:
-                print(f"  [DEBUG] Failed to fetch {u}")
+                print(f"  [WARNING] Failed to fetch {u}")
                 continue
-
-            # Debug: Show what we found
-            articles = soup.find_all("article")
-            all_links = soup.find_all("a", href=True)
-            estate_links = [a for a in all_links if "estate_db" in a.get("href", "")]
-
-            print(f"  [DEBUG] {u}")
-            print(f"    Found {len(articles)} article blocks")
-            print(f"    Found {len(all_links)} total links")
-            print(f"    Found {len(estate_links)} estate_db links")
-
-            # Show more sample links to see actual property pages
-            if len(estate_links) > 0:
-                print(f"    Sample links (first 10):")
-                for a in estate_links[:10]:
-                    href = a.get("href", "")
-                    full = urljoin(u, href)
-                    print(f"      - {full}")
 
             # Extract property links - ignore article blocks since they don't exist
             # Just look for estate_db links that aren't navigation
@@ -1167,16 +937,8 @@ class Maple(BaseScraper):
             print(f"  [CATEGORY PAGE FILTERED] {url}")
             return
 
-        # Special debug logging for specific properties (false positives)
-        is_special = "6780" in url or "6831" in url
-
         print(f"  [MAPLE] Processing property: {url[:80]}")
-        STATS["scanned"] += 1
-        if is_special:
-            print(f"\n{'='*60}")
-            print(f"SPECIAL MAPLE PROPERTY DEBUG")
-            print(f"URL: {url}")
-            print(f"{'='*60}")
+        inc_stat("scanned")
 
         soup = self.fetch(url)
         if not soup: return
@@ -1189,7 +951,6 @@ class Maple(BaseScraper):
                 title = clean_text(elem.get_text())
                 if "|" in title: title = title.split("|")[0]
                 if "–" in title: title = title.split("–")[0]
-                # Check if it's the generic site title
                 if "メープルハウジング" not in title and title:
                     break
 
@@ -1198,44 +959,20 @@ class Maple(BaseScraper):
         if is_generic:
             try:
                 from urllib.parse import unquote
-                # URL like: .../6763%ef%bc%9a%e8%87%aa%e7%84%b6...
-                # Extract the encoded part after estate_db/
                 url_parts = url.split('/estate_db/')
                 if len(url_parts) > 1:
-                    # Get everything between estate_db/ and the next / or end
                     path_after_db = url_parts[1].strip('/')
-                    # Get first path segment (the property slug)
                     encoded_title = path_after_db.split('/')[0] if '/' in path_after_db else path_after_db
-
-                    print(f"  [DEBUG] Decoding title from URL segment: {encoded_title[:50]}...")
                     decoded = unquote(encoded_title)
-                    print(f"  [DEBUG] Decoded to: {decoded[:80]}")
-
-                    # Extract property description after the ID and colon
                     if '：' in decoded:
                         title = decoded.split('：', 1)[1].strip()
-                        print(f"  [DEBUG] Extracted after ：: {title[:80]}")
                     elif ':' in decoded:
                         title = decoded.split(':', 1)[1].strip()
-                        print(f"  [DEBUG] Extracted after :: {title[:80]}")
                     else:
-                        # No colon, check if it starts with digits (property ID)
-                        # and try to extract meaningful part
-                        if decoded[:4].isdigit():
-                            title = decoded[4:].strip()  # Skip property ID
-                            print(f"  [DEBUG] Removed ID prefix: {title[:80]}")
-                        else:
-                            title = decoded
-                            print(f"  [DEBUG] Using full decoded: {title[:80]}")
-
-                    # If title is still generic or empty, keep original
+                        title = decoded[4:].strip() if decoded[:4].isdigit() else decoded
                     if not title or len(title) < 3 or "メープルハウジング" in title:
-                        print(f"  [DEBUG] Decoded title still generic or empty, keeping fallback")
                         title = None
-            except Exception as e:
-                print(f"  [DEBUG] Title decode failed for {url}: {e}")
-                import traceback
-                traceback.print_exc()
+            except Exception:
                 title = None
 
         if not title:
@@ -1244,112 +981,55 @@ class Maple(BaseScraper):
         full_text = clean_text(soup.get_text())
 
         if is_contracted(title, full_text):
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
 
         if any(k in title for k in MANSION_KEYWORDS):
-            STATS["skipped_mansion"] += 1
+            inc_stat("skipped_mansion")
             return
 
         city = get_location_trust(soup, full_text)
         if city == "WRONG_CITY" or not city:
-            # Enhanced debugging for Maple city detection
-            print(f"  [MAPLE CITY DEBUG] Property rejected - city detection result: {city}")
-            print(f"    URL: {url}")
-            print(f"    Title: {title[:80]}")
-            # Show what city-related text we can find
-            h1 = soup.find("h1")
-            if h1:
-                print(f"    H1 text: {h1.get_text()[:100]}")
-            # Check for location markers
-            location_found = False
-            for tag in soup.find_all(["th", "td", "dt", "dd"]):
-                tag_text = tag.get_text()
-                if any(marker in tag_text for marker in ["所在地", "住所", "Location", "エリア"]):
-                    location_found = True
-                    sib = tag.find_next_sibling()
-                    print(f"    Found location marker '{tag_text[:20]}': {sib.get_text()[:80] if sib else 'N/A'}")
-            if not location_found:
-                print(f"    No location markers (所在地/住所) found in page")
-            # Sample of full text to see what's there
-            print(f"    Full text sample: {full_text[:200]}")
-            STATS["skipped_loc"] += 1
+            print(f"  [LOCATION FILTERED] Maple - {city}: {url[:80]}")
+            inc_stat("skipped_loc")
             return
 
         # Sea View Scoring (Tiered for accuracy)
         sea_score = 0
         if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
             sea_score = 0
-            if is_special:
-                print(f"  Sea view score: 0 - Explicit 'no sea view' found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
-            if is_special:
-                matched = [k for k in HIGH_SEA_KEYWORDS if k in full_text]
-                print(f"  Sea view score: 4 - HIGH confidence")
-                print(f"    Matched keywords: {matched}")
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
-            if is_special:
-                matched = [k for k in MEDIUM_SEA_KEYWORDS if k in full_text]
-                print(f"  Sea view score: 3 - MEDIUM confidence (beach/coast names)")
-                print(f"    Matched keywords: {matched}")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            # Require explicit distance/time measurements to avoid false positives
             proximity_patterns = [
-                r"海まで徒歩[0-9０-９]",          # 海まで徒歩5分
-                r"海まで.*[0-9０-９]+.*分",       # 海まで約5分
-                r"海まで.*[0-9０-９]+.*[mｍメートル]",  # 海まで100m
-                r"海から[0-9０-９]+.*[mｍメートル]",    # 海から100m
-                r"徒歩[0-9０-９]+.*分.*海",       # 徒歩5分で海
-                r"ビーチまで.*[0-9０-９]+",      # ビーチまで5分
-                r"海.*徒歩圏",                    # 海が徒歩圏内
+                r"海まで徒歩[0-9０-９]",
+                r"海まで.*[0-9０-９]+.*分",
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",
+                r"海から[0-9０-９]+.*[mｍメートル]",
+                r"徒歩[0-9０-９]+.*分.*海",
+                r"ビーチまで.*[0-9０-９]+",
+                r"海.*徒歩圏",
             ]
-            matched_patterns = [p for p in proximity_patterns if re.search(p, full_text)]
-            if matched_patterns:
+            if any(re.search(p, full_text) for p in proximity_patterns):
                 sea_score = 2
-                if is_special:
-                    print(f"  Sea view score: 2 - Proximity detected")
-                    print(f"    Matched patterns: {matched_patterns}")
-                    for pattern in matched_patterns[:2]:
-                        match = re.search(f".{{0,20}}{pattern}.{{0,20}}", full_text)
-                        if match:
-                            print(f"    Context: ...{match.group()}...")
-            else:
-                if is_special:
-                    print(f"  Sea view score: 0 - Generic sea mention without clear proximity")
 
-        # Filter by sea view score - only include properties with clear sea connection
-        MIN_SEA_SCORE = 2
-        if is_special:
-            print(f"  Minimum sea score required: {MIN_SEA_SCORE}")
-        if sea_score < MIN_SEA_SCORE:
+        if sea_score < 2:
             print(f"  [SEA VIEW FILTERED] Maple - Insufficient sea connection (score={sea_score}): {url[:60]}")
-            if is_special:
-                print(f"  >>> SPECIAL MAPLE PROPERTY REJECTED: Sea view score too low ({sea_score} < {MIN_SEA_SCORE})")
-            STATS["skipped_loc"] += 1
+            inc_stat("skipped_loc")
             return
 
         price = extract_price(full_text)
-        if is_special:
-            print(f"  Price extracted: {price} JPY")
-        else:
-            print(f"  [DEBUG] Maple - Extracted price for {url[:60]}: {price}")
 
-        # Price validation - Exclude properties with no price (likely sold/unavailable)
         if not price or price <= 0:
             print(f"  [PRICE FILTERED] No valid price found: {url} (price={price})")
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
 
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
         year_built = extract_year_built(soup, full_text)
-
-        if is_special:
-            print(f"  >>> SPECIAL MAPLE PROPERTY PASSED ALL FILTERS")
-            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}, Year Built: {year_built}")
-            print(f"{'='*60}\n")
 
         item = {
             "id": f"maple-{abs(hash(url))}",
@@ -1397,18 +1077,8 @@ class Aoba(BaseScraper):
         for u in urls:
             soup = self.fetch(u)
             if not soup:
-                print(f"  [DEBUG] Failed to fetch {u}")
+                print(f"  [WARNING] Failed to fetch {u}")
                 continue
-
-            # Debug: Show what we found
-            all_links = soup.find_all("a", href=True)
-            html_links = [a for a in all_links if a.get("href", "").endswith(".html")]
-            room_links = [a for a in all_links if "room" in a.get("href", "")]
-
-            print(f"  [DEBUG] {u}")
-            print(f"    Found {len(all_links)} total links")
-            print(f"    Found {len(html_links)} .html links")
-            print(f"    Found {len(room_links)} 'room' links")
 
             # Find all property links - be more permissive initially
             # We'll filter by actual location in parse_detail()
@@ -1463,23 +1133,12 @@ class Aoba(BaseScraper):
             print(f"  [WARNING] Check: sea view requirements, location matching, price validation")
 
     def parse_detail(self, url):
-        STATS["scanned"] += 1
+        inc_stat("scanned")
 
-        # Special debug logging for specific properties
-        is_special = "room94930761" in url or "room98586218" in url or "room95327115" in url or "room82946986" in url or "room95106919" in url
-
-        if is_special:
-            print(f"\n{'='*60}")
-            print(f"SPECIAL AOBA PROPERTY DEBUG")
-            print(f"URL: {url}")
-            print(f"{'='*60}")
-        else:
-            print(f"  [DEBUG] Aoba - Parsing: {url[:80]}")
+        print(f"  [AOBA] Parsing: {url[:80]}")
 
         soup = self.fetch(url)
-        if not soup:
-            print(f"  [DEBUG] Aoba - Failed to fetch")
-            return
+        if not soup: return
 
         # Extract city from URL as context (Aoba uses area codes in URLs)
         url_city_map = {
@@ -1492,10 +1151,6 @@ class Aoba(BaseScraper):
         for code, city_name in url_city_map.items():
             if code in url:
                 url_city = city_name
-                if is_special:
-                    print(f"  Area code detected: {code} ({city_name})")
-                else:
-                    print(f"  [DEBUG] Aoba - Detected area code {code} ({city_name}) in URL")
                 break
 
         # Extract title: prefer h1, then h2 (skipping map-section headers like "地図MAP")
@@ -1530,128 +1185,63 @@ class Aoba(BaseScraper):
         full_text = clean_text(soup.get_text())
 
         if is_contracted(title, full_text):
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
 
         if any(k in title for k in MANSION_KEYWORDS):
-            STATS["skipped_mansion"] += 1
+            inc_stat("skipped_mansion")
             return
 
         # Use URL city as context if available
         city = get_location_trust(soup, full_text, url_city)
-        if is_special:
-            print(f"  City detected: {city} (context: {url_city})")
         if city == "WRONG_CITY":
-            # Property is explicitly from wrong city
             print(f"  [LOCATION FILTERED] Wrong city detected: {url}")
-            if is_special:
-                print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: Wrong city")
-            STATS["skipped_loc"] += 1
+            inc_stat("skipped_loc")
             return
         if not city:
-            # If URL had area code, trust it
             if url_city:
                 city = url_city
-                if is_special:
-                    print(f"  Using URL city as fallback: {city}")
             else:
                 print(f"  [WARNING] Could not determine city for: {url}")
-                if is_special:
-                    print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: Could not determine city")
-                STATS["skipped_loc"] += 1
+                inc_stat("skipped_loc")
                 return
 
         # Sea View Scoring (Tiered for accuracy)
         sea_score = 0
         if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
             sea_score = 0
-            print(f"  [DEBUG] Aoba - Explicit 'no sea view' found")
         elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
             sea_score = 4
-            if is_special:
-                matched = [k for k in HIGH_SEA_KEYWORDS if k in full_text]
-                print(f"  Sea view score: 4 - HIGH confidence")
-                print(f"    Matched keywords: {matched}")
-            else:
-                print(f"  [DEBUG] Aoba - High confidence sea view detected")
         elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
             sea_score = 3
-            if is_special:
-                matched = [k for k in MEDIUM_SEA_KEYWORDS if k in full_text]
-                print(f"  Sea view score: 3 - MEDIUM confidence (beach names)")
-                print(f"    Matched keywords: {matched}")
-            else:
-                print(f"  [DEBUG] Aoba - Medium confidence (beach name) detected")
         elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
-            # Require explicit distance/time measurements to avoid false positives
-            # Must have numbers: "海まで徒歩5分", "海から100m", etc.
             proximity_patterns = [
-                r"海まで徒歩[0-9０-９]",          # 海まで徒歩5分
-                r"海まで.*[0-9０-９]+.*分",       # 海まで約5分
-                r"海まで.*[0-9０-９]+.*[mｍメートル]",  # 海まで100m
-                r"海から[0-9０-９]+.*[mｍメートル]",    # 海から100m
-                r"徒歩[0-9０-９]+.*分.*海",       # 徒歩5分で海
-                r"ビーチまで.*[0-9０-９]+",      # ビーチまで5分
-                r"海.*徒歩圏",                    # 海が徒歩圏内
+                r"海まで徒歩[0-9０-９]",
+                r"海まで.*[0-9０-９]+.*分",
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",
+                r"海から[0-9０-９]+.*[mｍメートル]",
+                r"徒歩[0-9０-９]+.*分.*海",
+                r"ビーチまで.*[0-9０-９]+",
+                r"海.*徒歩圏",
             ]
-            matched_patterns = [p for p in proximity_patterns if re.search(p, full_text)]
-            if matched_patterns:
+            if any(re.search(p, full_text) for p in proximity_patterns):
                 sea_score = 2
-                if is_special:
-                    print(f"  Sea view score: 2 - Proximity detected")
-                    print(f"    Matched patterns: {matched_patterns}")
-                    # Show actual matched text snippets
-                    for pattern in matched_patterns[:2]:  # Show first 2 matches
-                        match = re.search(f".{{0,20}}{pattern}.{{0,20}}", full_text)
-                        if match:
-                            print(f"    Context: ...{match.group()}...")
-                else:
-                    print(f"  [DEBUG] Aoba - Sea proximity detected")
-            else:
-                if is_special:
-                    print(f"  Sea view score: 0 - Generic sea mention without clear proximity")
-                    print(f"    Contains '海' but no proximity patterns matched")
-                else:
-                    print(f"  [DEBUG] Aoba - Generic sea mention without clear proximity")
-        else:
-            if is_special:
-                print(f"  Sea view score: 0 - No sea-related keywords found")
-            else:
-                print(f"  [DEBUG] Aoba - No sea-related keywords found")
 
-        # Filter by sea view score - only include properties with clear sea connection
-        MIN_SEA_SCORE = 2
-        if is_special:
-            print(f"  Minimum sea score required: {MIN_SEA_SCORE}")
-        if sea_score < MIN_SEA_SCORE:
+        if sea_score < 2:
             print(f"  [SEA VIEW FILTERED] Aoba - Insufficient sea connection (score={sea_score}): {url[:60]}")
-            if is_special:
-                print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: Sea view score too low ({sea_score} < {MIN_SEA_SCORE})")
-            STATS["skipped_loc"] += 1
+            inc_stat("skipped_loc")
             return
 
         price = extract_price(full_text)
-        if is_special:
-            print(f"  Price extracted: {price} JPY")
-        else:
-            print(f"  [DEBUG] Aoba - Extracted price for {url[:60]}: {price}")
 
-        # Price validation - Exclude properties with no price (likely sold/unavailable)
         if not price or price <= 0:
             print(f"  [PRICE FILTERED] No valid price found: {url} (price={price})")
-            if is_special:
-                print(f"  >>> SPECIAL AOBA PROPERTY REJECTED: No valid price")
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
 
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
         year_built = extract_year_built(soup, full_text)
-
-        if is_special:
-            print(f"  >>> SPECIAL AOBA PROPERTY PASSED ALL FILTERS")
-            print(f"      City: {city}, Price: {price}, Sea Score: {sea_score}, Year Built: {year_built}")
-            print(f"{'='*60}\n")
 
         item = {
             "id": f"aoba-{abs(hash(url))}",
@@ -1773,7 +1363,7 @@ class Suumo(BaseScraper):
         return found
 
     def parse_detail(self, url, city_ctx, thumb_url=""):
-        STATS["scanned"] += 1
+        inc_stat("scanned")
         soup = self.fetch(url)
         if not soup:
             return
@@ -1786,15 +1376,15 @@ class Suumo(BaseScraper):
         full_text = clean_text(soup.get_text())
 
         if is_contracted(title, full_text):
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
         if any(k in title for k in MANSION_KEYWORDS):
-            STATS["skipped_mansion"] += 1
+            inc_stat("skipped_mansion")
             return
 
         city = get_location_trust(soup, full_text, city_ctx)
         if city == "WRONG_CITY" or not city:
-            STATS["skipped_loc"] += 1
+            inc_stat("skipped_loc")
             return
 
         # Sea view scoring (same thresholds as other scrapers)
@@ -1820,12 +1410,12 @@ class Suumo(BaseScraper):
 
         if sea_score < 2:
             print(f"  [SEA VIEW FILTERED] SUUMO score={sea_score}: {url[:60]}")
-            STATS["skipped_loc"] += 1
+            inc_stat("skipped_loc")
             return
 
         price = extract_price(full_text)
         if not price:
-            STATS["skipped_sold"] += 1
+            inc_stat("skipped_sold")
             return
 
         # Determine property type: URL path is the most reliable signal for SUUMO.
@@ -1895,12 +1485,12 @@ def deduplicate(listings):
         if fp in seen and seen[fp] != src:
             # Primary cross-source duplicate: same city+type+price, different site
             print(f"  [DEDUP] Removed cross-source duplicate from {src}: {city} {ptype} ¥{man}万 (kept {seen[fp]})")
-            STATS["skipped_dup"] += 1
+            inc_stat("skipped_dup")
         elif fp_loose in seen_xsrc and seen_xsrc[fp_loose] != src:
             # Secondary cross-source duplicate: same type+price, different city label
             # (city detection mismatch between sites for the same physical property)
             print(f"  [DEDUP] Removed cross-source duplicate (city mismatch) from {src}: {city} {ptype} ¥{man}万 (kept {seen_xsrc[fp_loose]})")
-            STATS["skipped_dup"] += 1
+            inc_stat("skipped_dup")
         else:
             # New fingerprint OR same source — keep it
             if fp not in seen:
@@ -1935,10 +1525,14 @@ def main():
     scrapers = [IzuTaiyo(), Maple(), Aoba(), Suumo()]
     all_data = []
 
-    for s in scrapers:
+    def run_scraper(s):
         s.run()
-        all_data.extend(s.items)
-        STATS["saved"] += len(s.items)
+        return s
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        for s in executor.map(run_scraper, scrapers):
+            all_data.extend(s.items)
+            inc_stat("saved", len(s.items))
 
     # Remove cross-source duplicates (same property on multiple sites)
     before_dedup = len(all_data)
