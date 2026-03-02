@@ -193,6 +193,10 @@ def is_contracted(title, text):
 
 def determine_type(title, text):
     combined = (title + " " + text).lower()
+    # "古家付売地" / "古家付土地" = land with old attached house → treat as house.
+    # Check both title and the early body text: Izu Taiyo H1 says "土地情報はこちら！"
+    # but the actual property label "古家付売地" appears in the page body.
+    if "古家付" in title or "古家付" in text[:3000]: return "house"
     # If explicitly Land
     if any(k in title for k in ["売地", "土地"]): return "land"
     # If explicitly House
