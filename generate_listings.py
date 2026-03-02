@@ -7,6 +7,7 @@ Izu Coastal Radar - Generator v16 (Failsafe & Context Trust)
 
 from __future__ import annotations
 import datetime as dt
+import hashlib
 import json
 import os
 import random
@@ -109,6 +110,10 @@ def get_usd_jpy_rate():
     return 155
 
 # --- HELPERS ---
+
+def stable_id(prefix, url):
+    """Deterministic ID from URL — survives across Python runs (unlike hash())."""
+    return f"{prefix}-{hashlib.md5(url.encode()).hexdigest()[:16]}"
 
 def sleep_jitter():
     time.sleep(random.uniform(0.5, 1.5))
@@ -851,7 +856,7 @@ class IzuTaiyo(BaseScraper):
         year_built = extract_year_built(soup, full_text)
 
         item = {
-            "id": f"izutaiyo-{abs(hash(url))}",
+            "id": stable_id("izutaiyo", url),
             "source": "Izu Taiyo",
             "sourceUrl": url,
             "title": title,
@@ -1032,7 +1037,7 @@ class Maple(BaseScraper):
         year_built = extract_year_built(soup, full_text)
 
         item = {
-            "id": f"maple-{abs(hash(url))}",
+            "id": stable_id("maple", url),
             "source": "Maple Housing",
             "sourceUrl": url,
             "title": title,
@@ -1244,7 +1249,7 @@ class Aoba(BaseScraper):
         year_built = extract_year_built(soup, full_text)
 
         item = {
-            "id": f"aoba-{abs(hash(url))}",
+            "id": stable_id("aoba", url),
             "source": "Aoba Resort",
             "sourceUrl": url,
             "title": title,
@@ -1431,7 +1436,7 @@ class Suumo(BaseScraper):
         year_built = extract_year_built(soup, full_text)
 
         item = {
-            "id": f"suumo-{abs(hash(url))}",
+            "id": stable_id("suumo", url),
             "source": "SUUMO",
             "sourceUrl": url,
             "title": title,
