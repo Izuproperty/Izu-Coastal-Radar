@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-02T04:06:42.299709",
+  "generatedAt": "2026-03-02T04:12:08.687312",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1235,6 +1235,34 @@
       "firstSeen": "2026-03-02"
     },
     {
+      "id": "maple-e2c91d723fa66596",
+      "source": "Maple Housing",
+      "sourceUrl": "https://www.maple-h.co.jp/estate_db/6780%ef%bc%9a%e7%95%91%e3%81%a8%e6%9e%9c%e6%a8%b9%e5%9c%92%e3%81%ae%e3%81%82%e3%82%8b281%e5%9d%aa%e3%81%ae%e6%95%b7%e5%9c%b0%e3%81%8c%e9%ad%85%e5%8a%9b%e3%83%bb%e7%86%b1%e5%b7%9d%e3%81%ae%e6%a3%ae/",
+      "title": "畑と果樹園のある281坪の敷地が魅力・熱川の森",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 12000000,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/10/6780-1.jpg",
+      "yearBuilt": 2000,
+      "firstSeen": "2026-03-02"
+    },
+    {
+      "id": "aoba-d13b68bb62cd5a8a",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room80136217.html",
+      "title": "リゾートパーク伊豆あたがわ 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 8600000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01771921353",
+      "yearBuilt": 1988,
+      "firstSeen": "2026-03-02"
+    },
+    {
       "id": "aoba-a316495e450ac74d",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
@@ -1259,21 +1287,7 @@
       "priceJpy": 7500000,
       "seaViewScore": 2,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98995661_1_500_500_3.jpg?t=01771921334",
-      "yearBuilt": 1976,
-      "firstSeen": "2026-03-02"
-    },
-    {
-      "id": "aoba-d13b68bb62cd5a8a",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room80136217.html",
-      "title": "リゾートパーク伊豆あたがわ 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 8600000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01771921353",
-      "yearBuilt": 1992,
+      "yearBuilt": 1965,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1301,7 +1315,7 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01771921415",
-      "yearBuilt": 1993,
+      "yearBuilt": 1998,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1315,7 +1329,7 @@
       "priceJpy": 9900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01771921424",
-      "yearBuilt": 1968,
+      "yearBuilt": 1981,
       "firstSeen": "2026-03-02"
     },
     {
