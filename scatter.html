@@ -92,6 +92,7 @@
       pointer-events: all;
     }
     #filter-count { font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
+    .filter-bar select { padding: 8px 10px; background: #0a0a0a; color: #fff; border: 1px solid #3a3a3c; border-radius: 8px; outline: none; font-size: 0.82rem; }
 
     /* Legend */
     .legend { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
@@ -153,13 +154,19 @@
 
 <header>
   <h1>IZU COASTAL RADAR — SCATTER</h1>
-  <div class="sub">Price vs. Property Age · Houses Only · Shimoda &amp; South Izu</div>
+  <div class="sub">Price vs. Property Age · Houses &amp; Condos · Shimoda &amp; South Izu</div>
   <div class="nav"><a href="index.html">← Back to Radar</a></div>
 </header>
 
 <div class="container">
 
   <div class="filter-bar">
+    <label>Type</label>
+    <select id="type-select" onchange="redraw()">
+      <option value="all">All</option>
+      <option value="house">House</option>
+      <option value="condo">Condos</option>
+    </select>
     <label>Price (USD)</label>
     <div class="price-slider">
       <div class="slider-values">
@@ -182,7 +189,7 @@
   <div class="legend">
     <div class="legend-item">
       <div class="dot-swatch regular"></div>
-      <span>House listing</span>
+      <span>House / Condo listing</span>
     </div>
     <div class="legend-item">
       <div class="dot-swatch nodata"></div>
@@ -253,10 +260,12 @@ function getFilteredListings() {
   const hi = parseInt(document.getElementById('price-max-slider').value);
   const jpyMin = stepToJpy(USD_STEPS_K[lo]);
   const jpyMax = stepToJpy(USD_STEPS_K[hi]);
+  const typeFilter = document.getElementById('type-select').value;
   return ALL_DATA.filter(l => {
     const p = l.priceJpy || 0;
     if (jpyMin !== null && p < jpyMin) return false;
     if (jpyMax !== null && p > jpyMax) return false;
+    if (typeFilter !== 'all' && l.propertyType !== typeFilter) return false;
     return true;
   });
 }
@@ -379,7 +388,7 @@ function renderStats(listings, withAge) {
   const medianAge = ages.length ? ages[Math.floor(ages.length / 2)] : null;
 
   const stats = [
-    { val: listings.length,                                        lbl: "Houses shown"  },
+    { val: listings.length,                                        lbl: "Listings shown" },
     { val: fmtUsd(Math.max(...prices)),                            lbl: "Highest price" },
     { val: `$${Math.round(median / 1000)}k`,                      lbl: "Median price"  },
     { val: medianAge !== null ? `${medianAge} yrs` : "—",         lbl: "Median age"    },

@@ -59,8 +59,8 @@ PROXIMITY_KEYWORDS = ["徒歩", "歩", "近", "分", "m", "メートル"]
 HOUSE_KEYWORDS = ["戸建", "家", "建物", "LDK", "House", "Room", "築"]
 LAND_KEYWORDS = ["売地", "土地", "Land", "建築条件"]
 
-# Keywords to EXCLUDE (Mansions/Condos)
-MANSION_KEYWORDS = ["マンション", "mansion", "condo"]
+# Keywords to identify Condos/Mansions (scraped as "condo" type)
+CONDO_KEYWORDS = ["マンション", "mansion", "condo"]
 
 # Status Keywords (Exclude Sold)
 CONTRACTED_KEYWORDS = ["成約", "商談中", "予約", "Sold", "Contracted", "Reserved", "済"]
@@ -203,6 +203,9 @@ def is_contracted(title, text):
 
 def determine_type(title, text):
     combined = (title + " " + text).lower()
+    # Condo/Mansion — check title first
+    if any(k in title for k in CONDO_KEYWORDS): return "condo"
+    if "のマンション情報" in title or "のマンション" in title: return "condo"
     # "古家付売地" / "古家付土地" = land with old attached house → treat as house.
     # Check both title and the early body text: Izu Taiyo H1 says "土地情報はこちら！"
     # but the actual property label "古家付売地" appears in the page body.
@@ -610,7 +613,8 @@ class IzuTaiyo(BaseScraper):
 
         property_types = [
             ("家", "House"),
-            ("土地", "Land")
+            ("土地", "Land"),
+            ("マンション", "Condo")
         ]
 
         for loc_code, city_name in location_codes.items():
@@ -761,27 +765,7 @@ class IzuTaiyo(BaseScraper):
             inc_stat("skipped_sold")
             return
 
-        # 3. Mansion? - Check for specific type indicators
-        # "のマンション情報" = mansion listing, "の家情報" = house listing
-        # Brokers often add "マンション" as a keyword tag, so we need to be specific
-        is_mansion = False
-
-        # Positive indicators it's a mansion
-        if "のマンション情報" in title or "のマンション" in title:
-            is_mansion = True
-        elif "condo" in title.lower():
-            is_mansion = True
-
-        # Negative indicators it's NOT a mansion (override)
-        if "の家情報" in title or "戸建" in title:
-            is_mansion = False
-
-        if is_mansion:
-            print(f"  [MANSION FILTERED] {city} - {title[:60]}")
-            inc_stat("skipped_mansion")
-            return
-
-        # 4. Sea View Scoring (Tiered for accuracy)
+        # 3. Sea View Scoring (Tiered for accuracy)
         sea_score = 0
 
         # Check for explicit "no sea view" statements first
@@ -879,7 +863,9 @@ class Maple(BaseScraper):
             "https://www.maple-h.co.jp/estate_db/house/",
             "https://www.maple-h.co.jp/estate_db/house/page/2/",
             "https://www.maple-h.co.jp/estate_db/estate/",
-            "https://www.maple-h.co.jp/estate_db/estate/page/2/"
+            "https://www.maple-h.co.jp/estate_db/estate/page/2/",
+            "https://www.maple-h.co.jp/estate_db/mansion/",
+            "https://www.maple-h.co.jp/estate_db/mansion/page/2/"
         ]
         candidates = set()
 
@@ -923,7 +909,7 @@ class Maple(BaseScraper):
                     if full.rstrip('/').endswith(tuple(f'/estate_db/{cat}' for cat in category_pages)):
                         continue
                     # Also exclude if it contains these keywords anywhere
-                    if any(cat in full.lower() for cat in ["/office", "/lease", "/mansion"]):
+                    if any(cat in full.lower() for cat in ["/office", "/lease"]):
                         continue
                     candidates.add(full)
 
@@ -987,10 +973,6 @@ class Maple(BaseScraper):
 
         if is_contracted(title, full_text):
             inc_stat("skipped_sold")
-            return
-
-        if any(k in title for k in MANSION_KEYWORDS):
-            inc_stat("skipped_mansion")
             return
 
         city = get_location_trust(soup, full_text)
@@ -1193,10 +1175,6 @@ class Aoba(BaseScraper):
             inc_stat("skipped_sold")
             return
 
-        if any(k in title for k in MANSION_KEYWORDS):
-            inc_stat("skipped_mansion")
-            return
-
         # Use URL city as context if available
         city = get_location_trust(soup, full_text, url_city)
         if city == "WRONG_CITY":
@@ -1281,6 +1259,8 @@ class Suumo(BaseScraper):
         ("/chukoikkodate/shizuoka/sc_kamogun/", None),
         ("/tochi/shizuoka/sc_shimoda/", "下田"),
         ("/tochi/shizuoka/sc_kamogun/", None),
+        ("/chukomanshon/shizuoka/sc_shimoda/", "下田"),
+        ("/chukomanshon/shizuoka/sc_kamogun/", None),
     ]
 
     def run(self):
@@ -1288,7 +1268,7 @@ class Suumo(BaseScraper):
         candidates = {}  # url -> city_ctx
 
         for path, city_hint in self.SEARCH_PAGES:
-            kind = "House" if "chukoikkodate" in path else "Land"
+            kind = "House" if "chukoikkodate" in path else ("Condo" if "chukomanshon" in path else "Land")
             area = city_hint or "Kamo district"
             page = 1
             while page <= 10:
@@ -1383,9 +1363,6 @@ class Suumo(BaseScraper):
         if is_contracted(title, full_text):
             inc_stat("skipped_sold")
             return
-        if any(k in title for k in MANSION_KEYWORDS):
-            inc_stat("skipped_mansion")
-            return
 
         city = get_location_trust(soup, full_text, city_ctx)
         if city == "WRONG_CITY" or not city:
@@ -1424,12 +1401,14 @@ class Suumo(BaseScraper):
             return
 
         # Determine property type: URL path is the most reliable signal for SUUMO.
-        # /tochi/ = 土地 (land), /chukoikkodate/ or /kodate/ = 中古一戸建て (house).
+        # /tochi/ = 土地 (land), /chukoikkodate/ = 中古一戸建て (house), /chukomanshon/ = condo.
         # Fall back to text-based detection when URL path is ambiguous.
         if "/tochi/" in url:
             prop_type = "land"
         elif "/chukoikkodate/" in url or "/kodate/" in url:
             prop_type = "house"
+        elif "/chukomanshon/" in url or "/mansion/" in url:
+            prop_type = "condo"
         else:
             prop_type = determine_type(title, full_text)
 
