@@ -203,9 +203,14 @@ def is_contracted(title, text):
 
 def determine_type(title, text):
     combined = (title + " " + text).lower()
-    # Condo/Mansion — check title first
-    if any(k in title for k in CONDO_KEYWORDS): return "condo"
-    if "のマンション情報" in title or "のマンション" in title: return "condo"
+    # Condo/Mansion — require a title signal AND condo-specific body data.
+    # Izu Taiyo's H1 uses "のマンション情報" for everything in their マンション
+    # search category, including villas/houses that aren't true condos.
+    # Require at least one of 管理費/修繕積立金/専有面積 in the body to confirm.
+    title_has_condo = (any(k in title for k in CONDO_KEYWORDS) or
+                       "のマンション情報" in title or "のマンション" in title)
+    body_has_condo  = any(k in text for k in ["管理費", "修繕積立金", "専有面積"])
+    if title_has_condo and body_has_condo: return "condo"
     # "古家付売地" / "古家付土地" = land with old attached house → treat as house.
     # Check both title and the early body text: Izu Taiyo H1 says "土地情報はこちら！"
     # but the actual property label "古家付売地" appears in the page body.
