@@ -201,28 +201,30 @@ def is_contracted(title, text):
         if k in combined: return True
     return False
 
-def determine_type(title, text):
+def determine_type(title, text, search_category=None):
+    # When we know which search category the property came from, trust it directly.
+    # The website's own categorisation (家/土地/マンション) is more reliable than
+    # trying to infer type from page text, which often triggers false positives
+    # (e.g. a land listing page that mentions マンション nearby).
+    if search_category == "land":
+        # "古家付売地" / "古家付土地" = land with old house → treat as house.
+        if "古家付" in title or "古家付" in text[:3000]:
+            return "house"
+        return "land"
+    if search_category == "condo":
+        return "condo"
+    if search_category == "house":
+        return "house"
+
+    # Fallback text-based detection for scrapers that don't pass a search category.
     combined = (title + " " + text).lower()
-    # Condo/Mansion — require a title signal AND condo-specific body data.
-    # Izu Taiyo's H1 uses "のマンション情報" for everything in their マンション
-    # search category, including villas/houses that aren't true condos.
-    # Require at least one of 管理費/修繕積立金/専有面積 in the body to confirm.
     title_has_condo = (any(k in title for k in CONDO_KEYWORDS) or
                        "のマンション情報" in title or "のマンション" in title)
-    # 管理費 is ambiguous — resort-area houses also carry HOA fees.
-    # Only 修繕積立金 (repair reserve fund) and 専有面積 (exclusive area)
-    # are genuinely condo-specific in Japanese real estate terminology.
     body_has_condo  = any(k in text for k in ["修繕積立金", "専有面積"])
     if title_has_condo and body_has_condo: return "condo"
-    # "古家付売地" / "古家付土地" = land with old attached house → treat as house.
-    # Check both title and the early body text: Izu Taiyo H1 says "土地情報はこちら！"
-    # but the actual property label "古家付売地" appears in the page body.
     if "古家付" in title or "古家付" in text[:3000]: return "house"
-    # If explicitly Land
     if any(k in title for k in ["売地", "土地"]): return "land"
-    # If explicitly House
     if any(k in combined for k in HOUSE_KEYWORDS): return "house"
-    # Fallback default
     return "house"
 
 # Japanese era → Gregorian year offsets
@@ -613,7 +615,7 @@ class IzuTaiyo(BaseScraper):
             "mi": "南伊豆"   # Minami-Izu
         }
 
-        found_links = {} # url -> city_context
+        found_links = {} # url -> (city_context, search_category)
 
         # Strategy: Use the regular search endpoint (s.php) instead of featured (tokusen.php)
         # The search form allows filtering by location and sea view conditions
@@ -674,7 +676,7 @@ class IzuTaiyo(BaseScraper):
                         if match:
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={match.group(1)}"
                             if d_link not in found_links:
-                                found_links[d_link] = city_name
+                                found_links[d_link] = (city_name, type_name.lower())
                                 page_found_count += 1
 
                         # Also check for hpbunno
@@ -687,7 +689,7 @@ class IzuTaiyo(BaseScraper):
                         if match:
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={match.group(1).strip()}"
                             if d_link not in found_links:
-                                found_links[d_link] = city_name
+                                found_links[d_link] = (city_name, type_name.lower())
                                 page_found_count += 1
 
                     # Also try direct links in <a> tags
@@ -696,7 +698,7 @@ class IzuTaiyo(BaseScraper):
                         if "d.php" in href and ("hpno=" in href or "hpbunno=" in href):
                             full = urljoin("https://www.izutaiyo.co.jp", href)
                             if full not in found_links:
-                                found_links[full] = city_name
+                                found_links[full] = (city_name, type_name.lower())
                                 page_found_count += 1
 
                     # FALLBACK: Search raw HTML for d.php links (catches JS-rendered or hidden links)
@@ -705,12 +707,12 @@ class IzuTaiyo(BaseScraper):
                         for prop_id in re.findall(r'd\.php\?hpno=(\w+)', html_str):
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpno={prop_id}"
                             if d_link not in found_links:
-                                found_links[d_link] = city_name
+                                found_links[d_link] = (city_name, type_name.lower())
                                 page_found_count += 1
                         for prop_id in re.findall(r'd\.php\?hpbunno=([^\'\"&\s]+)', html_str):
                             d_link = f"https://www.izutaiyo.co.jp/d.php?hpbunno={prop_id}"
                             if d_link not in found_links:
-                                found_links[d_link] = city_name
+                                found_links[d_link] = (city_name, type_name.lower())
                                 page_found_count += 1
 
                     if page_found_count == 0:
@@ -723,11 +725,11 @@ class IzuTaiyo(BaseScraper):
 
         print(f"  > Processing {len(found_links)} unique listings...")
 
-        for link, city_ctx in found_links.items():
-            self.parse_detail(link, city_ctx)
+        for link, (city_ctx, search_cat) in found_links.items():
+            self.parse_detail(link, city_ctx, search_cat)
             sleep_jitter()
 
-    def parse_detail(self, url, city_ctx):
+    def parse_detail(self, url, city_ctx, search_category=None):
         inc_stat("scanned")
         soup = self.fetch(url)
         if not soup: return
@@ -844,7 +846,7 @@ class IzuTaiyo(BaseScraper):
         else:
             img = get_best_image(soup, url)
 
-        ptype = determine_type(title, full_text)
+        ptype = determine_type(title, full_text, search_category)
         year_built = extract_year_built(soup, full_text)
 
         item = {
