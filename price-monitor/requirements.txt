@@ -1,0 +1,7 @@
+# The monitor uses only Python standard library modules (urllib, smtplib, json, re)
+# so there are no required third-party packages.
+#
+# Optional: install these if the standard scraper fails (JavaScript-heavy pages):
+#   pip install playwright && playwright install chromium
+#
+# The script will work as-is with just Python 3.9+.

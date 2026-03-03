@@ -26,3 +26,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Price monitor — local secrets and generated data
+price-monitor/.env
+price-monitor/price_history.json
+price-monitor/last_page_snippet.html
