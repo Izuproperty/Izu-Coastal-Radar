@@ -124,6 +124,7 @@
       <option value="all">All Types</option>
       <option value="house">House</option>
       <option value="land">Land</option>
+      <option value="condo">Condo</option>
     </select>
     <div class="toggle-group">
       <button class="toggle-btn active" id="sort-btn" onclick="toggleSort(this)">↓ Price</button>
@@ -165,9 +166,9 @@
   const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const TXT = {
-    EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land", useful: "Useful Izu Links" },
-    JP: { view: "詳細", allLoc: "全エリア", allSrc: "全業者", house: "戸建", land: "土地", useful: "伊豆のお役立ちリンク" },
-    CN: { view: "查看", allLoc: "全部地区", allSrc: "全部中介", house: "独栋", land: "土地", useful: "伊豆实用链接" }
+    EN: { view: "Analyze", allLoc: "All Locations", allSrc: "All Brokers", house: "House", land: "Land", condo: "Condo", useful: "Useful Izu Links" },
+    JP: { view: "詳細", allLoc: "全エリア", allSrc: "全業者", house: "戸建", land: "土地", condo: "マンション", useful: "伊豆のお役立ちリンク" },
+    CN: { view: "查看", allLoc: "全部地区", allSrc: "全部中介", house: "独栋", land: "土地", condo: "公寓", useful: "伊豆实用链接" }
   };
 
   async function init() {
