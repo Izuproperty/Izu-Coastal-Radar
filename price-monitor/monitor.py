@@ -13,6 +13,7 @@ import os
 import re
 import smtplib
 import sys
+import time
 import urllib.request
 import urllib.error
 from datetime import datetime, date
@@ -60,20 +61,34 @@ HEADERS = {
     "Accept-Encoding": "gzip, deflate, br",
     "Connection": "keep-alive",
     "Cache-Control": "no-cache",
+    "Referer": "https://www.biccamera.com/",
 }
+
+_FETCH_RETRIES = 3
+_FETCH_TIMEOUT = 60  # seconds per attempt
 
 
 def fetch_page(url: str) -> str:
-    """Download the page HTML, returning raw text."""
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        raw = resp.read()
-        # Handle gzip if the stdlib didn't auto-decompress
-        if resp.info().get("Content-Encoding") == "gzip":
-            import gzip
-            raw = gzip.decompress(raw)
-        charset = resp.headers.get_content_charset() or "utf-8"
-        return raw.decode(charset, errors="replace")
+    """Download the page HTML, retrying up to _FETCH_RETRIES times with backoff."""
+    last_exc: Exception | None = None
+    for attempt in range(1, _FETCH_RETRIES + 1):
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=_FETCH_TIMEOUT) as resp:
+                raw = resp.read()
+                if resp.info().get("Content-Encoding") == "gzip":
+                    import gzip
+                    raw = gzip.decompress(raw)
+                charset = resp.headers.get_content_charset() or "utf-8"
+                return raw.decode(charset, errors="replace")
+        except Exception as exc:
+            last_exc = exc
+            if attempt < _FETCH_RETRIES:
+                wait = 2 ** attempt  # 2 s, 4 s
+                log.warning("Fetch attempt %d/%d failed (%s) — retrying in %ds…",
+                            attempt, _FETCH_RETRIES, exc, wait)
+                time.sleep(wait)
+    raise last_exc  # re-raise after all attempts exhausted
 
 
 def _extract_first_number(text: str) -> int | None:
