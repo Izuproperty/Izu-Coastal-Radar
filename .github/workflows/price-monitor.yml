@@ -17,6 +17,8 @@ jobs:
 
       - name: Check Biccamera price
         env:
+          SMTP_HOST:   ${{ secrets.PRICE_MONITOR_SMTP_HOST }}
+          SMTP_PORT:   ${{ secrets.PRICE_MONITOR_SMTP_PORT }}
           SMTP_USER:   ${{ secrets.PRICE_MONITOR_SMTP_USER }}
           SMTP_PASS:   ${{ secrets.PRICE_MONITOR_SMTP_PASS }}
           ALERT_TO:    ${{ secrets.PRICE_MONITOR_ALERT_TO }}
