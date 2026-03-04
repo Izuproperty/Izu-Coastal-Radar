@@ -33,4 +33,8 @@ jobs:
           git add listings.json buildInfo.json
           git diff --cached --quiet || git commit -m "Daily refresh listings"
           git pull --rebase origin main
-          git push
+          for attempt in 1 2 3 4; do
+            git push && break
+            echo "Push attempt $attempt failed, retrying in $((attempt * 2))s..."
+            sleep $((attempt * 2))
+          done
