@@ -1318,8 +1318,8 @@ class Suumo(BaseScraper):
                 page += 1
                 sleep_jitter()
 
-        print(f"  > Visiting {min(len(candidates), 80)} SUUMO detail pages...")
-        for url, (city_ctx, thumb_url) in list(candidates.items())[:80]:
+        print(f"  > Visiting {len(candidates)} SUUMO detail pages...")
+        for url, (city_ctx, thumb_url) in candidates.items():
             self.parse_detail(url, city_ctx, thumb_url)
             sleep_jitter()
 
