@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-10T19:01:36.450755",
+  "generatedAt": "2026-03-11T19:03:35.728651",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1252,48 +1252,6 @@
       "firstSeen": "2026-03-03"
     },
     {
-      "id": "maple-96754bb3ddfbfc42",
-      "source": "Maple Housing",
-      "sourceUrl": "https://www.maple-h.co.jp/estate_db/6765%ef%bc%9a%e6%b5%b7%e3%82%92%e4%b8%80%e6%9c%9b%e3%81%99%e3%82%8b%e9%ab%98%e5%8f%b0%e3%81%ab%e5%bb%ba%e3%81%a4%e3%80%81%e9%87%8d%e5%8e%9a%e3%81%aarc%e6%b7%b7%e6%a7%8b%e9%80%a0%e3%81%ae%e6%b8%a9/",
-      "title": "海を一望する高台に建つ、重厚なrc混構造の温",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 16800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/08/6765-1.jpg",
-      "yearBuilt": 1973,
-      "firstSeen": "2026-03-10"
-    },
-    {
-      "id": "aoba-d13b68bb62cd5a8a",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room80136217.html",
-      "title": "リゾートパーク伊豆あたがわ 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 8600000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01772763900",
-      "yearBuilt": 1990,
-      "firstSeen": "2026-03-02"
-    },
-    {
-      "id": "aoba-a316495e450ac74d",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
-      "title": "下田市吉佐美 売倉庫",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 29800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01772763867",
-      "yearBuilt": 1963,
-      "firstSeen": "2026-03-02"
-    },
-    {
       "id": "aoba-29e4cb957b98fcc6",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room86455043.html",
@@ -1308,6 +1266,34 @@
       "firstSeen": "2026-03-02"
     },
     {
+      "id": "aoba-d13b68bb62cd5a8a",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room80136217.html",
+      "title": "リゾートパーク伊豆あたがわ 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 8600000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01772763900",
+      "yearBuilt": 1986,
+      "firstSeen": "2026-03-02"
+    },
+    {
+      "id": "aoba-8ca83a289f0677eb",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
+      "title": "エンゼルフォレスト大川汐見崎 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 16800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01772763971",
+      "yearBuilt": 1991,
+      "firstSeen": "2026-03-11"
+    },
+    {
       "id": "aoba-da5ab2b3e196bd5d",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
@@ -1318,7 +1304,21 @@
       "priceJpy": 9900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01772763862",
-      "yearBuilt": 2019,
+      "yearBuilt": 1973,
+      "firstSeen": "2026-03-02"
+    },
+    {
+      "id": "aoba-a316495e450ac74d",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
+      "title": "下田市吉佐美 売倉庫",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 29800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01772763867",
+      "yearBuilt": 1977,
       "firstSeen": "2026-03-02"
     },
     {
