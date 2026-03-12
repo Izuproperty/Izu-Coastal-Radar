@@ -924,8 +924,7 @@ class Maple(BaseScraper):
                     candidates.add(full)
 
         print(f"  > Processing {len(candidates)} candidates...")
-        # Process all candidates
-        for link in list(candidates)[:50]:  # Cap at 50
+        for link in sorted(candidates):
             self.parse_detail(link)
             sleep_jitter()
 
