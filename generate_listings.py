@@ -1117,7 +1117,7 @@ class Aoba(BaseScraper):
 
         # Process all candidates - parse_detail will filter by city
         aoba_before = len(self.items)
-        for link in list(candidates)[:60]:  # Cap at 60 to avoid timeout
+        for link in sorted(candidates):
             self.parse_detail(link)
             sleep_jitter()
 
