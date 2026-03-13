@@ -1024,7 +1024,16 @@ class Maple(BaseScraper):
             return
 
         img = get_best_image(soup, url)
-        ptype = determine_type(title, full_text)
+        # Decode URL slug to reliably detect land listings whose h1 may omit 土地
+        _slug_cat = None
+        try:
+            from urllib.parse import unquote as _unquote
+            _slug = _unquote(url.split('/estate_db/')[-1].strip('/').split('/')[0])
+            if any(k in _slug for k in ["土地", "売地"]):
+                _slug_cat = "land"
+        except Exception:
+            pass
+        ptype = determine_type(title, full_text, _slug_cat)
         year_built = extract_year_built(soup, full_text)
 
         item = {
