@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-13T13:16:12.255001",
+  "generatedAt": "2026-03-13T18:56:12.953562",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1284,7 +1284,7 @@
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6662%ef%bc%9a%e6%b5%b7%e3%82%92%e6%9c%9b%e3%82%80%e9%ab%98%e5%8f%b0%e3%81%ae%e6%9d%b1%e5%8d%97%e5%82%be%e6%96%9c%e3%81%ab%e5%ba%83%e3%81%8c%e3%82%8b302%e5%9d%aa%e3%81%ae%e5%9c%9f%e5%9c%b0/",
       "title": "海を望む高台の東南傾斜に広がる302坪の土地",
       "titleEn": "Higashi-Izu Property",
-      "propertyType": "land",
+      "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 4200000,
       "seaViewScore": 4,
@@ -1358,7 +1358,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01772763900",
-      "yearBuilt": 1986,
+      "yearBuilt": 1980,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1386,7 +1386,7 @@
       "priceJpy": 9900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01772763862",
-      "yearBuilt": 1988,
+      "yearBuilt": 2002,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1609,6 +1609,19 @@
       "firstSeen": "2026-03-02"
     },
     {
+      "id": "suumo-764c916b67fca25a",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/tochi/shizuoka/sc_shimoda/nc_78110858/",
+      "title": "須崎 4330万円",
+      "titleEn": "Shimoda Property",
+      "propertyType": "land",
+      "city": "下田",
+      "priceJpy": 43300000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F858%2F78110858%2F78110858_0018.jpg&w=452&h=339",
+      "firstSeen": "2026-03-13"
+    },
+    {
       "id": "suumo-8b2d4055a1342c8e",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/tochi/shizuoka/sc_kamogun/nc_78818852/",
@@ -1620,6 +1633,19 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F852%2F78818852%2F78818852_0001.jpg&w=452&h=339",
       "firstSeen": "2026-03-02"
+    },
+    {
+      "id": "suumo-2bcea67b372778b2",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/tochi/shizuoka/sc_kamogun/nc_76636384/",
+      "title": "大川（伊豆大川駅） 420万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "land",
+      "city": "東伊豆",
+      "priceJpy": 4200000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F384%2F76636384%2F76636384_0001.jpg&w=452&h=339",
+      "firstSeen": "2026-03-13"
     },
     {
       "id": "suumo-1aa99d0647720e1d",
