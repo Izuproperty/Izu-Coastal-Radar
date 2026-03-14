@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-14T04:25:14.097712",
+  "generatedAt": "2026-03-14T18:52:45.059028",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -625,11 +625,11 @@
       "id": "izutaiyo-aa44b2362f73e975",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB242G",
-      "title": "下田市 須崎（4830万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "title": "下田市 須崎（4330万円）の土地情報はこちら！2026.3.14下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
       "titleEn": "Shimoda Property",
       "propertyType": "land",
       "city": "下田",
-      "priceJpy": 48300000,
+      "priceJpy": 43300000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb242ga.jpg",
       "firstSeen": "2026-03-02"
@@ -1300,7 +1300,7 @@
       "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 14500000,
-      "seaViewScore": 3,
+      "seaViewScore": 4,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/08/6750-1.jpg",
       "yearBuilt": 1989,
       "firstSeen": "2026-03-12"
@@ -1344,7 +1344,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01772763867",
-      "yearBuilt": 1963,
+      "yearBuilt": 1977,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1358,7 +1358,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01772763900",
-      "yearBuilt": 1993,
+      "yearBuilt": 1988,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1386,7 +1386,7 @@
       "priceJpy": 9900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01772763862",
-      "yearBuilt": 1970,
+      "yearBuilt": 2002,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1691,19 +1691,6 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F099%2F76117099%2F76117099_0001.jpg&w=452&h=339",
       "firstSeen": "2026-03-02"
-    },
-    {
-      "id": "suumo-764c916b67fca25a",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/tochi/shizuoka/sc_shimoda/nc_78110858/",
-      "title": "須崎 4330万円",
-      "titleEn": "Shimoda Property",
-      "propertyType": "land",
-      "city": "下田",
-      "priceJpy": 43300000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F858%2F78110858%2F78110858_0018.jpg&w=452&h=339",
-      "firstSeen": "2026-03-13"
     },
     {
       "id": "suumo-8b2d4055a1342c8e",
