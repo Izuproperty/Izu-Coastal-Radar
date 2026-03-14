@@ -1449,6 +1449,134 @@ class Suumo(BaseScraper):
         self.add_item(item)
 
 
+class IzuMirai(BaseScraper):
+    def run(self):
+        print("--- Scanning Izu Mirai ---")
+        # Area-specific sale pages for each target city
+        base_urls = [
+            ("https://www.izumirai.com/area1b2/city_cr22302/", "河津"),   # Kawazu
+            ("https://www.izumirai.com/area1b2/city_cr22219/", "下田"),   # Shimoda
+            ("https://www.izumirai.com/area1b2/city_cr22304/", "南伊豆"), # Minami-Izu
+            ("https://www.izumirai.com/area1b2/city_cr22301/", "東伊豆"), # Higashi-Izu
+        ]
+        candidates = set()  # canonical URLs
+
+        for base_url, city_hint in base_urls:
+            for page in range(1, 6):  # up to 5 pages per area
+                page_url = base_url if page == 1 else f"{base_url}page/{page}/"
+                soup = self.fetch(page_url)
+                if not soup:
+                    break
+
+                found_on_page = 0
+                for a in soup.find_all("a", href=True):
+                    full = urljoin(page_url, a["href"])
+                    if re.search(r'/bkndetail/\d+/', full) and 'izumirai.com' in full:
+                        # Normalise to canonical: strip /room\d+/ suffix
+                        canonical = re.sub(r'/room\d+/?$', '/', full.rstrip('/') + '/')
+                        candidates.add(canonical)
+                        found_on_page += 1
+
+                if found_on_page == 0:
+                    break  # no more pages for this area
+
+        print(f"  > Processing {len(candidates)} candidates...")
+        for link in sorted(candidates):
+            self.parse_detail(link)
+            sleep_jitter()
+
+    def parse_detail(self, url):
+        print(f"  [IZUMIRAI] Processing: {url[:80]}")
+        inc_stat("scanned")
+
+        soup = self.fetch(url)
+        if not soup:
+            return
+
+        h1 = soup.select_one("h1.detail-header__name")
+        title = clean_text(h1.get_text()) if h1 else ""
+        if not title:
+            title = "Izu Mirai Property"
+
+        full_text = clean_text(soup.get_text())
+
+        if is_contracted(title, full_text):
+            inc_stat("skipped_sold")
+            return
+
+        city = get_location_trust(soup, full_text)
+        if city == "WRONG_CITY" or not city:
+            print(f"  [LOCATION FILTERED] IzuMirai - {city}: {url[:80]}")
+            inc_stat("skipped_loc")
+            return
+
+        # Sea view scoring (same tiers as other scrapers)
+        sea_score = 0
+        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+            sea_score = 0
+        elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
+            sea_score = 4
+        elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
+            sea_score = 3
+        elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            proximity_patterns = [
+                r"海まで徒歩[0-9０-９]",
+                r"海まで.*[0-9０-９]+.*分",
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",
+                r"海から[0-9０-９]+.*[mｍメートル]",
+                r"徒歩[0-9０-９]+.*分.*海",
+                r"ビーチまで.*[0-9０-９]+",
+                r"海.*徒歩圏",
+            ]
+            if any(re.search(p, full_text) for p in proximity_patterns):
+                sea_score = 2
+
+        if sea_score < 2:
+            print(f"  [SEA VIEW FILTERED] IzuMirai - score={sea_score}: {url[:60]}")
+            inc_stat("skipped_loc")
+            return
+
+        price = extract_price(full_text)
+        if not price or price <= 0:
+            print(f"  [PRICE FILTERED] No valid price: {url}")
+            inc_stat("skipped_sold")
+            return
+
+        og_img = soup.select_one('meta[property="og:image"]')
+        img_url = og_img.get("content", "") if og_img else ""
+
+        # Type: trust title keywords (site title always names the type explicitly)
+        if any(k in title for k in ["土地", "売地"]):
+            ptype = "land"
+        elif any(k in title for k in ["マンション"]):
+            ptype = "condo"
+        else:
+            ptype = determine_type(title, full_text)
+
+        year_built = extract_year_built(soup, full_text)
+
+        # Stable ID: use bknId hidden input (stable internal ID), fallback to URL
+        bkn_input = soup.find("input", {"name": "bknId"})
+        bkn_id = bkn_input.get("value", "") if bkn_input else ""
+        item_id = stable_id("izumirai", bkn_id if bkn_id else url)
+
+        item = {
+            "id": item_id,
+            "source": "Izu Mirai",
+            "sourceUrl": url,
+            "title": title,
+            "titleEn": f"{CITY_EN_MAP.get(city, city)} Property",
+            "propertyType": ptype,
+            "city": city,
+            "priceJpy": price,
+            "seaViewScore": sea_score,
+            "imageUrl": img_url,
+        }
+        if year_built:
+            item["yearBuilt"] = year_built
+        self.add_item(item)
+
+
 def deduplicate(listings):
     """
     Remove listings that represent the same physical property appearing on
@@ -1465,7 +1593,7 @@ def deduplicate(listings):
     When cross-source duplicates collide, the source with higher priority wins:
         Izu Taiyo > Maple Housing > Aoba Resort > SUUMO
     """
-    SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "SUUMO": 3}
+    SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "Izu Mirai": 3, "SUUMO": 4}
 
     # Process preferred sources first so they "win" the fingerprint slot
     ranked = sorted(listings, key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 99))
@@ -1524,7 +1652,7 @@ def main():
     except (FileNotFoundError, json.JSONDecodeError):
         pass  # No existing file or invalid JSON
 
-    scrapers = [IzuTaiyo(), Maple(), Aoba(), Suumo()]
+    scrapers = [IzuTaiyo(), Maple(), Aoba(), IzuMirai(), Suumo()]
     all_data = []
 
     def run_scraper(s):
