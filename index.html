@@ -322,7 +322,7 @@
   function fmtPrice(p) {
     if (!p) return "-";
     if (STATE.curr === 'JPY') {
-      if (STATE.lang === 'EN') return "¥" + (p / 1000000).toFixed(2) + "m";
+      if (STATE.lang === 'EN') return "¥" + (p / 1000000).toFixed(1) + "m";
       return "¥" + Math.round(p/10000).toLocaleString() + "万";
     }
     if (STATE.curr === 'USD') return "$" + Math.round(p / FX_USD).toLocaleString();
