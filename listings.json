@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-14T18:52:45.059028",
+  "generatedAt": "2026-03-15T18:53:19.667378",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -256,7 +256,7 @@
       "id": "izutaiyo-d2c45d832d0954bd",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB421H",
-      "title": "下田市 吉佐美（3500万円）の家情報はこちら！2026.2.22下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "title": "下田市 吉佐美（3500万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
       "titleEn": "Shimoda Property",
       "propertyType": "house",
       "city": "下田",
@@ -1358,7 +1358,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01772763900",
-      "yearBuilt": 1988,
+      "yearBuilt": 1986,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1386,7 +1386,7 @@
       "priceJpy": 9900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01772763862",
-      "yearBuilt": 2002,
+      "yearBuilt": 1992,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1453,9 +1453,9 @@
       "titleEn": "Shimoda Property",
       "propertyType": "house",
       "city": "下田",
-      "priceJpy": 27500000,
+      "priceJpy": 27000000,
       "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/99465504_1_0_500_3.jpg?t=1773456253",
+      "imageUrl": "https://cdn.img-asp.jp/bkn/99465504_1_0_500_3.jpg?t=1773542578",
       "yearBuilt": 2015,
       "firstSeen": "2026-03-14"
     },
@@ -1583,6 +1583,20 @@
       "imageUrl": "https://cdn.img-asp.jp/bkn/101945122_1_0_500_3.jpg?t=1773456255",
       "yearBuilt": 1992,
       "firstSeen": "2026-03-14"
+    },
+    {
+      "id": "suumo-59ca8a56285619a3",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_shimoda/nc_20444801/",
+      "title": "田牛 4480万円",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 44800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F801%2F20444801%2F20444801_0001.jpg&w=452&h=339",
+      "yearBuilt": 1989,
+      "firstSeen": "2026-03-15"
     },
     {
       "id": "suumo-e05e2d842a07b971",
