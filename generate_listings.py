@@ -588,15 +588,24 @@ class BaseScraper:
         self.session = requests.Session()
         self.session.headers.update(HEADERS)
         self.items = []
+        self.fetch_errors = 0   # non-200 or exception count
+        self.pages_ok = 0       # successful fetches
 
     def fetch(self, url, params=None):
         try:
             r = self.session.get(url, params=params, timeout=15, verify=False)
-            if r.status_code != 200: return None
+            if r.status_code != 200:
+                print(f"  [HTTP {r.status_code}] {url[:80]}")
+                inc_stat("error")
+                self.fetch_errors += 1
+                return None
             r.encoding = r.apparent_encoding
+            self.pages_ok += 1
             return BeautifulSoup(r.text, "html.parser")
-        except:
+        except Exception as e:
+            print(f"  [FETCH ERROR] {url[:80]}: {e}")
             inc_stat("error")
+            self.fetch_errors += 1
             return None
 
     def add_item(self, item):
@@ -606,6 +615,18 @@ class BaseScraper:
 class IzuTaiyo(BaseScraper):
     def run(self):
         print("--- Scanning Izu Taiyo ---")
+        # Warm up the session by visiting the search form first.
+        # Some servers require a prior page visit / cookie before accepting sa.php.
+        SEARCH_FORM_URL = "https://www.izutaiyo.co.jp/s.php"
+        SEARCH_RESULTS_URL = "https://www.izutaiyo.co.jp/sa.php"
+        warmup = self.fetch(SEARCH_FORM_URL)
+        if warmup:
+            print("  [Izu Taiyo] Session warm-up OK")
+        else:
+            print("  [WARNING] Izu Taiyo: warm-up fetch of s.php failed — site may be blocking")
+        # Tell the server we navigated from the search form
+        self.session.headers.update({"Referer": SEARCH_FORM_URL})
+
         # Location codes for the search endpoint (s.php)
         # These are used in the search form with format: 下田市[sm]
         location_codes = {
@@ -723,6 +744,10 @@ class IzuTaiyo(BaseScraper):
 
                     page += 1
 
+        if not found_links:
+            print("  [WARNING] Izu Taiyo: 0 candidates found across all searches — "
+                  f"fetch errors={self.fetch_errors}, pages OK={self.pages_ok}. "
+                  "Site structure may have changed or requests are being blocked.")
         print(f"  > Processing {len(found_links)} unique listings...")
 
         for link, (city_ctx, search_cat) in found_links.items():
@@ -1652,17 +1677,24 @@ def main():
     except (FileNotFoundError, json.JSONDecodeError):
         pass  # No existing file or invalid JSON
 
+    SCRAPER_NAMES = ["Izu Taiyo", "Maple Housing", "Aoba Resort", "Izu Mirai", "SUUMO"]
     scrapers = [IzuTaiyo(), Maple(), Aoba(), IzuMirai(), Suumo()]
     all_data = []
+    scraper_diag = {}  # name -> {saved, fetchErrors, pagesOk}
 
     def run_scraper(s):
         s.run()
         return s
 
     with ThreadPoolExecutor(max_workers=4) as executor:
-        for s in executor.map(run_scraper, scrapers):
+        for name, s in zip(SCRAPER_NAMES, executor.map(run_scraper, scrapers)):
             all_data.extend(s.items)
             inc_stat("saved", len(s.items))
+            scraper_diag[name] = {
+                "saved": len(s.items),
+                "fetchErrors": s.fetch_errors,
+                "pagesOk": s.pages_ok,
+            }
 
     # Remove cross-source duplicates (same property on multiple sites)
     before_dedup = len(all_data)
@@ -1690,9 +1722,14 @@ def main():
     for i in all_data:
         counts[i['source']] = counts.get(i['source'], 0) + 1
 
+    # Ensure every known scraper appears in counts (even if 0)
+    for name in SCRAPER_NAMES:
+        counts.setdefault(name, 0)
+
     with open(OUT_BUILDINFO, "w", encoding="utf-8") as f:
         json.dump({
             "counts": counts,
+            "scraperDiagnostics": scraper_diag,
             "generatedAt": out["generatedAt"],
             "forexRate": forex_rate
         }, f)
