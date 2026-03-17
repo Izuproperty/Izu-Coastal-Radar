@@ -1610,20 +1610,26 @@ def deduplicate(listings):
     Same-source listings with identical fingerprints are KEPT — they may be
     genuinely different properties at the same price point in the same city.
 
-    Primary fingerprint:   (city, propertyType, price rounded to nearest ¥100,000).
-    Secondary fingerprint: (propertyType, price rounded to nearest ¥100,000) — catches
-      cases where city detection returns different values across sources for the same
-      property (e.g. 下賀茂 tagged as 南伊豆 by Izu Taiyo but 下田 by SUUMO).
+    Primary fingerprint:   (city, propertyType, price rounded to nearest ¥100,000, yearBuilt).
+      yearBuilt is included when known; "?" is used as a sentinel for unknown.
+      Two items with different known years are NEVER treated as duplicates even
+      if city/type/price match (e.g. two round-number-priced houses in the same city).
+
+    Secondary fingerprint: (propertyType, price rounded to nearest ¥100,000, yearBuilt) —
+      catches cases where city detection returns different values across sources for the
+      same property (e.g. 下賀茂 tagged as 南伊豆 by Izu Taiyo but 下田 by SUUMO).
+      Only fires when yearBuilt is known for both items (prevents false positives when
+      year is unknown).
 
     When cross-source duplicates collide, the source with higher priority wins:
-        Izu Taiyo > Maple Housing > Aoba Resort > SUUMO
+        Izu Taiyo > Maple Housing > Aoba Resort > Izu Mirai > SUUMO
     """
     SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "Izu Mirai": 3, "SUUMO": 4}
 
     # Process preferred sources first so they "win" the fingerprint slot
     ranked = sorted(listings, key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 99))
-    seen       = {}  # (city, type, price_bucket) -> source  [primary]
-    seen_xsrc  = {}  # (type, price_bucket)       -> source  [secondary, cross-source only]
+    seen       = {}  # (city, type, price_bucket, year) -> source  [primary]
+    seen_xsrc  = {}  # (type, price_bucket, year)       -> source  [secondary, cross-source only]
     out = []
 
     for item in ranked:
@@ -1632,25 +1638,27 @@ def deduplicate(listings):
         price_bucket = round(price / 100000) if price else 0
         city  = item.get("city", "")
         ptype = item.get("propertyType", "")
-        fp       = (city, ptype, price_bucket)
-        fp_loose = (ptype, price_bucket)
+        year  = item.get("yearBuilt") or "?"   # "?" = unknown year
+        fp       = (city, ptype, price_bucket, year)
+        # Loose fingerprint only meaningful when year is known (avoids false positives)
+        fp_loose = (ptype, price_bucket, year) if year != "?" else None
         src = item.get("source", "?")
         man = price // 10000 if price else 0
 
         if fp in seen and seen[fp] != src:
-            # Primary cross-source duplicate: same city+type+price, different site
-            print(f"  [DEDUP] Removed cross-source duplicate from {src}: {city} {ptype} ¥{man}万 (kept {seen[fp]})")
+            # Primary cross-source duplicate: same city+type+price+year, different site
+            print(f"  [DEDUP] Removed cross-source duplicate from {src}: {city} {ptype} ¥{man}万 built={year} (kept {seen[fp]})")
             inc_stat("skipped_dup")
-        elif fp_loose in seen_xsrc and seen_xsrc[fp_loose] != src:
-            # Secondary cross-source duplicate: same type+price, different city label
+        elif fp_loose and fp_loose in seen_xsrc and seen_xsrc[fp_loose] != src:
+            # Secondary cross-source duplicate: same type+price+year, different city label
             # (city detection mismatch between sites for the same physical property)
-            print(f"  [DEDUP] Removed cross-source duplicate (city mismatch) from {src}: {city} {ptype} ¥{man}万 (kept {seen_xsrc[fp_loose]})")
+            print(f"  [DEDUP] Removed cross-source duplicate (city mismatch) from {src}: {city} {ptype} ¥{man}万 built={year} (kept {seen_xsrc[fp_loose]})")
             inc_stat("skipped_dup")
         else:
             # New fingerprint OR same source — keep it
             if fp not in seen:
                 seen[fp] = src
-            if fp_loose not in seen_xsrc:
+            if fp_loose and fp_loose not in seen_xsrc:
                 seen_xsrc[fp_loose] = src
             out.append(item)
 
