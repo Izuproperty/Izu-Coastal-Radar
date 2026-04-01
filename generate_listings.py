@@ -1645,13 +1645,20 @@ def deduplicate(listings):
         src = item.get("source", "?")
         man = price // 10000 if price else 0
 
-        # Near-year check: same city+type+price, year differs by ≤1, different source.
-        # Different data sources sometimes record construction vs. completion year,
-        # causing a 1-year discrepancy for the same physical property.
+        # Near-year check: same city+type+price (or equivalent adjacent city), year differs
+        # by ≤1, different source.  Different data sources sometimes record construction vs.
+        # completion year, causing a 1-year discrepancy for the same physical property.
+        # EQUIV_CITIES: pairs of cities whose boundary properties are routinely mis-tagged
+        # across sources (e.g. 下賀茂 straddles 南伊豆/下田 and SUUMO's sc_shimoda search
+        # context forces "下田" even when Izu Taiyo correctly assigns "南伊豆").
+        _EQUIV = frozenset({"下田", "南伊豆"})
         near_src = None
         if year != "?" and fp not in seen:
             for (k_city, k_ptype, k_price, k_year), k_src in seen.items():
-                if (k_city == city and k_ptype == ptype and k_price == price_bucket
+                cities_match = k_city == city or (
+                    frozenset({k_city, city}) == _EQUIV
+                )
+                if (cities_match and k_ptype == ptype and k_price == price_bucket
                         and k_year != "?" and abs(k_year - year) <= 1 and k_src != src):
                     near_src = k_src
                     break
@@ -1661,7 +1668,8 @@ def deduplicate(listings):
             print(f"  [DEDUP] Removed cross-source duplicate from {src}: {city} {ptype} ¥{man}万 built={year} (kept {seen[fp]})")
             inc_stat("skipped_dup")
         elif near_src:
-            # Near-year cross-source duplicate: year differs by ≤1 (construction vs completion year)
+            # Near-year cross-source duplicate: year differs by ≤1 (construction vs completion year),
+            # same city or equivalent adjacent city
             print(f"  [DEDUP] Removed near-year cross-source duplicate from {src}: {city} {ptype} ¥{man}万 built={year} (kept {near_src})")
             inc_stat("skipped_dup")
         elif fp_loose and fp_loose in seen_xsrc and seen_xsrc[fp_loose] != src:
