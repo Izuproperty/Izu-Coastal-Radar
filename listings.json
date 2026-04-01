@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-01T08:41:24.035848",
+  "generatedAt": "2026-04-01T12:01:32.902817",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1399,7 +1399,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01774920641",
-      "yearBuilt": 1977,
+      "yearBuilt": 1963,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1413,7 +1413,7 @@
       "priceJpy": 6300000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01774920571",
-      "yearBuilt": 1990,
+      "yearBuilt": 1993,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1427,7 +1427,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01774920556",
-      "yearBuilt": 1988,
+      "yearBuilt": 1986,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1469,7 +1469,7 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01774920578",
-      "yearBuilt": 2014,
+      "yearBuilt": 1998,
       "firstSeen": "2026-03-23"
     },
     {
@@ -1483,7 +1483,7 @@
       "priceJpy": 9900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01774920644",
-      "yearBuilt": 1991,
+      "yearBuilt": 2019,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1497,7 +1497,7 @@
       "priceJpy": 9800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/99255589_1_500_500_3.jpg?t=01774920575",
-      "yearBuilt": 1978,
+      "yearBuilt": 1990,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1655,20 +1655,6 @@
       "firstSeen": "2026-03-17"
     },
     {
-      "id": "suumo-8ea6bba0b00899d1",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_74889310/",
-      "title": "奈良本 980万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 9800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F310%2F74889310%2F74889310_0099.jpg&w=452&h=339",
-      "yearBuilt": 1990,
-      "firstSeen": "2026-03-31"
-    },
-    {
       "id": "suumo-b275a6f269185027",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20276023/",
@@ -1739,20 +1725,6 @@
       "firstSeen": "2026-03-30"
     },
     {
-      "id": "suumo-e4a86ce513aff46b",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78110851/",
-      "title": "下賀茂 3180万円",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 31800000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F851%2F78110851%2F78110851_0001.jpg&w=452&h=339",
-      "yearBuilt": 2017,
-      "firstSeen": "2026-03-23"
-    },
-    {
       "id": "suumo-50cf0144e4cf59a9",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20056151/",
@@ -1793,20 +1765,6 @@
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F543%2F77015543%2F77015543_0004.jpg&w=452&h=339",
       "yearBuilt": 1977,
       "firstSeen": "2026-03-02"
-    },
-    {
-      "id": "suumo-565c1f692895d0d2",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78110852/",
-      "title": "湊 4300万円",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 43000000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F852%2F78110852%2F78110852_0001.jpg&w=452&h=339",
-      "yearBuilt": 2009,
-      "firstSeen": "2026-03-17"
     },
     {
       "id": "suumo-7eb8825be35b0544",
