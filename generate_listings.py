@@ -1645,9 +1645,24 @@ def deduplicate(listings):
         src = item.get("source", "?")
         man = price // 10000 if price else 0
 
+        # Near-year check: same city+type+price, year differs by ≤1, different source.
+        # Different data sources sometimes record construction vs. completion year,
+        # causing a 1-year discrepancy for the same physical property.
+        near_src = None
+        if year != "?" and fp not in seen:
+            for (k_city, k_ptype, k_price, k_year), k_src in seen.items():
+                if (k_city == city and k_ptype == ptype and k_price == price_bucket
+                        and k_year != "?" and abs(k_year - year) <= 1 and k_src != src):
+                    near_src = k_src
+                    break
+
         if fp in seen and seen[fp] != src:
             # Primary cross-source duplicate: same city+type+price+year, different site
             print(f"  [DEDUP] Removed cross-source duplicate from {src}: {city} {ptype} ¥{man}万 built={year} (kept {seen[fp]})")
+            inc_stat("skipped_dup")
+        elif near_src:
+            # Near-year cross-source duplicate: year differs by ≤1 (construction vs completion year)
+            print(f"  [DEDUP] Removed near-year cross-source duplicate from {src}: {city} {ptype} ¥{man}万 built={year} (kept {near_src})")
             inc_stat("skipped_dup")
         elif fp_loose and fp_loose in seen_xsrc and seen_xsrc[fp_loose] != src:
             # Secondary cross-source duplicate: same type+price+year, different city label
