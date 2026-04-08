@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-07T19:18:01.838380",
+  "generatedAt": "2026-04-08T19:29:49.757924",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1298,7 +1298,7 @@
       "sourceUrl": "https://www.maple-h.co.jp/estate_db/6662%ef%bc%9a%e6%b5%b7%e3%82%92%e6%9c%9b%e3%82%80%e9%ab%98%e5%8f%b0%e3%81%ae%e6%9d%b1%e5%8d%97%e5%82%be%e6%96%9c%e3%81%ab%e5%ba%83%e3%81%8c%e3%82%8b302%e5%9d%aa%e3%81%ae%e5%9c%9f%e5%9c%b0/",
       "title": "海を望む高台の東南傾斜に広がる302坪の土地",
       "titleEn": "Higashi-Izu Property",
-      "propertyType": "land",
+      "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 4200000,
       "seaViewScore": 4,
@@ -1427,7 +1427,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01774920641",
-      "yearBuilt": 1977,
+      "yearBuilt": 1963,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1441,7 +1441,7 @@
       "priceJpy": 6300000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01774920571",
-      "yearBuilt": 1990,
+      "yearBuilt": 1992,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1455,7 +1455,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01774920556",
-      "yearBuilt": 1994,
+      "yearBuilt": 1986,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1487,6 +1487,34 @@
       "firstSeen": "2026-03-17"
     },
     {
+      "id": "aoba-2bf77c07319364e4",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94642399.html",
+      "title": "エンゼルフォレスト伊豆熱川別荘地 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 7800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01774920578",
+      "yearBuilt": 1989,
+      "firstSeen": "2026-04-08"
+    },
+    {
+      "id": "aoba-6cda0a39e5cf2f39",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
+      "title": "オーナーチェンジ物件 東伊豆町奈良本 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 6200000,
+      "seaViewScore": 2,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01774920554",
+      "yearBuilt": 2010,
+      "firstSeen": "2026-04-08"
+    },
+    {
       "id": "aoba-da5ab2b3e196bd5d",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
@@ -1497,7 +1525,7 @@
       "priceJpy": 9900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01774920644",
-      "yearBuilt": 2002,
+      "yearBuilt": 1994,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1683,20 +1711,6 @@
       "firstSeen": "2026-04-06"
     },
     {
-      "id": "suumo-3ba44c37702a2b4a",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_73209962/",
-      "title": "仁科 980万円",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 9800000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F962%2F73209962%2F73209962_0001.jpg&w=452&h=339",
-      "yearBuilt": 1993,
-      "firstSeen": "2026-03-17"
-    },
-    {
       "id": "suumo-8ea6bba0b00899d1",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_74889310/",
@@ -1709,6 +1723,20 @@
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F310%2F74889310%2F74889310_0099.jpg&w=452&h=339",
       "yearBuilt": 1990,
       "firstSeen": "2026-04-06"
+    },
+    {
+      "id": "suumo-3ba44c37702a2b4a",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_73209962/",
+      "title": "仁科 980万円",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 9800000,
+      "seaViewScore": 2,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F962%2F73209962%2F73209962_0001.jpg&w=452&h=339",
+      "yearBuilt": 1993,
+      "firstSeen": "2026-03-17"
     },
     {
       "id": "suumo-b275a6f269185027",
@@ -1913,6 +1941,19 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F852%2F78818852%2F78818852_0001.jpg&w=452&h=339",
       "firstSeen": "2026-03-02"
+    },
+    {
+      "id": "suumo-2bcea67b372778b2",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/tochi/shizuoka/sc_kamogun/nc_76636384/",
+      "title": "大川（伊豆大川駅） 420万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "land",
+      "city": "東伊豆",
+      "priceJpy": 4200000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F384%2F76636384%2F76636384_0001.jpg&w=452&h=339",
+      "firstSeen": "2026-04-08"
     },
     {
       "id": "suumo-ec7906ef76c6db66",
