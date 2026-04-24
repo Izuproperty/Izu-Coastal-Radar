@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-23T19:24:51.500435",
+  "generatedAt": "2026-04-24T19:06:00.843692",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -156,20 +156,6 @@
       "firstSeen": "2026-03-31"
     },
     {
-      "id": "izutaiyo-2334e14385d2d65f",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB428H",
-      "title": "下田市 吉佐美（888万円）の家情報はこちら！2026.4.12下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 8880000,
-      "seaViewScore": 3,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb428ha.jpg",
-      "yearBuilt": 1988,
-      "firstSeen": "2026-04-12"
-    },
-    {
       "id": "izutaiyo-5f1a81436fa76c5a",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB410H",
@@ -291,20 +277,6 @@
       "priceJpy": 40000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb367ha.jpg",
-      "firstSeen": "2026-03-17"
-    },
-    {
-      "id": "izutaiyo-9d288ae01b5e67e3",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB240H",
-      "title": "下田市 吉佐美（6980万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 69800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb240ha.jpg",
-      "yearBuilt": 1998,
       "firstSeen": "2026-03-17"
     },
     {
@@ -607,19 +579,6 @@
       "priceJpy": 18500000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb138ga.jpg",
-      "firstSeen": "2026-03-17"
-    },
-    {
-      "id": "izutaiyo-6f62fb2e2cb432dd",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB217G",
-      "title": "下田市 吉佐美（2980万円）の土地情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "land",
-      "city": "下田",
-      "priceJpy": 29800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb217ga.jpg",
       "firstSeen": "2026-03-17"
     },
     {
@@ -1525,7 +1484,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01776917547",
-      "yearBuilt": 1992,
+      "yearBuilt": 1970,
       "firstSeen": "2026-04-17"
     },
     {
@@ -1539,7 +1498,7 @@
       "priceJpy": 6300000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01776917414",
-      "yearBuilt": 1991,
+      "yearBuilt": 1990,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1553,7 +1512,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01776917481",
-      "yearBuilt": 1986,
+      "yearBuilt": 1984,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1595,7 +1554,7 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01776917550",
-      "yearBuilt": 1964,
+      "yearBuilt": 1997,
       "firstSeen": "2026-04-20"
     },
     {
@@ -1609,7 +1568,7 @@
       "priceJpy": 13800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01776917550",
-      "yearBuilt": 1969,
+      "yearBuilt": 2019,
       "firstSeen": "2026-04-23"
     },
     {
@@ -1767,6 +1726,20 @@
       "firstSeen": "2026-03-15"
     },
     {
+      "id": "suumo-020ad32949fd5b5c",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_shimoda/nc_77725011/",
+      "title": "吉佐美 6980万円",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 69800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F011%2F77725011%2F77725011_0001.jpg&w=452&h=339",
+      "yearBuilt": 1998,
+      "firstSeen": "2026-04-24"
+    },
+    {
       "id": "suumo-1fca4e0d7892f66f",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_shimoda/nc_79194004/",
@@ -1863,20 +1836,6 @@
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F195%2F20605195%2F20605195_0001.jpg&w=452&h=339",
       "yearBuilt": 1995,
       "firstSeen": "2026-04-06"
-    },
-    {
-      "id": "suumo-300c08ed3b9f8fa4",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20652164/",
-      "title": "一色 1150万円",
-      "titleEn": "Shimoda Property",
-      "propertyType": "house",
-      "city": "下田",
-      "priceJpy": 11500000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F164%2F20652164%2F20652164_0001.jpg&w=452&h=339",
-      "yearBuilt": 1996,
-      "firstSeen": "2026-04-13"
     },
     {
       "id": "suumo-71575f0e479b6b8d",
