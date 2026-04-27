@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-26T19:07:41.366145",
+  "generatedAt": "2026-04-27T19:45:14.057817",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -283,11 +283,11 @@
       "id": "izutaiyo-5446b3987e931971",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB368H",
-      "title": "下田市 柿崎（13000万円）の家情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "title": "下田市 柿崎（9800万円）の家情報はこちら！2026.4.27下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
       "titleEn": "Shimoda Property",
       "propertyType": "house",
       "city": "下田",
-      "priceJpy": 130000000,
+      "priceJpy": 98000000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb368ha.jpg",
       "yearBuilt": 1974,
@@ -986,7 +986,7 @@
       "id": "izutaiyo-7e8fe65a2632a4e8",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=HIP615H",
-      "title": "東伊豆町 片瀬（1500万円）の家情報はこちら！2026.4.6熱海店 山口 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "title": "東伊豆町 片瀬（1500万円）の家情報はこちら！熱海店 山口 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "東伊豆",
@@ -1399,7 +1399,7 @@
       "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 12000000,
-      "seaViewScore": 4,
+      "seaViewScore": 3,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/10/6780-1.jpg",
       "yearBuilt": 2000,
       "firstSeen": "2026-03-17"
@@ -1484,7 +1484,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01776917547",
-      "yearBuilt": 1993,
+      "yearBuilt": 1990,
       "firstSeen": "2026-04-17"
     },
     {
@@ -1498,7 +1498,7 @@
       "priceJpy": 6300000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01776917414",
-      "yearBuilt": 1993,
+      "yearBuilt": 1989,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1512,7 +1512,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01776917481",
-      "yearBuilt": 1990,
+      "yearBuilt": 1999,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1554,22 +1554,8 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01776917426",
-      "yearBuilt": 1993,
+      "yearBuilt": 1989,
       "firstSeen": "2026-04-25"
-    },
-    {
-      "id": "aoba-6cda0a39e5cf2f39",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
-      "title": "オーナーチェンジ物件 東伊豆町奈良本 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 6200000,
-      "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01776917479",
-      "yearBuilt": 2026,
-      "firstSeen": "2026-04-26"
     },
     {
       "id": "aoba-da5ab2b3e196bd5d",
@@ -1582,7 +1568,7 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01776917550",
-      "yearBuilt": 1992,
+      "yearBuilt": 2002,
       "firstSeen": "2026-04-20"
     },
     {
@@ -1808,6 +1794,20 @@
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F459%2F78750459%2F78750459_0001.jpg&w=452&h=339",
       "yearBuilt": 1975,
       "firstSeen": "2026-03-17"
+    },
+    {
+      "id": "suumo-d2fa552c067b1f07",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78232445/",
+      "title": "片瀬（片瀬白田駅） 780万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 7800000,
+      "seaViewScore": 2,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F445%2F78232445%2F78232445_0001.jpg&w=452&h=339",
+      "yearBuilt": 1992,
+      "firstSeen": "2026-04-27"
     },
     {
       "id": "suumo-1a290850ecbd37ad",
@@ -2099,11 +2099,11 @@
       "id": "suumo-1aa99d0647720e1d",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/tochi/shizuoka/sc_kamogun/nc_79108111/",
-      "title": "櫻田 1050万円",
+      "title": "櫻田 990万円",
       "titleEn": "Minami-Izu Property",
       "propertyType": "land",
       "city": "南伊豆",
-      "priceJpy": 10500000,
+      "priceJpy": 9900000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F111%2F79108111%2F79108111_0001.jpg&w=452&h=339",
       "firstSeen": "2026-03-02"
