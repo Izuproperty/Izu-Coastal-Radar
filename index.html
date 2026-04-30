@@ -37,6 +37,7 @@
     .toggle-btn { padding: 8px 12px; border: none; background: #000; color: #666; cursor: pointer; transition: 0.2s; }
     .toggle-btn:hover { background: #111; }
     .toggle-btn.active { background: #333; color: #fff; font-weight: 600; }
+    .toggle-btn.active-new { background: #30d158; color: #000; font-weight: 700; }
     
     .price-slider { display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
     .slider-values { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #ccc; white-space: nowrap; }
@@ -129,6 +130,9 @@
     <div class="toggle-group">
       <button class="toggle-btn active" id="sort-btn" onclick="toggleSort(this)">↓ Price</button>
     </div>
+    <div class="toggle-group">
+      <button class="toggle-btn" id="new-btn" onclick="toggleNewOnly(this)">New</button>
+    </div>
     <div class="price-slider">
       <div class="slider-values">
         <span id="price-min-label">¥0</span>
@@ -160,7 +164,7 @@
 
 <script>
   let DATA = [];
-  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all', sortAsc: false };
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all', sortAsc: false, newOnly: false };
   let FX_USD = 155; // Default fallback, will be updated from buildInfo.json
   const TODAY = new Date().toISOString().slice(0, 10);
   const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -335,6 +339,12 @@
     render();
   }
 
+  function toggleNewOnly(btn) {
+    STATE.newOnly = !STATE.newOnly;
+    btn.classList.toggle('active-new', STATE.newOnly);
+    render();
+  }
+
   function getJPTitle(fullTitle) {
     // Extract concise property info from verbose Izu Taiyo titles
     // Format: "下田市 白浜（1500万円）の家情報はこちら！..." -> "下田市 白浜"
@@ -365,6 +375,7 @@
       if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
       if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
       if (STATE.source !== 'all' && l.source !== STATE.source) return false;
+      if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) return false;
 
       // Price filtering (slider)
       const price = l.priceJpy || 0;
