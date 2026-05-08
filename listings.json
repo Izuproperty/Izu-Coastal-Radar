@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-07T19:52:06.526964",
+  "generatedAt": "2026-05-08T19:30:23.667214",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1446,6 +1446,20 @@
       "firstSeen": "2026-03-30"
     },
     {
+      "id": "maple-6d21c804b0e76c4a",
+      "source": "Maple Housing",
+      "sourceUrl": "https://www.maple-h.co.jp/estate_db/6883%ef%bc%9a%e3%83%aa%e3%83%93%e3%83%b3%e3%82%b0%e3%80%81%e6%b5%b4%e5%ae%a4%e3%82%88%e3%82%8a%e6%b5%b7%e3%82%84%e5%b3%b6%e3%80%85%e3%82%92%e6%9c%9b%e3%82%80%e7%9c%ba%e6%9c%9b%e3%81%ab%e5%af%8c/",
+      "title": "リビング、浴室より海や島々を望む眺望に富",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 13800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2026/05/6883-1.jpg",
+      "yearBuilt": 1988,
+      "firstSeen": "2026-05-08"
+    },
+    {
       "id": "aoba-a316495e450ac74d",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22219/room98036165.html",
@@ -1456,7 +1470,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01777507648",
-      "yearBuilt": 1977,
+      "yearBuilt": 1963,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1470,7 +1484,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01777507597",
-      "yearBuilt": 1993,
+      "yearBuilt": 1991,
       "firstSeen": "2026-04-17"
     },
     {
@@ -1484,7 +1498,7 @@
       "priceJpy": 6300000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01777507660",
-      "yearBuilt": 1993,
+      "yearBuilt": 1992,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1498,7 +1512,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01777507621",
-      "yearBuilt": 1998,
+      "yearBuilt": 1989,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1540,22 +1554,36 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01777507652",
-      "yearBuilt": 2014,
+      "yearBuilt": 2002,
       "firstSeen": "2026-04-30"
     },
     {
-      "id": "aoba-da5ab2b3e196bd5d",
+      "id": "aoba-6cda0a39e5cf2f39",
       "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
+      "title": "オーナーチェンジ物件 東伊豆町奈良本 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 6200000,
+      "seaViewScore": 2,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01777507623",
+      "yearBuilt": 1994,
+      "firstSeen": "2026-05-08"
+    },
+    {
+      "id": "aoba-8ca83a289f0677eb",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
       "title": "エンゼルフォレスト大川汐見崎 戸建",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "東伊豆",
-      "priceJpy": 8800000,
+      "priceJpy": 13800000,
       "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01777507595",
-      "yearBuilt": 2011,
-      "firstSeen": "2026-04-29"
+      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01777507595",
+      "yearBuilt": 2019,
+      "firstSeen": "2026-05-08"
     },
     {
       "id": "aoba-eab801ede6a53d68",
