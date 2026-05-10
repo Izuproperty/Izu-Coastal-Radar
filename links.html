@@ -135,7 +135,6 @@
 
 <footer>
   <div class="footer-inner">
-    <div id="footer-note">Add links over time — this page is designed to scale.</div>
     <div><a href="index.html">Home</a></div>
   </div>
 </footer>
@@ -151,8 +150,7 @@
       watch: "WATCH →",
       read: "READ →",
       open: "OPEN →",
-      pillVideo: "VIDEO",
-      note: "Add links over time — this page is designed to scale."
+      pillVideo: "VIDEO"
     },
     JP: {
       title: "役立つ伊豆リンク",
@@ -161,8 +159,7 @@
       watch: "視聴 →",
       read: "読む →",
       open: "開く →",
-      pillVideo: "動画",
-      note: "リンクは随時追加 — このページは拡張可能です。"
+      pillVideo: "動画"
     },
     CN: {
       title: "伊豆实用链接",
@@ -171,8 +168,7 @@
       watch: "观看 →",
       read: "阅读 →",
       open: "打开 →",
-      pillVideo: "视频",
-      note: "随时添加链接 — 此页面可扩展。"
+      pillVideo: "视频"
     }
   };
 
@@ -238,7 +234,6 @@
     document.getElementById("page-title").innerText = t.title;
     document.getElementById("subtitle").innerText = t.subtitle;
     document.getElementById("back-home").innerText = t.back;
-    document.getElementById("footer-note").innerText = t.note;
   }
 
   function getCta(itemType) {
