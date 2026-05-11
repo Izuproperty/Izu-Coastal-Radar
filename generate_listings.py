@@ -138,9 +138,10 @@ def normalize_city(text):
         # Also remove whitespace from target cities for comparison
         c_normalized = re.sub(r"\s+", "", c)
         if c_normalized in normalized:
-            # 賀茂郡 (Kamo District) is stored as 南伊豆 so both city labels
-            # appear as a single "Minami-Izu" entry in the UI.
-            return "南伊豆" if c == "賀茂郡" else c
+            # 賀茂郡 → Minami-Izu; 河津 merged into 東伊豆 per display grouping.
+            if c == "賀茂郡": return "南伊豆"
+            if c == "河津":   return "東伊豆"
+            return c
     return None
 
 def extract_price(text):
