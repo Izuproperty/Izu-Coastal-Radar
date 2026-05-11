@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Izu Coastal Radar — Map View</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --bg-body: #050505;
+      --bg-card: #151517;
+      --text-primary: #e5e5e7;
+      --text-secondary: #86868b;
+      --accent: #2997ff;
+      --border: #333;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; overflow: hidden; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-primary); display: flex; flex-direction: column; }
+
+    header {
+      background: #000; border-bottom: 1px solid var(--border);
+      padding: 12px 20px; display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .nav-back { color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
+    .nav-back:hover { color: #fff; }
+    .header-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; white-space: nowrap; }
+    .header-sub { color: var(--text-secondary); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    .controls {
+      background: rgba(10,10,12,0.97); padding: 8px 16px; border-bottom: 1px solid #2a2a2c;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex-shrink: 0;
+      backdrop-filter: blur(12px); z-index: 500;
+    }
+
+    select {
+      padding: 6px 10px; background: #000; color: #fff; border: 1px solid #444;
+      border-radius: 8px; outline: none; font-size: 0.82rem; font-family: inherit;
+    }
+
+    .toggle-group { display: flex; border: 1px solid #333; border-radius: 8px; overflow: hidden; }
+    .toggle-btn {
+      padding: 6px 10px; border: none; background: #000; color: #666;
+      cursor: pointer; transition: 0.15s; font-size: 0.78rem; font-family: inherit;
+    }
+    .toggle-btn:hover { background: #111; color: #aaa; }
+    .toggle-btn.active { background: #2a2a2c; color: #fff; font-weight: 600; }
+    .toggle-btn.active-new { background: #30d158; color: #000; font-weight: 700; }
+
+    .price-slider { display: flex; flex-direction: column; gap: 4px; min-width: 190px; }
+    .slider-values { display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.72rem; font-weight: 600; color: #ccc; white-space: nowrap; }
+    .slider-values .price-sep { color: #555; }
+    .slider-container { position: relative; height: 18px; }
+    .slider-track-bg { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; height: 4px; background: #333; border-radius: 2px; pointer-events: none; }
+    .slider-track { position: absolute; top: 50%; transform: translateY(-50%); height: 4px; background: var(--accent); border-radius: 2px; pointer-events: none; }
+    .slider-container input[type="range"] {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; margin: 0;
+      -webkit-appearance: none; appearance: none; background: transparent; pointer-events: none; outline: none;
+    }
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; pointer-events: auto;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--accent); cursor: pointer;
+    }
+    .slider-container input[type="range"]::-moz-range-thumb {
+      pointer-events: auto; width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--accent); cursor: pointer;
+    }
+
+    .count-badge { color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
+    .geo-status { font-size: 0.7rem; color: #444; font-style: italic; white-space: nowrap; }
+
+    #map { flex: 1; min-height: 0; }
+
+    .leaflet-popup-content-wrapper {
+      background: #111113 !important; border: 1px solid #2c2c2e !important;
+      border-radius: 12px !important; box-shadow: 0 12px 40px rgba(0,0,0,0.7) !important;
+      color: var(--text-primary) !important; padding: 0 !important; overflow: hidden;
+    }
+    .leaflet-popup-content { margin: 0 !important; width: 230px !important; }
+    .leaflet-popup-tip-container { display: none; }
+    .leaflet-popup-close-button { color: #555 !important; top: 6px !important; right: 8px !important; font-size: 17px !important; z-index: 10; }
+    .leaflet-popup-close-button:hover { color: #fff !important; background: none !important; }
+    .leaflet-control-attribution { background: rgba(0,0,0,0.7) !important; color: #555 !important; }
+    .leaflet-control-attribution a { color: #666 !important; }
+    .leaflet-control-zoom a { background: #111 !important; color: #aaa !important; border-color: #333 !important; }
+    .leaflet-control-zoom a:hover { background: #222 !important; color: #fff !important; }
+    .leaflet-bar { border: 1px solid #333 !important; }
+
+    .map-popup {}
+    .popup-img { width: 100%; height: 140px; object-fit: cover; display: block; border-bottom: 1px solid #222; }
+    .popup-body { padding: 11px 13px; }
+    .popup-price { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .popup-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+    .popup-badge {
+      display: inline-block; padding: 2px 6px; border-radius: 4px;
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .badge-house { background: rgba(41,151,255,0.18); color: #2997ff; border: 1px solid rgba(41,151,255,0.3); }
+    .badge-land  { background: rgba(48,209,88,0.18);  color: #30d158; border: 1px solid rgba(48,209,88,0.3); }
+    .badge-condo { background: rgba(255,159,10,0.18); color: #ff9f0a; border: 1px solid rgba(255,159,10,0.3); }
+    .popup-city  { font-size: 0.78rem; color: #888; }
+    .popup-age   { font-size: 0.78rem; color: #666; }
+    .popup-title { font-size: 0.78rem; color: #aaa; line-height: 1.4; margin-bottom: 9px; }
+    .popup-link  { display: inline-block; color: var(--accent); font-weight: 700; font-size: 0.75rem; text-decoration: none; text-transform: uppercase; letter-spacing: 0.4px; }
+    .popup-link:hover { color: #fff; }
+    .popup-source { font-size: 0.65rem; color: #444; margin-top: 5px; }
+    .popup-approx { font-size: 0.65rem; color: #444; margin-top: 4px; }
+
+    .map-legend {
+      position: absolute; bottom: 32px; right: 12px; z-index: 1000;
+      background: rgba(8,8,10,0.88); border: 1px solid #2a2a2c;
+      border-radius: 10px; padding: 10px 14px; font-size: 0.72rem;
+      backdrop-filter: blur(8px); pointer-events: none;
+    }
+    .legend-row { display: flex; align-items: center; gap: 8px; color: #aaa; margin-bottom: 5px; }
+    .legend-row:last-child { margin-bottom: 0; }
+    .legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .legend-approx { margin-top: 7px; padding-top: 7px; border-top: 1px solid #222; color: #444; font-size: 0.62rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <a href="index.html" class="nav-back">← List View</a>
+    <div>
+      <div class="header-title">IZU COASTAL RADAR</div>
+      <div class="header-sub">Map View · Shimoda · Kawazu · South Izu</div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="toggle-group" id="curr-group">
+    <button class="toggle-btn active" onclick="setCurr('JPY',this)">¥</button>
+    <button class="toggle-btn" onclick="setCurr('USD',this)">$</button>
+  </div>
+
+  <select id="loc-select" onchange="applyFilters()"></select>
+
+  <select id="type-select" onchange="applyFilters()">
+    <option value="all">All Types</option>
+    <option value="house">House</option>
+    <option value="land">Land</option>
+    <option value="condo">Condo</option>
+  </select>
+
+  <div class="toggle-group">
+    <button class="toggle-btn" id="new-btn" onclick="toggleNewOnly(this)">New</button>
+  </div>
+
+  <div class="price-slider">
+    <div class="slider-values">
+      <span id="price-min-label">¥0</span>
+      <span class="price-sep">–</span>
+      <span id="price-max-label">No limit</span>
+    </div>
+    <div class="slider-container">
+      <div class="slider-track-bg"></div>
+      <div class="slider-track" id="slider-track"></div>
+      <input type="range" id="price-min-slider" min="0" max="14" value="0" oninput="onPriceSlider('min')">
+      <input type="range" id="price-max-slider" min="0" max="14" value="14" oninput="onPriceSlider('max')">
+    </div>
+  </div>
+
+  <span class="count-badge" id="count">...</span>
+  <span class="geo-status" id="geo-status"></span>
+</div>
+
+<div id="map"></div>
+
+<div class="map-legend">
+  <div class="legend-row"><div class="legend-dot" style="background:#2997ff"></div> House</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#30d158"></div> Land</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#ff9f0a"></div> Condo</div>
+  <div class="legend-approx">Dashed outline = city-level estimate<br>Solid = geocoded from listing</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let DATA = [];
+let MARKERS = [];
+let FX_USD = 155;
+let STATE = { curr: 'JPY', loc: 'all', type: 'all', newOnly: false };
+
+const TODAY = new Date().toISOString().slice(0, 10);
+const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+const CITY_COORDS = {
+  "下田":  [34.6751, 138.9451],
+  "河津":  [34.7722, 138.9894],
+  "東伊豆": [34.8394, 139.0847],
+  "南伊豆": [34.6289, 138.8614],
+};
+
+const CITY_EN = {
+  "下田": "Shimoda", "河津": "Kawazu",
+  "東伊豆": "Higashi-Izu", "南伊豆": "Minami-Izu", "賀茂郡": "Minami-Izu"
+};
+const TYPE_COLORS = { house: '#2997ff', land: '#30d158', condo: '#ff9f0a' };
+const PRICE_STEPS = [0, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000, 30000, null];
+
+const map = L.map('map', { center: [34.720, 138.955], zoom: 11 });
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 19
+}).addTo(map);
+
+function makeIcon(color, approx) {
+  const dash = approx ? 'stroke-dasharray="3 2"' : '';
+  const opacity = approx ? 0.7 : 1;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="34" viewBox="0 0 26 34">
+    <path d="M13 1C6.37 1 1 6.37 1 13c0 8.5 12 20 12 20s12-11.5 12-20C25 6.37 19.63 1 13 1z"
+      fill="${color}" fill-opacity="${opacity}" stroke="${color}" stroke-width="1.8" ${dash}/>
+    <circle cx="13" cy="13" r="4.5" fill="rgba(255,255,255,0.9)"/>
+  </svg>`;
+  return L.divIcon({ html: svg, className: '', iconSize: [26, 34], iconAnchor: [13, 34], popupAnchor: [0, -36] });
+}
+
+function hashStr(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
+  return h;
+}
+function jitterCoords(city, listingId) {
+  const base = CITY_COORDS[city];
+  if (!base) return null;
+  const h = hashStr(listingId || city);
+  return [
+    base[0] + ((h & 0xFFF) / 0xFFF * 2 - 1) * 0.016,
+    base[1] + ((h >> 12 & 0xFFF) / 0xFFF * 2 - 1) * 0.020
+  ];
+}
+
+const GEO_PREFIX = 'izu_geo2_';
+const geoQueue = [];
+let geoRunning = false;
+
+function geoGet(key) {
+  try { return JSON.parse(localStorage.getItem(GEO_PREFIX + btoa(unescape(encodeURIComponent(key))))); } catch { return null; }
+}
+function geoSet(key, val) {
+  try { localStorage.setItem(GEO_PREFIX + btoa(unescape(encodeURIComponent(key))), JSON.stringify(val)); } catch {}
+}
+
+function extractLocStr(l) {
+  if (!l.title) return null;
+  const m = l.title.match(/^([^（「(]+)/);
+  if (!m) return null;
+  let s = m[1].trim()
+    .replace(/の家情報.*$/, '').replace(/の土地情報.*$/, '').replace(/のマンション情報.*$/, '').trim();
+  if (!["下田", "河津", "東伊豆", "南伊豆", "賀茂"].some(c => s.includes(c))) return null;
+  return s.length > 2 ? s : null;
+}
+
+function geoNext() {
+  if (geoQueue.length === 0) { geoRunning = false; document.getElementById('geo-status').textContent = ''; return; }
+  geoRunning = true;
+  const { markerObj, locStr } = geoQueue.shift();
+  const remaining = geoQueue.length;
+  document.getElementById('geo-status').textContent = remaining > 0 ? `Locating… ${remaining} remaining` : 'Finalising locations…';
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locStr + ', 静岡県, 日本')}&format=json&limit=1&accept-language=ja`;
+  fetch(url, { headers: { 'User-Agent': 'IzuCoastalRadar/1.0' } })
+    .then(r => r.json())
+    .then(data => {
+      if (data && data[0]) {
+        const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+        if (lat > 34.5 && lat < 35.1 && lng > 138.6 && lng < 139.3) {
+          geoSet(locStr, [lat, lng]);
+          markerObj.approx = false;
+          markerObj.marker.setLatLng([lat, lng]);
+          markerObj.marker.setIcon(makeIcon(TYPE_COLORS[markerObj.listing.propertyType] || '#2997ff', false));
+        }
+      }
+    })
+    .catch(() => {})
+    .finally(() => setTimeout(geoNext, 1150));
+}
+
+function fmtPrice(p) {
+  if (!p) return '—';
+  if (STATE.curr === 'JPY') return '¥' + (p / 1000000).toFixed(1) + 'm';
+  return '$' + Math.round(p / FX_USD).toLocaleString();
+}
+
+function shortName(l) {
+  if (l.title) {
+    const m = l.title.match(/^([^（「(]+)/);
+    if (m) return m[1].trim().replace(/の家情報.*$/, '').replace(/の土地情報.*$/, '').replace(/のマンション情報.*$/, '').trim().slice(0, 50);
+  }
+  return l.titleEn || 'Property';
+}
+
+function makePopupHTML(l, approx) {
+  const img = l.imageUrl || 'https://placehold.co/230x140?text=No+Image';
+  const city = CITY_EN[l.city] || l.city;
+  const ptype = l.propertyType || 'house';
+  const currentYear = new Date().getFullYear();
+  const age = (ptype !== 'land' && l.yearBuilt) ? `${currentYear - l.yearBuilt}y old` : '';
+  return `<div class="map-popup">
+    <a href="${l.sourceUrl}" target="_blank" rel="noopener">
+      <img src="${img}" class="popup-img" referrerpolicy="no-referrer" onerror="this.src='https://placehold.co/230x140?text=No+Image'">
+    </a>
+    <div class="popup-body">
+      <div class="popup-price">${fmtPrice(l.priceJpy)}</div>
+      <div class="popup-meta">
+        <span class="popup-badge badge-${ptype}">${ptype}</span>
+        <span class="popup-city">${city}</span>
+        ${age ? `<span class="popup-age">${age}</span>` : ''}
+      </div>
+      <div class="popup-title">${shortName(l)}</div>
+      <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="popup-link">View Listing &rarr;</a>
+      <div class="popup-source">${l.source}</div>
+      ${approx ? '<div class="popup-approx">Location shown at city level (no exact address)</div>' : ''}
+    </div>
+  </div>`;
+}
+
+function buildMarkers() {
+  MARKERS.forEach(m => map.removeLayer(m.marker));
+  MARKERS = [];
+  geoQueue.length = 0;
+  DATA.forEach(l => {
+    const startCoords = jitterCoords(l.city, l.id);
+    if (!startCoords) return;
+    const color = TYPE_COLORS[l.propertyType] || '#2997ff';
+    const markerObj = { listing: l, approx: true, marker: null };
+    const locStr = extractLocStr(l);
+    const cached = locStr ? geoGet(locStr) : null;
+    const coords = cached || startCoords;
+    if (cached) markerObj.approx = false;
+    const marker = L.marker(coords, { icon: makeIcon(color, !cached) });
+    markerObj.marker = marker;
+    marker.on('click', () => marker.setPopupContent(makePopupHTML(l, markerObj.approx)));
+    marker.bindPopup(makePopupHTML(l, markerObj.approx), { maxWidth: 230 });
+    MARKERS.push(markerObj);
+    if (locStr && !cached) geoQueue.push({ markerObj, locStr });
+  });
+  applyFilters();
+  if (geoQueue.length > 0 && !geoRunning) setTimeout(geoNext, 1500);
+}
+
+function applyFilters() {
+  STATE.loc  = document.getElementById('loc-select').value;
+  STATE.type = document.getElementById('type-select').value;
+  const minIdx = parseInt(document.getElementById('price-min-slider').value);
+  const maxIdx = parseInt(document.getElementById('price-max-slider').value);
+  const priceMin = PRICE_STEPS[minIdx] !== null ? PRICE_STEPS[minIdx] * 10000 : null;
+  const priceMax = PRICE_STEPS[maxIdx] !== null ? PRICE_STEPS[maxIdx] * 10000 : null;
+  let visible = 0;
+  MARKERS.forEach(mo => {
+    const l = mo.listing;
+    let show = true;
+    if (STATE.loc !== 'all' && l.city !== STATE.loc) show = false;
+    if (STATE.type !== 'all' && l.propertyType !== STATE.type) show = false;
+    if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) show = false;
+    const p = l.priceJpy || 0;
+    if (priceMin !== null && p < priceMin) show = false;
+    if (priceMax !== null && p > priceMax) show = false;
+    if (show) { mo.marker.addTo(map); visible++; } else map.removeLayer(mo.marker);
+  });
+  document.getElementById('count').textContent = `${visible} listings`;
+}
+
+function populateLocFilter() {
+  const sel = document.getElementById('loc-select');
+  const cities = [...new Set(DATA.map(l => l.city))].sort();
+  sel.innerHTML = `<option value="all">All Locations</option>`;
+  cities.forEach(c => sel.innerHTML += `<option value="${c}">${CITY_EN[c] || c}</option>`);
+}
+
+function setCurr(c, btn) {
+  STATE.curr = c;
+  document.querySelectorAll('#curr-group .toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updatePriceLabels(parseInt(document.getElementById('price-min-slider').value), parseInt(document.getElementById('price-max-slider').value));
+  MARKERS.forEach(mo => { if (mo.marker.isPopupOpen()) mo.marker.setPopupContent(makePopupHTML(mo.listing, mo.approx)); });
+}
+
+function formatStep(val) {
+  if (val === null) return 'No limit';
+  if (val === 0) return STATE.curr === 'JPY' ? '¥0' : '$0';
+  if (STATE.curr === 'JPY') return '¥' + (val / 100) + 'm';
+  const usd = val * 10000 / FX_USD;
+  if (usd >= 1000000) return '$' + (usd / 1000000).toFixed(1) + 'M';
+  return '$' + Math.round(usd / 1000) + 'k';
+}
+function updatePriceLabels(minIdx, maxIdx) {
+  document.getElementById('price-min-label').textContent = formatStep(PRICE_STEPS[minIdx]);
+  document.getElementById('price-max-label').textContent = formatStep(PRICE_STEPS[maxIdx]);
+}
+function updateSliderTrack(minIdx, maxIdx) {
+  const total = PRICE_STEPS.length - 1;
+  document.getElementById('slider-track').style.left  = (minIdx / total * 100) + '%';
+  document.getElementById('slider-track').style.width = ((maxIdx - minIdx) / total * 100) + '%';
+}
+function onPriceSlider(handle) {
+  const minS = document.getElementById('price-min-slider');
+  const maxS = document.getElementById('price-max-slider');
+  let lo = parseInt(minS.value), hi = parseInt(maxS.value);
+  if (handle === 'min' && lo > hi) { minS.value = hi; lo = hi; }
+  if (handle === 'max' && hi < lo) { maxS.value = lo; hi = lo; }
+  updatePriceLabels(lo, hi); updateSliderTrack(lo, hi); applyFilters();
+}
+function toggleNewOnly(btn) {
+  STATE.newOnly = !STATE.newOnly;
+  btn.classList.toggle('active-new', STATE.newOnly);
+  applyFilters();
+}
+
+async function init() {
+  const t = Date.now();
+  try {
+    const [listRes, buildRes] = await Promise.all([fetch(`listings.json?t=${t}`), fetch(`buildInfo.json?t=${t}`)]);
+    const json = await listRes.json();
+    DATA = json.listings || [];
+    if (buildRes.ok) { const bi = await buildRes.json(); if (bi.forexRate) FX_USD = bi.forexRate; }
+  } catch (e) { document.getElementById('count').textContent = 'Error loading data'; return; }
+  populateLocFilter();
+  updatePriceLabels(0, PRICE_STEPS.length - 1);
+  updateSliderTrack(0, PRICE_STEPS.length - 1);
+  buildMarkers();
+}
+
+init();
+</script>
+</body>
+</html>
