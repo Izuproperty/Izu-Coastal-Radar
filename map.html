@@ -140,7 +140,7 @@
     <a href="index.html" class="nav-back">← List View</a>
     <div>
       <div class="header-title">IZU COASTAL RADAR</div>
-      <div class="header-sub">Map View · Shimoda · Kawazu · South Izu</div>
+      <div class="header-sub">Map View · Shimoda · Higashi-Izu · South Izu</div>
     </div>
   </div>
 </header>
@@ -152,6 +152,7 @@
   </div>
 
   <select id="loc-select" onchange="applyFilters()"></select>
+  <select id="source-select" onchange="applyFilters()"></select>
 
   <select id="type-select" onchange="applyFilters()">
     <option value="all">All Types</option>
@@ -198,7 +199,7 @@
 let DATA = [];
 let MARKERS = []; // only entries that have (or are awaiting) a real geocoded position
 let FX_USD = 155;
-let STATE = { curr: 'JPY', loc: 'all', type: 'all', newOnly: false };
+let STATE = { curr: 'JPY', loc: 'all', type: 'all', source: 'all', newOnly: false };
 
 const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
@@ -316,8 +317,9 @@ function makePopupHTML(l) {
 
 function passesFilters(l) {
   const city = normCity(l.city);
-  if (STATE.loc !== 'all' && city !== STATE.loc) return false;
-  if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
+  if (STATE.loc    !== 'all' && city          !== STATE.loc)    return false;
+  if (STATE.source !== 'all' && l.source      !== STATE.source) return false;
+  if (STATE.type   !== 'all' && l.propertyType !== STATE.type)  return false;
   if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) return false;
   const minIdx = parseInt(document.getElementById('price-min-slider').value);
   const maxIdx = parseInt(document.getElementById('price-max-slider').value);
@@ -353,8 +355,9 @@ function buildMarkers() {
 }
 
 function applyFilters() {
-  STATE.loc  = document.getElementById('loc-select').value;
-  STATE.type = document.getElementById('type-select').value;
+  STATE.loc    = document.getElementById('loc-select').value;
+  STATE.source = document.getElementById('source-select').value;
+  STATE.type   = document.getElementById('type-select').value;
   refreshCounts();
 }
 
@@ -372,9 +375,10 @@ function refreshCounts() {
       buckets[cityEn] = (buckets[cityEn] || 0) + 1;
     }
   });
-  const total = mappedCount + Object.values(buckets).reduce((a, b) => a + b, 0);
-  document.getElementById('count').textContent =
-    mappedCount < total ? `${total} listings (${mappedCount} mapped)` : `${total} listings`;
+  const bucketTotal = Object.values(buckets).reduce((a, b) => a + b, 0);
+  document.getElementById('count').textContent = bucketTotal > 0
+    ? `${mappedCount} on map · ${bucketTotal} by city`
+    : `${mappedCount} listings`;
   updateCityBucketPanel(buckets);
 }
 
@@ -397,6 +401,13 @@ function populateLocFilter() {
   const cities = [...new Set(DATA.map(l => normCity(l.city)))].sort();
   sel.innerHTML = `<option value="all">All Locations</option>`;
   cities.forEach(c => sel.innerHTML += `<option value="${c}">${CITY_EN[c] || c}</option>`);
+}
+
+function populateSrcFilter() {
+  const sel = document.getElementById('source-select');
+  const sources = [...new Set(DATA.map(l => l.source))].sort();
+  sel.innerHTML = `<option value="all">All Brokers</option>`;
+  sources.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
 }
 
 function setCurr(c, btn) {
@@ -447,6 +458,7 @@ async function init() {
     if (buildRes.ok) { const bi = await buildRes.json(); if (bi.forexRate) FX_USD = bi.forexRate; }
   } catch (e) { document.getElementById('count').textContent = 'Error loading data'; return; }
   populateLocFilter();
+  populateSrcFilter();
   updatePriceLabels(0, PRICE_STEPS.length - 1);
   updateSliderTrack(0, PRICE_STEPS.length - 1);
   buildMarkers();
