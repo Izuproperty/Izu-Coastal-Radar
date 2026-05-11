@@ -212,7 +212,7 @@ function normCity(c) { return c === '河津' ? '東伊豆' : c; }
 const TYPE_COLORS = { house: '#2997ff', land: '#30d158', condo: '#ff9f0a' };
 const PRICE_STEPS = [0, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000, 30000, null];
 
-const map = L.map('map', { center: [34.72, 138.97], zoom: 12 });
+const map = L.map('map', { center: [32.0, 127.0], zoom: 4 });
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
   subdomains: 'abcd', maxZoom: 19
@@ -450,6 +450,10 @@ async function init() {
   updatePriceLabels(0, PRICE_STEPS.length - 1);
   updateSliderTrack(0, PRICE_STEPS.length - 1);
   buildMarkers();
+  // Cinematic fly-in from wide Pacific view
+  setTimeout(() => {
+    map.flyTo([34.72, 138.97], 12, { duration: 2.8, easeLinearity: 0.12 });
+  }, 150);
 }
 
 init();
