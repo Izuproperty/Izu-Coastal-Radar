@@ -375,9 +375,10 @@ function refreshCounts() {
       buckets[cityEn] = (buckets[cityEn] || 0) + 1;
     }
   });
-  const total = mappedCount + Object.values(buckets).reduce((a, b) => a + b, 0);
-  document.getElementById('count').textContent =
-    mappedCount < total ? `${total} listings (${mappedCount} mapped)` : `${total} listings`;
+  const bucketTotal = Object.values(buckets).reduce((a, b) => a + b, 0);
+  document.getElementById('count').textContent = bucketTotal > 0
+    ? `${mappedCount} on map · ${bucketTotal} by city`
+    : `${mappedCount} listings`;
   updateCityBucketPanel(buckets);
 }
 
