@@ -190,10 +190,10 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 const CITY_COORDS = {
-  "下田":  [34.6751, 138.9451],
-  "河津":  [34.7722, 138.9894],
-  "東伊豆": [34.8394, 139.0847],
-  "南伊豆": [34.6289, 138.8614],
+  "下田":  [34.6796, 138.9457],
+  "河津":  [34.7728, 138.9867],
+  "東伊豆": [34.8161, 139.0399],
+  "南伊豆": [34.6607, 138.8583],
 };
 
 const CITY_EN = {
@@ -230,8 +230,8 @@ function jitterCoords(city, listingId) {
   if (!base) return null;
   const h = hashStr(listingId || city);
   return [
-    base[0] + ((h & 0xFFF) / 0xFFF * 2 - 1) * 0.016,
-    base[1] + ((h >> 12 & 0xFFF) / 0xFFF * 2 - 1) * 0.020
+    base[0] + ((h & 0xFFF) / 0xFFF * 2 - 1) * 0.006,
+    base[1] + ((h >> 12 & 0xFFF) / 0xFFF * 2 - 1) * 0.006
   ];
 }
 
