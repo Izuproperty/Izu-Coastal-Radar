@@ -119,6 +119,18 @@
     .legend-row:last-child { margin-bottom: 0; }
     .legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
     .legend-approx { margin-top: 7px; padding-top: 7px; border-top: 1px solid #222; color: #444; font-size: 0.62rem; }
+
+    .city-bucket-panel {
+      position: absolute; bottom: 32px; left: 12px; z-index: 1000;
+      background: rgba(8,8,10,0.88); border: 1px solid #2a2a2c;
+      border-radius: 10px; padding: 10px 14px; font-size: 0.72rem;
+      backdrop-filter: blur(8px); pointer-events: none; display: none;
+    }
+    .bucket-title { color: #555; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .bucket-row { display: flex; align-items: center; gap: 8px; color: #888; margin-bottom: 4px; }
+    .bucket-row:last-child { margin-bottom: 0; }
+    .bucket-sq { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .bucket-count { margin-left: auto; padding-left: 12px; color: #666; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -172,67 +184,47 @@
 
 <div id="map"></div>
 
+<div class="city-bucket-panel" id="city-bucket"></div>
+
 <div class="map-legend">
   <div class="legend-row"><div class="legend-dot" style="background:#2997ff"></div> House</div>
   <div class="legend-row"><div class="legend-dot" style="background:#30d158"></div> Land</div>
   <div class="legend-row"><div class="legend-dot" style="background:#ff9f0a"></div> Condo</div>
-  <div class="legend-approx">Dashed outline = city-level estimate<br>Solid = geocoded from listing</div>
+  <div class="legend-approx">Pins = geocoded from listing title<br>Unmapped listings shown in side panel</div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 let DATA = [];
-let MARKERS = [];
+let MARKERS = []; // only entries that have (or are awaiting) a real geocoded position
 let FX_USD = 155;
 let STATE = { curr: 'JPY', loc: 'all', type: 'all', newOnly: false };
 
-const TODAY = new Date().toISOString().slice(0, 10);
 const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-const CITY_COORDS = {
-  "下田":  [34.6796, 138.9457],
-  "河津":  [34.7728, 138.9867],
-  "東伊豆": [34.8161, 139.0399],
-  "南伊豆": [34.6607, 138.8583],
-};
-
 const CITY_EN = {
-  "下田": "Shimoda", "河津": "Kawazu",
+  "下田": "Shimoda", "河津": "Higashi-Izu",
   "東伊豆": "Higashi-Izu", "南伊豆": "Minami-Izu", "賀茂郡": "Minami-Izu"
 };
+const BUCKET_COLORS = { "Shimoda": "#2997ff", "Higashi-Izu": "#ff9f0a", "Minami-Izu": "#30d158" };
+function normCity(c) { return c === '河津' ? '東伊豆' : c; }
+
 const TYPE_COLORS = { house: '#2997ff', land: '#30d158', condo: '#ff9f0a' };
 const PRICE_STEPS = [0, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000, 30000, null];
 
-const map = L.map('map', { center: [34.720, 138.955], zoom: 11 });
+const map = L.map('map', { center: [34.72, 138.97], zoom: 12 });
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
   subdomains: 'abcd', maxZoom: 19
 }).addTo(map);
 
-function makeIcon(color, approx) {
-  const dash = approx ? 'stroke-dasharray="3 2"' : '';
-  const opacity = approx ? 0.7 : 1;
+function makeIcon(color) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="34" viewBox="0 0 26 34">
     <path d="M13 1C6.37 1 1 6.37 1 13c0 8.5 12 20 12 20s12-11.5 12-20C25 6.37 19.63 1 13 1z"
-      fill="${color}" fill-opacity="${opacity}" stroke="${color}" stroke-width="1.8" ${dash}/>
+      fill="${color}" stroke="${color}" stroke-width="1.8"/>
     <circle cx="13" cy="13" r="4.5" fill="rgba(255,255,255,0.9)"/>
   </svg>`;
   return L.divIcon({ html: svg, className: '', iconSize: [26, 34], iconAnchor: [13, 34], popupAnchor: [0, -36] });
-}
-
-function hashStr(s) {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
-  return h;
-}
-function jitterCoords(city, listingId) {
-  const base = CITY_COORDS[city];
-  if (!base) return null;
-  const h = hashStr(listingId || city);
-  return [
-    base[0] + ((h & 0xFFF) / 0xFFF * 2 - 1) * 0.006,
-    base[1] + ((h >> 12 & 0xFFF) / 0xFFF * 2 - 1) * 0.006
-  ];
 }
 
 const GEO_PREFIX = 'izu_geo2_';
@@ -261,7 +253,7 @@ function geoNext() {
   geoRunning = true;
   const { markerObj, locStr } = geoQueue.shift();
   const remaining = geoQueue.length;
-  document.getElementById('geo-status').textContent = remaining > 0 ? `Locating… ${remaining} remaining` : 'Finalising locations…';
+  document.getElementById('geo-status').textContent = remaining > 0 ? `Locating… ${remaining} remaining` : 'Finalising…';
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locStr + ', 静岡県, 日本')}&format=json&limit=1&accept-language=ja`;
   fetch(url, { headers: { 'User-Agent': 'IzuCoastalRadar/1.0' } })
     .then(r => r.json())
@@ -270,9 +262,14 @@ function geoNext() {
         const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
         if (lat > 34.5 && lat < 35.1 && lng > 138.6 && lng < 139.3) {
           geoSet(locStr, [lat, lng]);
-          markerObj.approx = false;
-          markerObj.marker.setLatLng([lat, lng]);
-          markerObj.marker.setIcon(makeIcon(TYPE_COLORS[markerObj.listing.propertyType] || '#2997ff', false));
+          const l = markerObj.listing;
+          const color = TYPE_COLORS[l.propertyType] || '#2997ff';
+          const marker = L.marker([lat, lng], { icon: makeIcon(color) });
+          marker.on('click', () => marker.setPopupContent(makePopupHTML(l)));
+          marker.bindPopup(makePopupHTML(l), { maxWidth: 230 });
+          markerObj.marker = marker;
+          if (passesFilters(l)) marker.addTo(map);
+          refreshCounts();
         }
       }
     })
@@ -294,12 +291,11 @@ function shortName(l) {
   return l.titleEn || 'Property';
 }
 
-function makePopupHTML(l, approx) {
+function makePopupHTML(l) {
   const img = l.imageUrl || 'https://placehold.co/230x140?text=No+Image';
-  const city = CITY_EN[l.city] || l.city;
+  const city = CITY_EN[normCity(l.city)] || l.city;
   const ptype = l.propertyType || 'house';
-  const currentYear = new Date().getFullYear();
-  const age = (ptype !== 'land' && l.yearBuilt) ? `${currentYear - l.yearBuilt}y old` : '';
+  const age = (ptype !== 'land' && l.yearBuilt) ? `${new Date().getFullYear() - l.yearBuilt}y old` : '';
   return `<div class="map-popup">
     <a href="${l.sourceUrl}" target="_blank" rel="noopener">
       <img src="${img}" class="popup-img" referrerpolicy="no-referrer" onerror="this.src='https://placehold.co/230x140?text=No+Image'">
@@ -314,60 +310,91 @@ function makePopupHTML(l, approx) {
       <div class="popup-title">${shortName(l)}</div>
       <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="popup-link">View Listing &rarr;</a>
       <div class="popup-source">${l.source}</div>
-      ${approx ? '<div class="popup-approx">Location shown at city level (no exact address)</div>' : ''}
     </div>
   </div>`;
 }
 
+function passesFilters(l) {
+  const city = normCity(l.city);
+  if (STATE.loc !== 'all' && city !== STATE.loc) return false;
+  if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
+  if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) return false;
+  const minIdx = parseInt(document.getElementById('price-min-slider').value);
+  const maxIdx = parseInt(document.getElementById('price-max-slider').value);
+  const priceMin = PRICE_STEPS[minIdx] !== null ? PRICE_STEPS[minIdx] * 10000 : null;
+  const priceMax = PRICE_STEPS[maxIdx] !== null ? PRICE_STEPS[maxIdx] * 10000 : null;
+  const p = l.priceJpy || 0;
+  if (priceMin !== null && p < priceMin) return false;
+  if (priceMax !== null && p > priceMax) return false;
+  return true;
+}
+
 function buildMarkers() {
-  MARKERS.forEach(m => map.removeLayer(m.marker));
+  MARKERS.forEach(mo => mo.marker && map.removeLayer(mo.marker));
   MARKERS = [];
   geoQueue.length = 0;
   DATA.forEach(l => {
-    const startCoords = jitterCoords(l.city, l.id);
-    if (!startCoords) return;
-    const color = TYPE_COLORS[l.propertyType] || '#2997ff';
-    const markerObj = { listing: l, approx: true, marker: null };
     const locStr = extractLocStr(l);
     const cached = locStr ? geoGet(locStr) : null;
-    const coords = cached || startCoords;
-    if (cached) markerObj.approx = false;
-    const marker = L.marker(coords, { icon: makeIcon(color, !cached) });
-    markerObj.marker = marker;
-    marker.on('click', () => marker.setPopupContent(makePopupHTML(l, markerObj.approx)));
-    marker.bindPopup(makePopupHTML(l, markerObj.approx), { maxWidth: 230 });
+    const markerObj = { listing: l, marker: null };
+    if (cached) {
+      const color = TYPE_COLORS[l.propertyType] || '#2997ff';
+      const marker = L.marker(cached, { icon: makeIcon(color) });
+      marker.on('click', () => marker.setPopupContent(makePopupHTML(l)));
+      marker.bindPopup(makePopupHTML(l), { maxWidth: 230 });
+      markerObj.marker = marker;
+    } else if (locStr) {
+      geoQueue.push({ markerObj, locStr });
+    }
     MARKERS.push(markerObj);
-    if (locStr && !cached) geoQueue.push({ markerObj, locStr });
   });
-  applyFilters();
+  refreshCounts();
   if (geoQueue.length > 0 && !geoRunning) setTimeout(geoNext, 1500);
 }
 
 function applyFilters() {
   STATE.loc  = document.getElementById('loc-select').value;
   STATE.type = document.getElementById('type-select').value;
-  const minIdx = parseInt(document.getElementById('price-min-slider').value);
-  const maxIdx = parseInt(document.getElementById('price-max-slider').value);
-  const priceMin = PRICE_STEPS[minIdx] !== null ? PRICE_STEPS[minIdx] * 10000 : null;
-  const priceMax = PRICE_STEPS[maxIdx] !== null ? PRICE_STEPS[maxIdx] * 10000 : null;
-  let visible = 0;
+  refreshCounts();
+}
+
+function refreshCounts() {
+  let mappedCount = 0;
+  const buckets = {};
   MARKERS.forEach(mo => {
     const l = mo.listing;
-    let show = true;
-    if (STATE.loc !== 'all' && l.city !== STATE.loc) show = false;
-    if (STATE.type !== 'all' && l.propertyType !== STATE.type) show = false;
-    if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) show = false;
-    const p = l.priceJpy || 0;
-    if (priceMin !== null && p < priceMin) show = false;
-    if (priceMax !== null && p > priceMax) show = false;
-    if (show) { mo.marker.addTo(map); visible++; } else map.removeLayer(mo.marker);
+    const show = passesFilters(l);
+    if (mo.marker) {
+      if (show) { mo.marker.addTo(map); mappedCount++; }
+      else map.removeLayer(mo.marker);
+    } else if (show) {
+      const cityEn = CITY_EN[normCity(l.city)] || l.city;
+      buckets[cityEn] = (buckets[cityEn] || 0) + 1;
+    }
   });
-  document.getElementById('count').textContent = `${visible} listings`;
+  const total = mappedCount + Object.values(buckets).reduce((a, b) => a + b, 0);
+  document.getElementById('count').textContent =
+    mappedCount < total ? `${total} listings (${mappedCount} mapped)` : `${total} listings`;
+  updateCityBucketPanel(buckets);
+}
+
+function updateCityBucketPanel(buckets) {
+  const panel = document.getElementById('city-bucket');
+  const entries = Object.entries(buckets).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  panel.innerHTML = '<div class="bucket-title">Address unknown — city estimate</div>' +
+    entries.map(([city, n]) =>
+      `<div class="bucket-row">
+        <div class="bucket-sq" style="background:${BUCKET_COLORS[city] || '#888'}"></div>
+        <span>${city}</span><span class="bucket-count">${n}</span>
+      </div>`
+    ).join('');
 }
 
 function populateLocFilter() {
   const sel = document.getElementById('loc-select');
-  const cities = [...new Set(DATA.map(l => l.city))].sort();
+  const cities = [...new Set(DATA.map(l => normCity(l.city)))].sort();
   sel.innerHTML = `<option value="all">All Locations</option>`;
   cities.forEach(c => sel.innerHTML += `<option value="${c}">${CITY_EN[c] || c}</option>`);
 }
@@ -377,7 +404,7 @@ function setCurr(c, btn) {
   document.querySelectorAll('#curr-group .toggle-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   updatePriceLabels(parseInt(document.getElementById('price-min-slider').value), parseInt(document.getElementById('price-max-slider').value));
-  MARKERS.forEach(mo => { if (mo.marker.isPopupOpen()) mo.marker.setPopupContent(makePopupHTML(mo.listing, mo.approx)); });
+  MARKERS.forEach(mo => { if (mo.marker && mo.marker.isPopupOpen()) mo.marker.setPopupContent(makePopupHTML(mo.listing)); });
 }
 
 function formatStep(val) {
@@ -403,12 +430,12 @@ function onPriceSlider(handle) {
   let lo = parseInt(minS.value), hi = parseInt(maxS.value);
   if (handle === 'min' && lo > hi) { minS.value = hi; lo = hi; }
   if (handle === 'max' && hi < lo) { maxS.value = lo; hi = lo; }
-  updatePriceLabels(lo, hi); updateSliderTrack(lo, hi); applyFilters();
+  updatePriceLabels(lo, hi); updateSliderTrack(lo, hi); refreshCounts();
 }
 function toggleNewOnly(btn) {
   STATE.newOnly = !STATE.newOnly;
   btn.classList.toggle('active-new', STATE.newOnly);
-  applyFilters();
+  refreshCounts();
 }
 
 async function init() {

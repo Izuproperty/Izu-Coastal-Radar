@@ -210,18 +210,19 @@
   // City name translations
   const CITY_MAP = {
     "下田": "Shimoda",
-    "河津": "Kawazu",
+    "河津": "Higashi-Izu",
     "東伊豆": "Higashi-Izu",
     "南伊豆": "Minami-Izu",
     "賀茂郡": "Minami-Izu"
   };
   const CITY_MAP_CN = {
     "下田": "下田",
-    "河津": "河津",
+    "河津": "东伊豆",
     "東伊豆": "东伊豆",
     "南伊豆": "南伊豆",
     "賀茂郡": "南伊豆"
   };
+  function normCity(c) { return c === '河津' ? '東伊豆' : c; }
 
   function getCityName(city) {
     if (STATE.lang === 'EN') return CITY_MAP[city] || city;
@@ -237,7 +238,7 @@
     const oldLoc = locSel.value;
     const oldSrc = srcSel.value;
 
-    const locs = [...new Set(DATA.map(l => l.city))].sort();
+    const locs = [...new Set(DATA.map(l => normCity(l.city)))].sort();
     const srcs = [...new Set(DATA.map(l => l.source))].sort();
 
     locSel.innerHTML = `<option value="all">${TXT[STATE.lang].allLoc}</option>`;
@@ -374,7 +375,7 @@
     const priceMax = PRICE_STEPS[maxIdx] !== null ? PRICE_STEPS[maxIdx] * 10000 : null;
 
     const filtered = DATA.filter(l => {
-      if (STATE.loc !== 'all' && l.city !== STATE.loc) return false;
+      if (STATE.loc !== 'all' && normCity(l.city) !== STATE.loc) return false;
       if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
       if (STATE.source !== 'all' && l.source !== STATE.source) return false;
       if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) return false;
