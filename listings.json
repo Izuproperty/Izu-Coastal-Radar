@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-11T19:59:39.428425",
+  "generatedAt": "2026-05-12T20:05:55.667308",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -13,7 +13,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml012ha.jpg",
       "yearBuilt": 1976,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6680894,
+      "lng": 138.9354711
     },
     {
       "id": "izutaiyo-8a23ff37f405740f",
@@ -41,7 +43,9 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2012ha.jpg",
       "yearBuilt": 1965,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-8e90c753677c3607",
@@ -97,7 +101,9 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb351ha.jpg",
       "yearBuilt": 1980,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6674506,
+      "lng": 138.93506
     },
     {
       "id": "izutaiyo-eec27400ddca63b0",
@@ -125,7 +131,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb426ha.jpg",
       "yearBuilt": 1986,
-      "firstSeen": "2026-04-10"
+      "firstSeen": "2026-04-10",
+      "lat": 34.6770783,
+      "lng": 138.9440626
     },
     {
       "id": "izutaiyo-fe2a1c4a8e2c4ced",
@@ -139,7 +147,9 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb369ha.jpg",
       "yearBuilt": 1974,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-8b37db8b6d176f3d",
@@ -167,7 +177,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg",
       "yearBuilt": 1975,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.672998,
+      "lng": 138.940711
     },
     {
       "id": "izutaiyo-4a76a36d94caf98e",
@@ -181,7 +193,9 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml119ha.jpg",
       "yearBuilt": 1974,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-4414aecf38028ce0",
@@ -195,7 +209,9 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg",
       "yearBuilt": 1993,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-0a532d6650f1416f",
@@ -209,7 +225,9 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010ha.jpg",
       "yearBuilt": 1998,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-a6ef69a2bc0579f1",
@@ -222,7 +240,9 @@
       "priceJpy": 15800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb320ha.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6989879,
+      "lng": 138.9408639
     },
     {
       "id": "izutaiyo-771cdb117598e43e",
@@ -263,7 +283,9 @@
       "priceJpy": 40000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb367ha.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6989879,
+      "lng": 138.9408639
     },
     {
       "id": "izutaiyo-5446b3987e931971",
@@ -277,7 +299,9 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb368ha.jpg",
       "yearBuilt": 1974,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-4029d0726bfb9886",
@@ -291,7 +315,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb225ha.jpg",
       "yearBuilt": 1991,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6680894,
+      "lng": 138.9354711
     },
     {
       "id": "izutaiyo-e01fb0c3facbd1d5",
@@ -305,7 +331,9 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb392ha.jpg",
       "yearBuilt": 2009,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-87e94d2c426bdd68",
@@ -331,7 +359,9 @@
       "priceJpy": 2000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb027ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-8ab70da42757bb2f",
@@ -357,7 +387,9 @@
       "priceJpy": 2300000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm1191ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-11d2a88fb2b5ef1e",
@@ -396,7 +428,9 @@
       "priceJpy": 3000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml014ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-da5d098dc590538d",
@@ -409,7 +443,9 @@
       "priceJpy": 4000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml005ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6674506,
+      "lng": 138.93506
     },
     {
       "id": "izutaiyo-14f21a82959e13e6",
@@ -422,7 +458,9 @@
       "priceJpy": 4800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb139ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-9f905a33df3f03b2",
@@ -448,7 +486,9 @@
       "priceJpy": 5000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2s11ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-10f5b4fd767be9f8",
@@ -461,7 +501,9 @@
       "priceJpy": 5470000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb425ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.679497,
+      "lng": 138.945365
     },
     {
       "id": "izutaiyo-29f3c8546b54c4af",
@@ -474,7 +516,9 @@
       "priceJpy": 7800000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm1049ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-7a0e7a8d2d85de7b",
@@ -487,7 +531,9 @@
       "priceJpy": 8000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb307ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.679497,
+      "lng": 138.945365
     },
     {
       "id": "izutaiyo-f2d3aa1765ed6049",
@@ -500,7 +546,9 @@
       "priceJpy": 8000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2004ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.679497,
+      "lng": 138.945365
     },
     {
       "id": "izutaiyo-8d9555be4fb9af1d",
@@ -513,7 +561,9 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb346ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-3a7e39949b83cbff",
@@ -526,7 +576,9 @@
       "priceJpy": 9800000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb241ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-aefd2f1cd8d348ae",
@@ -539,7 +591,9 @@
       "priceJpy": 14000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb382ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6680894,
+      "lng": 138.9354711
     },
     {
       "id": "izutaiyo-943c4df188f13b49",
@@ -552,7 +606,9 @@
       "priceJpy": 18000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb029ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.681608,
+      "lng": 138.929311
     },
     {
       "id": "izutaiyo-b2bf4b21f7357aff",
@@ -565,7 +621,9 @@
       "priceJpy": 18500000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb138ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-1abad1e61ae73cb9",
@@ -578,7 +636,9 @@
       "priceJpy": 39300000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb030ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-aa44b2362f73e975",
@@ -591,7 +651,9 @@
       "priceJpy": 43300000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb242ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-019e51b2d63b8321",
@@ -605,7 +667,9 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb419ga.jpg",
       "yearBuilt": 2001,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-46522fd865d0b410",
@@ -619,7 +683,9 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb420ga.jpg",
       "yearBuilt": 1983,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.697857,
+      "lng": 138.972447
     },
     {
       "id": "izutaiyo-59b39aaf04a365b7",
@@ -634,6 +700,20 @@
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb258ma.jpg",
       "yearBuilt": 1989,
       "firstSeen": "2026-03-17"
+    },
+    {
+      "id": "izutaiyo-7bb7c7c76c735166",
+      "source": "Izu Taiyo",
+      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
+      "title": "下田市 リゾート129 碁石が浜パートＩ（1380万円）のマンション情報はこちら！2026.5.12下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "titleEn": "Shimoda Property",
+      "propertyType": "condo",
+      "city": "下田",
+      "priceJpy": 13800000,
+      "seaViewScore": 2,
+      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408ma.jpg",
+      "yearBuilt": 1988,
+      "firstSeen": "2026-04-23"
     },
     {
       "id": "izutaiyo-a0be675e61fbe4f3",
@@ -662,20 +742,6 @@
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb365ma.jpg",
       "yearBuilt": 1993,
       "firstSeen": "2026-03-17"
-    },
-    {
-      "id": "izutaiyo-7bb7c7c76c735166",
-      "source": "Izu Taiyo",
-      "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB408M",
-      "title": "下田市 リゾート129 碁石が浜パートＩ（1580万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
-      "titleEn": "Shimoda Property",
-      "propertyType": "condo",
-      "city": "下田",
-      "priceJpy": 15800000,
-      "seaViewScore": 2,
-      "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408ma.jpg",
-      "yearBuilt": 1988,
-      "firstSeen": "2026-04-23"
     },
     {
       "id": "izutaiyo-f4a34b9fa0843c75",
@@ -723,11 +789,11 @@
       "id": "izutaiyo-0fdb7611806da5e2",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=KW2004H",
-      "title": "河津町 桜坂温泉別荘地（350万円）の家情報はこちら！下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "title": "河津町 桜坂温泉別荘地（250万円）の家情報はこちら！2026.5.12下田店 鈴木 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "河津",
-      "priceJpy": 3500000,
+      "priceJpy": 2500000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kw2004ha.jpg",
       "yearBuilt": 1969,
@@ -829,7 +895,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb326ha.jpg",
       "yearBuilt": 1991,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.757074,
+      "lng": 138.987474
     },
     {
       "id": "izutaiyo-f7e461910f6b6fb1",
@@ -842,7 +910,9 @@
       "priceJpy": 3000000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwl102ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.757074,
+      "lng": 138.987474
     },
     {
       "id": "izutaiyo-ecdaea0e7bba0b43",
@@ -924,7 +994,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip575ha.jpg",
       "yearBuilt": 1995,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-b004d0d8703b66a0",
@@ -952,7 +1024,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip598ha.jpg",
       "yearBuilt": 1997,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-e820117b4fc0fc09",
@@ -966,7 +1040,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip463ha.jpg",
       "yearBuilt": 2002,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-7e8fe65a2632a4e8",
@@ -980,7 +1056,9 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip615ha.jpg",
       "yearBuilt": 1979,
-      "firstSeen": "2026-04-06"
+      "firstSeen": "2026-04-06",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-52ff3e4fe6984a61",
@@ -1006,7 +1084,9 @@
       "priceJpy": 3800000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip609ga.jpg",
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.7892196,
+      "lng": 139.0428215
     },
     {
       "id": "izutaiyo-5e514abc2b2197d3",
@@ -1020,7 +1100,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip613ga.jpg",
       "yearBuilt": 1977,
-      "firstSeen": "2026-03-17"
+      "firstSeen": "2026-03-17",
+      "lat": 34.7892196,
+      "lng": 139.0428215
     },
     {
       "id": "izutaiyo-a7a2a18ac43b711a",
@@ -1033,7 +1115,9 @@
       "priceJpy": 8270000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5021ga.jpg",
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-b5b8480d0c92aab1",
@@ -1059,7 +1143,9 @@
       "priceJpy": 8622000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5017ga.jpg",
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-e65d190b8c587202",
@@ -1072,7 +1158,9 @@
       "priceJpy": 8629000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5015ga.jpg",
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-7c80727544b52b8f",
@@ -1085,7 +1173,9 @@
       "priceJpy": 8686000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5023ga.jpg",
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-5c0b4477a0da6ab8",
@@ -1098,7 +1188,9 @@
       "priceJpy": 9800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip596ga.jpg",
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.7892196,
+      "lng": 139.0428215
     },
     {
       "id": "izutaiyo-6f49ed632cb345ea",
@@ -1111,7 +1203,9 @@
       "priceJpy": 12388000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5022ga.jpg",
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-0a38527b35186d9f",
@@ -1251,7 +1345,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib321ha.jpg",
       "yearBuilt": 1982,
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.6487025,
+      "lng": 138.8862298
     },
     {
       "id": "izutaiyo-f47caa428594099a",
@@ -1265,7 +1361,9 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib375ha.jpg",
       "yearBuilt": 2018,
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.656949,
+      "lng": 138.861873
     },
     {
       "id": "izutaiyo-6d9119a9f921ea60",
@@ -1305,7 +1403,9 @@
       "priceJpy": 16800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib285ga.jpg",
-      "firstSeen": "2026-04-07"
+      "firstSeen": "2026-04-07",
+      "lat": 34.6487025,
+      "lng": 138.8862298
     },
     {
       "id": "izutaiyo-5811a9f721fc9c38",
@@ -1454,7 +1554,7 @@
       "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 13800000,
-      "seaViewScore": 4,
+      "seaViewScore": 3,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2026/05/6883-1.jpg",
       "yearBuilt": 1988,
       "firstSeen": "2026-05-08"
@@ -1470,7 +1570,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01778460412",
-      "yearBuilt": 1963,
+      "yearBuilt": 1977,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1484,7 +1584,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01778460471",
-      "yearBuilt": 1975,
+      "yearBuilt": 1991,
       "firstSeen": "2026-04-17"
     },
     {
@@ -1498,7 +1598,7 @@
       "priceJpy": 6300000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01778460397",
-      "yearBuilt": 1994,
+      "yearBuilt": 1977,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1512,7 +1612,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01778460446",
-      "yearBuilt": 1984,
+      "yearBuilt": 1986,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1554,21 +1654,7 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01778460408",
-      "yearBuilt": 1990,
-      "firstSeen": "2026-05-11"
-    },
-    {
-      "id": "aoba-6cda0a39e5cf2f39",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
-      "title": "オーナーチェンジ物件 東伊豆町奈良本 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 6200000,
-      "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01778460442",
-      "yearBuilt": 1982,
+      "yearBuilt": 1989,
       "firstSeen": "2026-05-11"
     },
     {
@@ -1582,7 +1668,7 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01778460473",
-      "yearBuilt": 1982,
+      "yearBuilt": 2014,
       "firstSeen": "2026-05-09"
     },
     {
@@ -1596,7 +1682,7 @@
       "priceJpy": 13800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01778460473",
-      "yearBuilt": 1985,
+      "yearBuilt": 2019,
       "firstSeen": "2026-05-11"
     },
     {
@@ -1978,18 +2064,18 @@
       "firstSeen": "2026-03-02"
     },
     {
-      "id": "suumo-6864ab01efd61306",
+      "id": "suumo-0c4ef14f2b96fea4",
       "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20557682/",
-      "title": "石部 3980万円",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20840712/",
+      "title": "峰（河津駅） 3880万円",
       "titleEn": "Shimoda Property",
       "propertyType": "house",
       "city": "下田",
-      "priceJpy": 39800000,
+      "priceJpy": 38800000,
       "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F682%2F20557682%2F20557682_0004.jpg&w=452&h=339",
-      "yearBuilt": 2002,
-      "firstSeen": "2026-04-04"
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F712%2F20840712%2F20840712_0001.jpg&w=452&h=339",
+      "yearBuilt": 1978,
+      "firstSeen": "2026-05-12"
     },
     {
       "id": "suumo-a0010190db71eb0f",
