@@ -25,6 +25,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # --- CONFIG ---
 OUT_LISTINGS = "listings.json"
 OUT_BUILDINFO = "buildInfo.json"
+GEOCACHE_FILE = "geocache.json"
 
 # We only want these areas
 TARGET_CITIES_JP = ["下田", "河津", "東伊豆", "南伊豆", "賀茂郡"]
@@ -1691,6 +1692,74 @@ def deduplicate(listings):
 
 # --- MAIN ---
 
+def _extract_loc_str(title):
+    """Mirror of JS extractLocStr — pulls geocodable address from a listing title."""
+    if not title:
+        return None
+    m = re.match(r'^([^（「(]+)', title)
+    if not m:
+        return None
+    s = m.group(1).strip()
+    for suffix in ['の家情報', 'の土地情報', 'のマンション情報']:
+        s = re.sub(suffix + '.*$', '', s)
+    s = s.strip()
+    if not any(c in s for c in ['下田', '河津', '東伊豆', '南伊豆', '賀茂']):
+        return None
+    return s if len(s) > 2 else None
+
+
+def geocode_listings(listings):
+    """Adds lat/lng to each listing. Uses a persistent geocache to avoid repeat lookups."""
+    try:
+        with open(GEOCACHE_FILE, encoding="utf-8") as f:
+            cache = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        cache = {}
+
+    NOM_URL = "https://nominatim.openstreetmap.org/search"
+    NOM_HEADERS = {"User-Agent": "IzuCoastalRadar/1.0"}
+    new_lookups = 0
+    geocoded = 0
+
+    for item in listings:
+        loc_str = _extract_loc_str(item.get("title", ""))
+        if not loc_str:
+            continue
+        if loc_str in cache:
+            coords = cache[loc_str]
+            if coords:
+                item["lat"], item["lng"] = coords[0], coords[1]
+                geocoded += 1
+            continue
+        # New lookup needed
+        try:
+            r = requests.get(NOM_URL, params={
+                "q": f"{loc_str}, 静岡県, 日本",
+                "format": "json", "limit": 1, "accept-language": "ja"
+            }, headers=NOM_HEADERS, timeout=10, verify=False)
+            data = r.json()
+            if data:
+                lat, lng = float(data[0]["lat"]), float(data[0]["lon"])
+                if 34.5 < lat < 35.1 and 138.6 < lng < 139.3:
+                    cache[loc_str] = [lat, lng]
+                    item["lat"], item["lng"] = lat, lng
+                    geocoded += 1
+                else:
+                    cache[loc_str] = None
+            else:
+                cache[loc_str] = None
+        except Exception as e:
+            print(f"  [GEO ERROR] {loc_str}: {e}")
+        new_lookups += 1
+        time.sleep(1.1)  # Nominatim rate limit: 1 req/sec
+
+    with open(GEOCACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False, indent=2)
+
+    print(f"  [GEO] {geocoded} geocoded ({new_lookups} new lookups, {len(cache)} cached)")
+    return geocoded
+
+
 def main():
     # Fetch current forex rate
     print("\n" + "="*50)
@@ -1742,6 +1811,11 @@ def main():
         else:
             item["firstSeen"] = today
             new_count += 1
+
+    print("\n" + "="*50)
+    print(" GEOCODING")
+    print("="*50)
+    geocode_listings(all_data)
 
     out = {
         "generatedAt": dt.datetime.now().isoformat(),

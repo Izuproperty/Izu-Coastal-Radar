@@ -180,7 +180,6 @@
   </div>
 
   <span class="count-badge" id="count">...</span>
-  <span class="geo-status" id="geo-status"></span>
 </div>
 
 <div id="map"></div>
@@ -191,13 +190,13 @@
   <div class="legend-row"><div class="legend-dot" style="background:#2997ff"></div> House</div>
   <div class="legend-row"><div class="legend-dot" style="background:#30d158"></div> Land</div>
   <div class="legend-row"><div class="legend-dot" style="background:#ff9f0a"></div> Condo</div>
-  <div class="legend-approx">Pins = geocoded from listing title<br>Unmapped listings shown in side panel</div>
+  <div class="legend-approx">Pins = address resolved at scrape time<br>Unmapped listings shown in side panel</div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 let DATA = [];
-let MARKERS = []; // only entries that have (or are awaiting) a real geocoded position
+let MARKERS = [];
 let FX_USD = 155;
 let STATE = { curr: 'JPY', loc: 'all', type: 'all', source: 'all', newOnly: false };
 
@@ -226,56 +225,6 @@ function makeIcon(color) {
     <circle cx="13" cy="13" r="4.5" fill="rgba(255,255,255,0.9)"/>
   </svg>`;
   return L.divIcon({ html: svg, className: '', iconSize: [26, 34], iconAnchor: [13, 34], popupAnchor: [0, -36] });
-}
-
-const GEO_PREFIX = 'izu_geo2_';
-const geoQueue = [];
-let geoRunning = false;
-
-function geoGet(key) {
-  try { return JSON.parse(localStorage.getItem(GEO_PREFIX + btoa(unescape(encodeURIComponent(key))))); } catch { return null; }
-}
-function geoSet(key, val) {
-  try { localStorage.setItem(GEO_PREFIX + btoa(unescape(encodeURIComponent(key))), JSON.stringify(val)); } catch {}
-}
-
-function extractLocStr(l) {
-  if (!l.title) return null;
-  const m = l.title.match(/^([^（「(]+)/);
-  if (!m) return null;
-  let s = m[1].trim()
-    .replace(/の家情報.*$/, '').replace(/の土地情報.*$/, '').replace(/のマンション情報.*$/, '').trim();
-  if (!["下田", "河津", "東伊豆", "南伊豆", "賀茂"].some(c => s.includes(c))) return null;
-  return s.length > 2 ? s : null;
-}
-
-function geoNext() {
-  if (geoQueue.length === 0) { geoRunning = false; document.getElementById('geo-status').textContent = ''; return; }
-  geoRunning = true;
-  const { markerObj, locStr } = geoQueue.shift();
-  const remaining = geoQueue.length;
-  document.getElementById('geo-status').textContent = remaining > 0 ? `Locating… ${remaining} remaining` : 'Finalising…';
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locStr + ', 静岡県, 日本')}&format=json&limit=1&accept-language=ja`;
-  fetch(url, { headers: { 'User-Agent': 'IzuCoastalRadar/1.0' } })
-    .then(r => r.json())
-    .then(data => {
-      if (data && data[0]) {
-        const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
-        if (lat > 34.5 && lat < 35.1 && lng > 138.6 && lng < 139.3) {
-          geoSet(locStr, [lat, lng]);
-          const l = markerObj.listing;
-          const color = TYPE_COLORS[l.propertyType] || '#2997ff';
-          const marker = L.marker([lat, lng], { icon: makeIcon(color) });
-          marker.on('click', () => marker.setPopupContent(makePopupHTML(l)));
-          marker.bindPopup(makePopupHTML(l), { maxWidth: 230 });
-          markerObj.marker = marker;
-          if (passesFilters(l)) marker.addTo(map);
-          refreshCounts();
-        }
-      }
-    })
-    .catch(() => {})
-    .finally(() => setTimeout(geoNext, 1150));
 }
 
 function fmtPrice(p) {
@@ -334,24 +283,18 @@ function passesFilters(l) {
 function buildMarkers() {
   MARKERS.forEach(mo => mo.marker && map.removeLayer(mo.marker));
   MARKERS = [];
-  geoQueue.length = 0;
   DATA.forEach(l => {
-    const locStr = extractLocStr(l);
-    const cached = locStr ? geoGet(locStr) : null;
     const markerObj = { listing: l, marker: null };
-    if (cached) {
+    if (l.lat && l.lng) {
       const color = TYPE_COLORS[l.propertyType] || '#2997ff';
-      const marker = L.marker(cached, { icon: makeIcon(color) });
+      const marker = L.marker([l.lat, l.lng], { icon: makeIcon(color) });
       marker.on('click', () => marker.setPopupContent(makePopupHTML(l)));
       marker.bindPopup(makePopupHTML(l), { maxWidth: 230 });
       markerObj.marker = marker;
-    } else if (locStr) {
-      geoQueue.push({ markerObj, locStr });
     }
     MARKERS.push(markerObj);
   });
   refreshCounts();
-  if (geoQueue.length > 0 && !geoRunning) setTimeout(geoNext, 1500);
 }
 
 function applyFilters() {
