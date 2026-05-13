@@ -1750,42 +1750,73 @@ def _extract_loc_str(title):
 
 
 def extract_address_str(soup):
-    """Extract the full 所在地 address from a property detail page.
+    """Extract the clean 所在地 address from a property detail page.
 
-    Returns a string like '静岡県下田市須崎字福浦' that can be passed directly
-    to Nominatim. This is far more precise than guessing from the title because
-    it captures the exact street-level address including 字 (sub-area) names
-    that many subdivision listings omit from their titles.
+    Izu Taiyo cells look like:
+      <td>静岡県下田市箕作字数沢 <a href="...">航空図</a> ※注</td>
+    Using get_text() picks up the link text "航空図 ※注", which breaks
+    Nominatim. We instead take only the direct NavigableString children
+    of the sibling element (before any child tags) to get clean address text.
     """
+    from bs4 import NavigableString
     ADDR_MARKERS = ["所在地", "物件所在地", "住所"]
     TARGET_KEYWORDS = ['静岡県', '下田', '河津', '東伊豆', '南伊豆', '賀茂']
+
+    def _first_text(tag):
+        """Return the direct text content of a tag, ignoring child-tag text."""
+        parts = [s.strip() for s in tag.children
+                 if isinstance(s, NavigableString) and s.strip()]
+        return ' '.join(parts) if parts else None
 
     for tag in soup.find_all(["th", "td", "dt", "dd"]):
         tag_text = re.sub(r'\s+', '', tag.get_text())
         if tag_text not in ADDR_MARKERS:
             continue
-        # Label found — check sibling (td/dd) and parent row
         sib = tag.find_next_sibling()
         candidates = []
         if sib:
-            candidates.append(clean_text(sib.get_text()))
+            direct = _first_text(sib)
+            if direct:
+                candidates.append(direct)
         parent = tag.find_parent("tr")
         if parent:
             cells = parent.find_all(["th", "td"])
             if len(cells) >= 2:
-                candidates.append(clean_text(cells[1].get_text()))
+                direct = _first_text(cells[1])
+                if direct:
+                    candidates.append(direct)
         for addr in candidates:
             if any(kw in addr for kw in TARGET_KEYWORDS) and len(addr) > 5:
                 return addr
     return None
 
 
+def _geo_query_str(raw):
+    """Prepare a raw address or title fragment for Nominatim.
+
+    Strips 字 (traditional sub-area labels) and trailing house numbers
+    which Nominatim typically doesn't index, leaving a neighbourhood-level
+    string that geocodes reliably.
+    """
+    if not raw:
+        return None
+    s = raw
+    # Remove 字XXX sub-area designators
+    s = re.sub(r'\s*字\S+', '', s)
+    # Remove trailing house/lot numbers (e.g. "1234-5", "1番地")
+    s = re.sub(r'[\s,、]+[0-9][0-9\-番地]*\s*$', '', s)
+    return s.strip() or None
+
+
 def geocode_listings(listings):
     """Adds lat/lng to each listing. Uses a persistent geocache to avoid repeat lookups.
 
-    Prefers item["address"] (the full 所在地 text extracted during scraping) over
-    the title-derived loc_str, because exact addresses geocode much more precisely
-    than subdivision or complex names that appear in listing titles.
+    Strategy (two-tier fallback):
+    1. If item has a clean 所在地 address, try that first.
+    2. If address lookup is missing or cached null, fall back to the
+       neighbourhood string derived from the listing title.
+    This preserves the 17+ title-based cached hits while new address-based
+    lookups fill in the gaps over successive daily scrapes.
     """
     try:
         with open(GEOCACHE_FILE, encoding="utf-8") as f:
@@ -1793,43 +1824,57 @@ def geocode_listings(listings):
     except (FileNotFoundError, json.JSONDecodeError):
         cache = {}
 
+    # Drop stale null entries that contain garbled Izu Taiyo link text so they
+    # are re-tried with the now-clean address extraction on this run.
+    cache = {k: v for k, v in cache.items() if v is not None or '航空図' not in k}
+
     NOM_URL = "https://nominatim.openstreetmap.org/search"
     NOM_HEADERS = {"User-Agent": "IzuCoastalRadar/1.0"}
     new_lookups = 0
     geocoded = 0
 
-    for item in listings:
-        # Prefer stored address over title-derived string
-        loc_str = item.get("address") or _extract_loc_str(item.get("title", ""))
-        if not loc_str:
-            continue
-        if loc_str in cache:
-            coords = cache[loc_str]
-            if coords:
-                item["lat"], item["lng"] = coords[0], coords[1]
-                geocoded += 1
-            continue
-        # New lookup needed
+    def _lookup(loc_str):
+        """Query Nominatim; return [lat, lng] within Izu bounds or None."""
+        nonlocal new_lookups
+        q = _geo_query_str(loc_str)
+        if not q:
+            return None
+        if q in cache:
+            return cache[q]
         try:
             r = requests.get(NOM_URL, params={
-                "q": f"{loc_str}, 静岡県, 日本",
+                "q": f"{q}, 静岡県, 日本",
                 "format": "json", "limit": 1, "accept-language": "ja"
             }, headers=NOM_HEADERS, timeout=10, verify=False)
             data = r.json()
+            coords = None
             if data:
                 lat, lng = float(data[0]["lat"]), float(data[0]["lon"])
                 if 34.5 < lat < 35.1 and 138.6 < lng < 139.3:
-                    cache[loc_str] = [lat, lng]
-                    item["lat"], item["lng"] = lat, lng
-                    geocoded += 1
-                else:
-                    cache[loc_str] = None
-            else:
-                cache[loc_str] = None
+                    coords = [lat, lng]
+            cache[q] = coords
         except Exception as e:
-            print(f"  [GEO ERROR] {loc_str}: {e}")
+            print(f"  [GEO ERROR] {q}: {e}")
+            cache[q] = None
         new_lookups += 1
         time.sleep(1.1)  # Nominatim rate limit: 1 req/sec
+        return cache[q]
+
+    for item in listings:
+        addr_str   = item.get("address")
+        title_str  = _extract_loc_str(item.get("title", ""))
+
+        coords = None
+        # Tier 1: full address from 所在地 field
+        if addr_str:
+            coords = _lookup(addr_str)
+        # Tier 2: neighbourhood string from title (preserves existing cache hits)
+        if not coords and title_str:
+            coords = _lookup(title_str)
+
+        if coords:
+            item["lat"], item["lng"] = coords[0], coords[1]
+            geocoded += 1
 
     with open(GEOCACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(cache, f, ensure_ascii=False, indent=2)
