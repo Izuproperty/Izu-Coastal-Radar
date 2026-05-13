@@ -900,6 +900,7 @@ class IzuTaiyo(BaseScraper):
 
         ptype = determine_type(title, full_text, search_category)
         year_built = extract_year_built(soup, full_text)
+        address = extract_address_str(soup)
 
         item = {
             "id": stable_id("izutaiyo", url),
@@ -915,6 +916,8 @@ class IzuTaiyo(BaseScraper):
         }
         if year_built:
             item["yearBuilt"] = year_built
+        if address:
+            item["address"] = address
         self.add_item(item)
 
 class Maple(BaseScraper):
@@ -1087,6 +1090,7 @@ class Maple(BaseScraper):
             pass
         ptype = determine_type(title, full_text, _slug_cat)
         year_built = extract_year_built(soup, full_text)
+        address = extract_address_str(soup)
 
         item = {
             "id": stable_id("maple", url),
@@ -1102,6 +1106,8 @@ class Maple(BaseScraper):
         }
         if year_built:
             item["yearBuilt"] = year_built
+        if address:
+            item["address"] = address
         self.add_item(item)
 
 class Aoba(BaseScraper):
@@ -1295,6 +1301,7 @@ class Aoba(BaseScraper):
         img = get_best_image(soup, url)
         ptype = determine_type(title, full_text)
         year_built = extract_year_built(soup, full_text)
+        address = extract_address_str(soup)
 
         item = {
             "id": stable_id("aoba", url),
@@ -1310,6 +1317,8 @@ class Aoba(BaseScraper):
         }
         if year_built:
             item["yearBuilt"] = year_built
+        if address:
+            item["address"] = address
         self.add_item(item)
 
 class Suumo(BaseScraper):
@@ -1483,6 +1492,7 @@ class Suumo(BaseScraper):
             prop_type = determine_type(title, full_text)
 
         year_built = extract_year_built(soup, full_text)
+        address = extract_address_str(soup)
 
         item = {
             "id": stable_id("suumo", url),
@@ -1498,6 +1508,8 @@ class Suumo(BaseScraper):
         }
         if year_built:
             item["yearBuilt"] = year_built
+        if address:
+            item["address"] = address
         self.add_item(item)
 
 
@@ -1612,6 +1624,8 @@ class IzuMirai(BaseScraper):
         bkn_id = bkn_input.get("value", "") if bkn_input else ""
         item_id = stable_id("izumirai", bkn_id if bkn_id else url)
 
+        address = extract_address_str(soup)
+
         item = {
             "id": item_id,
             "source": "Izu Mirai",
@@ -1626,6 +1640,8 @@ class IzuMirai(BaseScraper):
         }
         if year_built:
             item["yearBuilt"] = year_built
+        if address:
+            item["address"] = address
         self.add_item(item)
 
 
@@ -1733,8 +1749,44 @@ def _extract_loc_str(title):
     return s if len(s) > 2 else None
 
 
+def extract_address_str(soup):
+    """Extract the full 所在地 address from a property detail page.
+
+    Returns a string like '静岡県下田市須崎字福浦' that can be passed directly
+    to Nominatim. This is far more precise than guessing from the title because
+    it captures the exact street-level address including 字 (sub-area) names
+    that many subdivision listings omit from their titles.
+    """
+    ADDR_MARKERS = ["所在地", "物件所在地", "住所"]
+    TARGET_KEYWORDS = ['静岡県', '下田', '河津', '東伊豆', '南伊豆', '賀茂']
+
+    for tag in soup.find_all(["th", "td", "dt", "dd"]):
+        tag_text = re.sub(r'\s+', '', tag.get_text())
+        if tag_text not in ADDR_MARKERS:
+            continue
+        # Label found — check sibling (td/dd) and parent row
+        sib = tag.find_next_sibling()
+        candidates = []
+        if sib:
+            candidates.append(clean_text(sib.get_text()))
+        parent = tag.find_parent("tr")
+        if parent:
+            cells = parent.find_all(["th", "td"])
+            if len(cells) >= 2:
+                candidates.append(clean_text(cells[1].get_text()))
+        for addr in candidates:
+            if any(kw in addr for kw in TARGET_KEYWORDS) and len(addr) > 5:
+                return addr
+    return None
+
+
 def geocode_listings(listings):
-    """Adds lat/lng to each listing. Uses a persistent geocache to avoid repeat lookups."""
+    """Adds lat/lng to each listing. Uses a persistent geocache to avoid repeat lookups.
+
+    Prefers item["address"] (the full 所在地 text extracted during scraping) over
+    the title-derived loc_str, because exact addresses geocode much more precisely
+    than subdivision or complex names that appear in listing titles.
+    """
     try:
         with open(GEOCACHE_FILE, encoding="utf-8") as f:
             cache = json.load(f)
@@ -1747,7 +1799,8 @@ def geocode_listings(listings):
     geocoded = 0
 
     for item in listings:
-        loc_str = _extract_loc_str(item.get("title", ""))
+        # Prefer stored address over title-derived string
+        loc_str = item.get("address") or _extract_loc_str(item.get("title", ""))
         if not loc_str:
             continue
         if loc_str in cache:
