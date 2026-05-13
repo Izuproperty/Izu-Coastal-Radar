@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-13T20:06:31.579343",
+  "generatedAt": "2026-05-13T21:32:27.727161",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -13,8 +13,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml012ha.jpg",
       "yearBuilt": 1976,
-      "address": "静岡県下田市箕作字数沢、字中塚 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市箕作字数沢、字中塚",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6680894,
+      "lng": 138.9354711
     },
     {
       "id": "izutaiyo-8a23ff37f405740f",
@@ -28,8 +30,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb393ha.jpg",
       "yearBuilt": 1977,
-      "address": "静岡県下田市白浜字女郎山 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字女郎山",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-640696e11479ce91",
@@ -43,8 +47,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2012ha.jpg",
       "yearBuilt": 1965,
-      "address": "静岡県下田市白浜字小長田 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字小長田",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-8e90c753677c3607",
@@ -58,7 +64,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb214ha.jpg",
       "yearBuilt": 1989,
-      "address": "静岡県下田市吉佐美字水神 航空図 ※注",
+      "address": "静岡県下田市吉佐美字水神",
       "firstSeen": "2026-03-17"
     },
     {
@@ -73,8 +79,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb391ha.jpg",
       "yearBuilt": 1993,
-      "address": "静岡県下田市須崎字田ノ上 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎字田ノ上",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-74325603063e3950",
@@ -88,7 +96,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb401ha.jpg",
       "yearBuilt": 1974,
-      "address": "静岡県下田市吉佐美字水通シ 航空図 ※注",
+      "address": "静岡県下田市吉佐美字水通シ",
       "firstSeen": "2026-03-17"
     },
     {
@@ -103,8 +111,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb351ha.jpg",
       "yearBuilt": 1980,
-      "address": "静岡県下田市吉佐美字丸田 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市吉佐美字丸田",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6674506,
+      "lng": 138.93506
     },
     {
       "id": "izutaiyo-eec27400ddca63b0",
@@ -118,8 +128,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb303ha.jpg",
       "yearBuilt": 1981,
-      "address": "静岡県下田市須崎字日影山 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎字日影山",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-fdf3c777f611c81e",
@@ -133,8 +145,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb426ha.jpg",
       "yearBuilt": 1986,
-      "address": "静岡県下田市一丁目 航空図 ※注",
-      "firstSeen": "2026-04-10"
+      "address": "静岡県下田市一丁目",
+      "firstSeen": "2026-04-10",
+      "lat": 34.676885,
+      "lng": 138.9436517
     },
     {
       "id": "izutaiyo-fe2a1c4a8e2c4ced",
@@ -148,8 +162,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb369ha.jpg",
       "yearBuilt": 1974,
-      "address": "静岡県下田市白浜字林川 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字林川",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-8b37db8b6d176f3d",
@@ -163,8 +179,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb268ha.jpg",
       "yearBuilt": 1973,
-      "address": "静岡県下田市白浜字女郎畑 航空図 ※注",
-      "firstSeen": "2026-03-31"
+      "address": "静岡県下田市白浜字女郎畑",
+      "firstSeen": "2026-03-31",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-5f1a81436fa76c5a",
@@ -178,8 +196,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb410ha.jpg",
       "yearBuilt": 1975,
-      "address": "静岡県下田市武ガ浜 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市武ガ浜",
+      "firstSeen": "2026-03-17",
+      "lat": 34.676885,
+      "lng": 138.9436517
     },
     {
       "id": "izutaiyo-4a76a36d94caf98e",
@@ -193,8 +213,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml119ha.jpg",
       "yearBuilt": 1974,
-      "address": "静岡県下田市白浜字一色 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字一色",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-4414aecf38028ce0",
@@ -208,8 +230,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb409ha.jpg",
       "yearBuilt": 1993,
-      "address": "静岡県下田市白浜字小長田 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字小長田",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-0a532d6650f1416f",
@@ -223,8 +247,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2010ha.jpg",
       "yearBuilt": 1998,
-      "address": "静岡県下田市白浜字中平戸 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字中平戸",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-a6ef69a2bc0579f1",
@@ -237,8 +263,10 @@
       "priceJpy": 15800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb320ha.jpg",
-      "address": "静岡県下田市河内上湯原 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市河内上湯原",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6989879,
+      "lng": 138.9408639
     },
     {
       "id": "izutaiyo-771cdb117598e43e",
@@ -252,7 +280,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2009ha.jpg",
       "yearBuilt": 1968,
-      "address": "静岡県下田市田牛字道隈原 航空図 ※注",
+      "address": "静岡県下田市田牛字道隈原",
       "firstSeen": "2026-03-17"
     },
     {
@@ -267,7 +295,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb350ha.jpg",
       "yearBuilt": 1988,
-      "address": "静岡県下田市吉佐美字亜相 航空図 ※注",
+      "address": "静岡県下田市吉佐美字亜相",
       "firstSeen": "2026-03-17"
     },
     {
@@ -281,8 +309,10 @@
       "priceJpy": 40000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb367ha.jpg",
-      "address": "静岡県下田市河内字上湯原 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市河内字上湯原",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6989879,
+      "lng": 138.9408639
     },
     {
       "id": "izutaiyo-5446b3987e931971",
@@ -296,8 +326,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb368ha.jpg",
       "yearBuilt": 1974,
-      "address": "静岡県下田市柿崎字白山 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市柿崎字白山",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-4029d0726bfb9886",
@@ -311,8 +343,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb225ha.jpg",
       "yearBuilt": 1991,
-      "address": "静岡県下田市五丁目 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市五丁目",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6680894,
+      "lng": 138.9354711
     },
     {
       "id": "izutaiyo-e01fb0c3facbd1d5",
@@ -326,8 +360,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb392ha.jpg",
       "yearBuilt": 2009,
-      "address": "静岡県下田市柿崎字浜田 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市柿崎字浜田",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-87e94d2c426bdd68",
@@ -340,7 +376,7 @@
       "priceJpy": 1830000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm0197ga.jpg",
-      "address": "静岡県下田市旧岡方村 航空図 ※注",
+      "address": "静岡県下田市旧岡方村",
       "firstSeen": "2026-03-17"
     },
     {
@@ -354,8 +390,10 @@
       "priceJpy": 2000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb027ga.jpg",
-      "address": "静岡県下田市白浜字下尾ノ平戸 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字下尾ノ平戸",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-8ab70da42757bb2f",
@@ -368,8 +406,10 @@
       "priceJpy": 2000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb086ga.jpg",
-      "address": "静岡県下田市白浜字女郎山 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字女郎山",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-7604af511f4595bf",
@@ -382,8 +422,10 @@
       "priceJpy": 2300000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm1191ga.jpg",
-      "address": "静岡県下田市白浜字山口 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字山口",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-11d2a88fb2b5ef1e",
@@ -396,7 +438,7 @@
       "priceJpy": 2800000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm1s70ga.jpg",
-      "address": "静岡県下田市吉佐美字万千山 航空図 ※注",
+      "address": "静岡県下田市吉佐美字万千山",
       "firstSeen": "2026-03-17"
     },
     {
@@ -410,8 +452,10 @@
       "priceJpy": 3000000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smz066ga.jpg",
-      "address": "静岡県下田市須崎字田ノ上 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎字田ノ上",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-b54b8740e5044023",
@@ -424,8 +468,10 @@
       "priceJpy": 3000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml014ga.jpg",
-      "address": "静岡県下田市白浜字小長田 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字小長田",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-da5d098dc590538d",
@@ -438,8 +484,10 @@
       "priceJpy": 4000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sml005ga.jpg",
-      "address": "静岡県下田市吉佐美字金原山 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市吉佐美字金原山",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6674506,
+      "lng": 138.93506
     },
     {
       "id": "izutaiyo-14f21a82959e13e6",
@@ -452,8 +500,10 @@
       "priceJpy": 4800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb139ga.jpg",
-      "address": "静岡県下田市須崎字福浦 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎字福浦",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-9f905a33df3f03b2",
@@ -466,7 +516,7 @@
       "priceJpy": 5000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb345ga.jpg",
-      "address": "静岡県下田市蓮台寺字堀之内 航空図 ※注",
+      "address": "静岡県下田市蓮台寺字堀之内",
       "firstSeen": "2026-03-17"
     },
     {
@@ -480,8 +530,10 @@
       "priceJpy": 5000000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2s11ga.jpg",
-      "address": "静岡県下田市白浜 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-10f5b4fd767be9f8",
@@ -494,8 +546,10 @@
       "priceJpy": 5470000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb425ga.jpg",
-      "address": "静岡県下田市東中 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市東中",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6826153,
+      "lng": 138.9506589
     },
     {
       "id": "izutaiyo-29f3c8546b54c4af",
@@ -508,8 +562,10 @@
       "priceJpy": 7800000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm1049ga.jpg",
-      "address": "静岡県下田市白浜 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-7a0e7a8d2d85de7b",
@@ -522,8 +578,10 @@
       "priceJpy": 8000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb307ga.jpg",
-      "address": "静岡県下田市東中 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市東中",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6826153,
+      "lng": 138.9506589
     },
     {
       "id": "izutaiyo-f2d3aa1765ed6049",
@@ -536,8 +594,10 @@
       "priceJpy": 8000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/sm2004ga.jpg",
-      "address": "静岡県下田市東中 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市東中",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6826153,
+      "lng": 138.9506589
     },
     {
       "id": "izutaiyo-8d9555be4fb9af1d",
@@ -550,8 +610,10 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb346ga.jpg",
-      "address": "静岡県下田市白浜字境ノ久保 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字境ノ久保",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-3a7e39949b83cbff",
@@ -564,8 +626,10 @@
       "priceJpy": 9800000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb241ga.jpg",
-      "address": "静岡県下田市柿崎字大原 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市柿崎字大原",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-aefd2f1cd8d348ae",
@@ -578,8 +642,10 @@
       "priceJpy": 14000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb382ga.jpg",
-      "address": "静岡県下田市五丁目 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市五丁目",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6680894,
+      "lng": 138.9354711
     },
     {
       "id": "izutaiyo-943c4df188f13b49",
@@ -592,8 +658,10 @@
       "priceJpy": 18000000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb029ga.jpg",
-      "address": "静岡県下田市六丁目 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市六丁目",
+      "firstSeen": "2026-03-17",
+      "lat": 34.681608,
+      "lng": 138.929311
     },
     {
       "id": "izutaiyo-b2bf4b21f7357aff",
@@ -606,8 +674,10 @@
       "priceJpy": 18500000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb138ga.jpg",
-      "address": "静岡県下田市須崎字福浦 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎字福浦",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-1abad1e61ae73cb9",
@@ -620,8 +690,10 @@
       "priceJpy": 39300000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb030ga.jpg",
-      "address": "静岡県下田市須崎 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-aa44b2362f73e975",
@@ -634,8 +706,10 @@
       "priceJpy": 43300000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb242ga.jpg",
-      "address": "静岡県下田市須崎字釜ノ上 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎字釜ノ上",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "izutaiyo-019e51b2d63b8321",
@@ -649,8 +723,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb419ga.jpg",
       "yearBuilt": 2001,
-      "address": "静岡県下田市白浜字上平瀬 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字上平瀬",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-46522fd865d0b410",
@@ -664,8 +740,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb420ga.jpg",
       "yearBuilt": 1983,
-      "address": "静岡県下田市白浜字大浜 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市白浜字大浜",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "izutaiyo-59b39aaf04a365b7",
@@ -679,7 +757,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb258ma.jpg",
       "yearBuilt": 1989,
-      "address": "静岡県下田市吉佐美2750-14 航空図 ※注",
+      "address": "静岡県下田市吉佐美2750-14",
       "firstSeen": "2026-03-17"
     },
     {
@@ -694,7 +772,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb408ma.jpg",
       "yearBuilt": 1988,
-      "address": "静岡県下田市田牛718-88 航空図 ※注",
+      "address": "静岡県下田市田牛718-88",
       "firstSeen": "2026-04-23"
     },
     {
@@ -709,7 +787,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb430ma.jpg",
       "yearBuilt": 1989,
-      "address": "静岡県下田市吉佐美2750-14 航空図 ※注",
+      "address": "静岡県下田市吉佐美2750-14",
       "firstSeen": "2026-04-16"
     },
     {
@@ -724,7 +802,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb365ma.jpg",
       "yearBuilt": 1993,
-      "address": "静岡県下田市田牛682-4,711-82 航空図 ※注",
+      "address": "静岡県下田市田牛682-4,711-82",
       "firstSeen": "2026-03-17"
     },
     {
@@ -739,7 +817,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb354ma.jpg",
       "yearBuilt": 1990,
-      "address": "静岡県下田市田牛718-84 航空図 ※注",
+      "address": "静岡県下田市田牛718-84",
       "firstSeen": "2026-03-17"
     },
     {
@@ -754,7 +832,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/sm/smb324ma.jpg",
       "yearBuilt": 1993,
-      "address": "静岡県下田市田牛682-4,711-82 航空図 ※注",
+      "address": "静岡県下田市田牛682-4,711-82",
       "firstSeen": "2026-03-17"
     },
     {
@@ -769,7 +847,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kw2003ha.jpg",
       "yearBuilt": 1976,
-      "address": "静岡県賀茂郡河津町見高字長野泉水 航空図 ※注",
+      "address": "静岡県賀茂郡河津町見高字長野泉水",
       "firstSeen": "2026-03-17"
     },
     {
@@ -784,7 +862,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kw2004ha.jpg",
       "yearBuilt": 1969,
-      "address": "静岡県賀茂郡河津町峰字追立口 航空図 ※注",
+      "address": "静岡県賀茂郡河津町峰字追立口",
       "firstSeen": "2026-04-10"
     },
     {
@@ -799,7 +877,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb235ha.jpg",
       "yearBuilt": 1968,
-      "address": "静岡県賀茂郡河津町峰字外野ケ原 航空図 ※注",
+      "address": "静岡県賀茂郡河津町峰字外野ケ原",
       "firstSeen": "2026-03-17"
     },
     {
@@ -814,7 +892,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb400ha.jpg",
       "yearBuilt": 1976,
-      "address": "静岡県賀茂郡河津町見高字端戸 航空図 ※注",
+      "address": "静岡県賀茂郡河津町見高字端戸",
       "firstSeen": "2026-03-17"
     },
     {
@@ -829,7 +907,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb424ha.jpg",
       "yearBuilt": 1970,
-      "address": "静岡県賀茂郡河津町見高字横道 航空図 ※注",
+      "address": "静岡県賀茂郡河津町見高字横道",
       "firstSeen": "2026-04-05"
     },
     {
@@ -844,7 +922,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb295ha.jpg",
       "yearBuilt": 1971,
-      "address": "静岡県賀茂郡河津町縄地字穴口 航空図 ※注",
+      "address": "静岡県賀茂郡河津町縄地字穴口",
       "firstSeen": "2026-03-17"
     },
     {
@@ -859,7 +937,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kw1055ha.jpg",
       "yearBuilt": 1989,
-      "address": "静岡県賀茂郡河津町見高 航空図 ※注",
+      "address": "静岡県賀茂郡河津町見高",
       "firstSeen": "2026-03-17"
     },
     {
@@ -874,7 +952,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb286ha.jpg",
       "yearBuilt": 1990,
-      "address": "静岡県賀茂郡河津町見高字長野杉原 航空図 ※注",
+      "address": "静岡県賀茂郡河津町見高字長野杉原",
       "firstSeen": "2026-03-17"
     },
     {
@@ -889,8 +967,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb326ha.jpg",
       "yearBuilt": 1991,
-      "address": "静岡県賀茂郡河津町峰字堀田 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県賀茂郡河津町峰字堀田",
+      "firstSeen": "2026-03-17",
+      "lat": 34.757074,
+      "lng": 138.987474
     },
     {
       "id": "izutaiyo-f7e461910f6b6fb1",
@@ -903,8 +983,10 @@
       "priceJpy": 3000000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwl102ga.jpg",
-      "address": "静岡県賀茂郡河津町峰字大平 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県賀茂郡河津町峰字大平",
+      "firstSeen": "2026-03-17",
+      "lat": 34.757074,
+      "lng": 138.987474
     },
     {
       "id": "izutaiyo-ecdaea0e7bba0b43",
@@ -917,7 +999,7 @@
       "priceJpy": 6200000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb305ga.jpg",
-      "address": "静岡県賀茂郡河津町見高字中田尻 航空図 ※注",
+      "address": "静岡県賀茂郡河津町見高字中田尻",
       "firstSeen": "2026-03-17"
     },
     {
@@ -931,7 +1013,7 @@
       "priceJpy": 9800000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb042ga.jpg",
-      "address": "静岡県賀茂郡河津町見高字長野杉原 航空図 ※注",
+      "address": "静岡県賀茂郡河津町見高字長野杉原",
       "firstSeen": "2026-03-17"
     },
     {
@@ -946,7 +1028,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip602ha.jpg",
       "yearBuilt": 1988,
-      "address": "静岡県賀茂郡東伊豆町奈良本 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-03-17"
     },
     {
@@ -961,7 +1043,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip608ha.jpg",
       "yearBuilt": 1980,
-      "address": "静岡県賀茂郡東伊豆町奈良本 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-03-17"
     },
     {
@@ -976,7 +1058,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hib422ha.jpg",
       "yearBuilt": 1988,
-      "address": "静岡県賀茂郡東伊豆町白田字向河内 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町白田字向河内",
       "firstSeen": "2026-03-20"
     },
     {
@@ -991,8 +1073,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip575ha.jpg",
       "yearBuilt": 1995,
-      "address": "静岡県賀茂郡東伊豆町奈良本 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "firstSeen": "2026-03-17",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-b004d0d8703b66a0",
@@ -1006,7 +1090,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip276ha.jpg",
       "yearBuilt": 1984,
-      "address": "静岡県賀茂郡東伊豆町奈良本 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-03-17"
     },
     {
@@ -1021,8 +1105,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip598ha.jpg",
       "yearBuilt": 1997,
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-03-17",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-e820117b4fc0fc09",
@@ -1036,8 +1122,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip463ha.jpg",
       "yearBuilt": 2002,
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-03-17",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-7e8fe65a2632a4e8",
@@ -1051,8 +1139,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip615ha.jpg",
       "yearBuilt": 1979,
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-04-06"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-04-06",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-52ff3e4fe6984a61",
@@ -1065,7 +1155,7 @@
       "priceJpy": 3500000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip612ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町奈良本 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-03-17"
     },
     {
@@ -1079,8 +1169,10 @@
       "priceJpy": 3800000,
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip609ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町稲取 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県賀茂郡東伊豆町稲取",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7892196,
+      "lng": 139.0428215
     },
     {
       "id": "izutaiyo-5e514abc2b2197d3",
@@ -1094,8 +1186,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip613ga.jpg",
       "yearBuilt": 1977,
-      "address": "静岡県賀茂郡東伊豆町稲取 航空図 ※注",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県賀茂郡東伊豆町稲取",
+      "firstSeen": "2026-03-17",
+      "lat": 34.7892196,
+      "lng": 139.0428215
     },
     {
       "id": "izutaiyo-a7a2a18ac43b711a",
@@ -1108,8 +1202,10 @@
       "priceJpy": 8270000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5021ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-b5b8480d0c92aab1",
@@ -1122,7 +1218,7 @@
       "priceJpy": 8500000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip510ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町白田 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町白田",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1136,8 +1232,10 @@
       "priceJpy": 8622000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5017ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-e65d190b8c587202",
@@ -1150,8 +1248,10 @@
       "priceJpy": 8629000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5015ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-7c80727544b52b8f",
@@ -1164,8 +1264,10 @@
       "priceJpy": 8686000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5023ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-5c0b4477a0da6ab8",
@@ -1178,8 +1280,10 @@
       "priceJpy": 9800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip596ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町稲取 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡東伊豆町稲取",
+      "firstSeen": "2026-04-07",
+      "lat": 34.7892196,
+      "lng": 139.0428215
     },
     {
       "id": "izutaiyo-6f49ed632cb345ea",
@@ -1192,8 +1296,10 @@
       "priceJpy": 12388000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hi5022ga.jpg",
-      "address": "静岡県賀茂郡東伊豆町片瀬 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-04-07",
+      "lat": 34.8146187,
+      "lng": 139.0687238
     },
     {
       "id": "izutaiyo-0a38527b35186d9f",
@@ -1207,7 +1313,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip606ma.jpg",
       "yearBuilt": 1992,
-      "address": "静岡県賀茂郡東伊豆町片瀬567-8 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町片瀬567-8",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1222,7 +1328,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip352ma.jpg",
       "yearBuilt": 1993,
-      "address": "静岡県賀茂郡東伊豆町奈良本1265-79,1265-17,1265-56,1265-74 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町奈良本1265-79,1265-17,1265-56,1265-74",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1237,7 +1343,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/him123ma.jpg",
       "yearBuilt": 1990,
-      "address": "静岡県賀茂郡東伊豆町奈良本1246 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町奈良本1246",
       "firstSeen": "2026-04-09"
     },
     {
@@ -1252,7 +1358,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/hi/hip614ma.jpg",
       "yearBuilt": 1991,
-      "address": "静岡県賀茂郡東伊豆町奈良本1248-1 航空図 ※注",
+      "address": "静岡県賀茂郡東伊豆町奈良本1248-1",
       "firstSeen": "2026-04-18"
     },
     {
@@ -1267,7 +1373,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi2001ha.jpg",
       "yearBuilt": 1989,
-      "address": "静岡県賀茂郡南伊豆町子浦字真子浦 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町子浦字真子浦",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1282,7 +1388,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib316ha.jpg",
       "yearBuilt": 1969,
-      "address": "静岡県賀茂郡南伊豆町入間字里 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町入間字里",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1297,7 +1403,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib370ha.jpg",
       "yearBuilt": 1973,
-      "address": "静岡県賀茂郡南伊豆町手石字猪ノ奥 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町手石字猪ノ奥",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1312,7 +1418,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib398ha.jpg",
       "yearBuilt": 1974,
-      "address": "静岡県賀茂郡南伊豆町下賀茂字湯之本 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町下賀茂字湯之本",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1327,7 +1433,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib253ha.jpg",
       "yearBuilt": 2004,
-      "address": "静岡県賀茂郡南伊豆町伊浜字茶ノ木畑 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町伊浜字茶ノ木畑",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1342,8 +1448,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib321ha.jpg",
       "yearBuilt": 1982,
-      "address": "静岡県賀茂郡南伊豆町湊字前川 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡南伊豆町湊字前川",
+      "firstSeen": "2026-04-07",
+      "lat": 34.6487025,
+      "lng": 138.8862298
     },
     {
       "id": "izutaiyo-f47caa428594099a",
@@ -1357,8 +1465,10 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib375ha.jpg",
       "yearBuilt": 2018,
-      "address": "静岡県賀茂郡南伊豆町下賀茂字中崎 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡南伊豆町下賀茂字中崎",
+      "firstSeen": "2026-04-07",
+      "lat": 34.656949,
+      "lng": 138.861873
     },
     {
       "id": "izutaiyo-6d9119a9f921ea60",
@@ -1372,7 +1482,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mi1128ha.jpg",
       "yearBuilt": 2010,
-      "address": "静岡県賀茂郡南伊豆町湊 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町湊",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1386,7 +1496,7 @@
       "priceJpy": 1500000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib108ga.jpg",
-      "address": "静岡県賀茂郡南伊豆町下小野字前ノ原 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町下小野字前ノ原",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1400,8 +1510,10 @@
       "priceJpy": 16800000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib285ga.jpg",
-      "address": "静岡県賀茂郡南伊豆町湊字池田 航空図 ※注",
-      "firstSeen": "2026-04-07"
+      "address": "静岡県賀茂郡南伊豆町湊字池田",
+      "firstSeen": "2026-04-07",
+      "lat": 34.6487025,
+      "lng": 138.8862298
     },
     {
       "id": "izutaiyo-5811a9f721fc9c38",
@@ -1415,7 +1527,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/mi/mib289ma.jpg",
       "yearBuilt": 1985,
-      "address": "静岡県賀茂郡南伊豆町加納582 航空図 ※注",
+      "address": "静岡県賀茂郡南伊豆町加納582",
       "firstSeen": "2026-04-07"
     },
     {
@@ -1577,8 +1689,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01778460412",
-      "yearBuilt": 1963,
-      "address": "静岡県下田市吉佐美",
+      "yearBuilt": 1977,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1592,8 +1703,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01778460471",
-      "yearBuilt": 1960,
-      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "yearBuilt": 1977,
       "firstSeen": "2026-04-17"
     },
     {
@@ -1607,8 +1717,7 @@
       "priceJpy": 6300000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01778460397",
-      "yearBuilt": 1993,
-      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "yearBuilt": 1992,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1622,8 +1731,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01778460446",
-      "yearBuilt": 1988,
-      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "yearBuilt": 1999,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1638,7 +1746,6 @@
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/86455043_1_500_500_3.jpg?t=01778460444",
       "yearBuilt": 1998,
-      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-03-02"
     },
     {
@@ -1653,7 +1760,6 @@
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/89640081_1_500_500_3.jpg?t=01778460464",
       "yearBuilt": 1982,
-      "address": "静岡県賀茂郡東伊豆町大川",
       "firstSeen": "2026-03-17"
     },
     {
@@ -1667,38 +1773,21 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01778460408",
-      "yearBuilt": 1989,
-      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "yearBuilt": 1990,
       "firstSeen": "2026-05-11"
     },
     {
-      "id": "aoba-da5ab2b3e196bd5d",
+      "id": "aoba-6cda0a39e5cf2f39",
       "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room96311271.html",
-      "title": "エンゼルフォレスト大川汐見崎 戸建",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
+      "title": "オーナーチェンジ物件 東伊豆町奈良本 戸建",
       "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
       "city": "東伊豆",
-      "priceJpy": 8800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01778460473",
-      "yearBuilt": 1991,
-      "address": "静岡県賀茂郡東伊豆町大川",
-      "firstSeen": "2026-05-09"
-    },
-    {
-      "id": "aoba-8ca83a289f0677eb",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
-      "title": "エンゼルフォレスト大川汐見崎 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 13800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01778460473",
-      "yearBuilt": 1985,
-      "address": "静岡県賀茂郡東伊豆町大川",
+      "priceJpy": 6200000,
+      "seaViewScore": 2,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01778460442",
+      "yearBuilt": 1960,
       "firstSeen": "2026-05-13"
     },
     {
@@ -1712,8 +1801,7 @@
       "priceJpy": 9800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/99255589_1_500_500_3.jpg?t=01778460400",
-      "yearBuilt": 1990,
-      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "yearBuilt": 1978,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1728,8 +1816,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F526%2F78638526%2F78638526_0001.jpg&w=452&h=339",
       "yearBuilt": 1967,
-      "address": "静岡県下田市須崎 [ ■周辺環境 ]",
-      "firstSeen": "2026-03-23"
+      "address": "静岡県下田市須崎",
+      "firstSeen": "2026-03-23",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "suumo-b0153a5f6e5b5cf6",
@@ -1743,8 +1833,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F075%2F20692075%2F20692075_0001.jpg&w=452&h=339",
       "yearBuilt": 1976,
-      "address": "静岡県下田市白浜 [ ■周辺環境 ]",
-      "firstSeen": "2026-04-19"
+      "address": "静岡県下田市白浜",
+      "firstSeen": "2026-04-19",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "suumo-323c7a2da823bc79",
@@ -1758,7 +1850,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F949%2F78493949%2F78493949_0001.jpg&w=452&h=339",
       "yearBuilt": 1989,
-      "address": "静岡県下田市吉佐美 [ ■周辺環境 ]",
+      "address": "静岡県下田市吉佐美",
       "firstSeen": "2026-03-23"
     },
     {
@@ -1773,8 +1865,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F398%2F20843398%2F20843398_0001.jpg&w=452&h=339",
       "yearBuilt": 1987,
-      "address": "静岡県下田市東中 [ ■周辺環境 ]",
-      "firstSeen": "2026-05-13"
+      "address": "静岡県下田市東中",
+      "firstSeen": "2026-05-13",
+      "lat": 34.6826153,
+      "lng": 138.9506589
     },
     {
       "id": "suumo-1b370d63eb0f9c13",
@@ -1788,8 +1882,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F736%2F20678736%2F20678736_0001.jpg&w=452&h=339",
       "yearBuilt": 1993,
-      "address": "静岡県下田市白浜 [ ■周辺環境 ]",
-      "firstSeen": "2026-04-17"
+      "address": "静岡県下田市白浜",
+      "firstSeen": "2026-04-17",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "suumo-80954e97998e7e27",
@@ -1803,8 +1899,10 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F472%2F20366472%2F20366472_0027.jpg&w=452&h=339",
       "yearBuilt": 2013,
-      "address": "静岡県下田市須崎 [ ■周辺環境 ]",
-      "firstSeen": "2026-03-17"
+      "address": "静岡県下田市須崎",
+      "firstSeen": "2026-03-17",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "suumo-1dfb8f897574446f",
@@ -1818,7 +1916,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F782%2F20590782%2F20590782_0001.jpg&w=452&h=339",
       "yearBuilt": 1997,
-      "address": "静岡県下田市六丁目 [ ■周辺環境 ]",
+      "address": "静岡県下田市六丁目",
       "firstSeen": "2026-04-05"
     },
     {
@@ -1833,7 +1931,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F074%2F20692074%2F20692074_0001.jpg&w=452&h=339",
       "yearBuilt": 1975,
-      "address": "静岡県下田市西本郷１ [ ■周辺環境 ]",
+      "address": "静岡県下田市西本郷１",
       "firstSeen": "2026-04-19"
     },
     {
@@ -1848,7 +1946,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F734%2F20461734%2F20461734_0001.jpg&w=452&h=339",
       "yearBuilt": 1987,
-      "address": "静岡県下田市田牛 [ ■周辺環境 ]",
+      "address": "静岡県下田市田牛",
       "firstSeen": "2026-04-05"
     },
     {
@@ -1863,7 +1961,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F088%2F78909088%2F78909088_0009.jpg&w=452&h=339",
       "yearBuilt": 2015,
-      "address": "静岡県下田市吉佐美 [ ■周辺環境 ]",
+      "address": "静岡県下田市吉佐美",
       "firstSeen": "2026-03-23"
     },
     {
@@ -1878,7 +1976,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F801%2F20444801%2F20444801_0001.jpg&w=452&h=339",
       "yearBuilt": 1989,
-      "address": "静岡県下田市田牛 [ ■周辺環境 ]",
+      "address": "静岡県下田市田牛",
       "firstSeen": "2026-03-15"
     },
     {
@@ -1893,7 +1991,7 @@
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F536%2F20759536%2F20759536_0001.jpg&w=452&h=339",
       "yearBuilt": 1988,
-      "address": "静岡県下田市田牛 [ ■周辺環境 ]",
+      "address": "静岡県下田市田牛",
       "firstSeen": "2026-04-29"
     },
     {
@@ -1908,8 +2006,10 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F004%2F79194004%2F79194004_0038.jpg&w=220&h=165",
       "yearBuilt": 2020,
-      "address": "静岡県下田市白浜 [ ■周辺環境 ]",
-      "firstSeen": "2026-04-06"
+      "address": "静岡県下田市白浜",
+      "firstSeen": "2026-04-06",
+      "lat": 34.7094815,
+      "lng": 138.978844
     },
     {
       "id": "suumo-f85113dd46664198",
@@ -1923,7 +2023,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F341%2F76672341%2F76672341_0001.jpg&w=452&h=339",
       "yearBuilt": 1972,
-      "address": "静岡県賀茂郡南伊豆町手石 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡南伊豆町手石",
       "firstSeen": "2026-04-19"
     },
     {
@@ -1938,7 +2038,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F459%2F78750459%2F78750459_0001.jpg&w=452&h=339",
       "yearBuilt": 1975,
-      "address": "静岡県賀茂郡河津町見高 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡河津町見高",
       "firstSeen": "2026-03-17"
     },
     {
@@ -1953,7 +2053,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F445%2F78232445%2F78232445_0001.jpg&w=452&h=339",
       "yearBuilt": 1992,
-      "address": "静岡県賀茂郡東伊豆町片瀬 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町片瀬",
       "firstSeen": "2026-05-07"
     },
     {
@@ -1968,8 +2068,23 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F844%2F78977844%2F78977844_0001.jpg&w=452&h=339",
       "yearBuilt": 1995,
-      "address": "静岡県賀茂郡東伊豆町大川 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町大川",
       "firstSeen": "2026-04-06"
+    },
+    {
+      "id": "suumo-8ea6bba0b00899d1",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_74889310/",
+      "title": "奈良本 980万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 9800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F310%2F74889310%2F74889310_0099.jpg&w=452&h=339",
+      "yearBuilt": 1990,
+      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "firstSeen": "2026-05-13"
     },
     {
       "id": "suumo-1520b78e6abdd311",
@@ -1983,7 +2098,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F195%2F20605195%2F20605195_0001.jpg&w=452&h=339",
       "yearBuilt": 1995,
-      "address": "静岡県賀茂郡東伊豆町奈良本 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-04-06"
     },
     {
@@ -1998,7 +2113,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F608%2F78398608%2F78398608_0001.jpg&w=452&h=339",
       "yearBuilt": 1999,
-      "address": "静岡県賀茂郡東伊豆町稲取 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町稲取",
       "firstSeen": "2026-04-29"
     },
     {
@@ -2013,7 +2128,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F194%2F20727194%2F20727194_0001.jpg&w=452&h=339",
       "yearBuilt": 1974,
-      "address": "静岡県賀茂郡東伊豆町奈良本 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-04-25"
     },
     {
@@ -2028,7 +2143,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F273%2F20104273%2F20104273_0001.jpg&w=452&h=339",
       "yearBuilt": 2011,
-      "address": "静岡県賀茂郡南伊豆町入間 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡南伊豆町入間",
       "firstSeen": "2026-03-23"
     },
     {
@@ -2043,7 +2158,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F203%2F20553203%2F20553203_0001.jpg&w=452&h=339",
       "yearBuilt": 1962,
-      "address": "静岡県賀茂郡東伊豆町稲取 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町稲取",
       "firstSeen": "2026-03-30"
     },
     {
@@ -2058,7 +2173,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F530%2F20261530%2F20261530_0023.jpg&w=452&h=339",
       "yearBuilt": 2012,
-      "address": "静岡県賀茂郡南伊豆町加納字東通３９８－６ [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡南伊豆町加納字東通３９８－６",
       "firstSeen": "2026-04-02"
     },
     {
@@ -2073,7 +2188,7 @@
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F151%2F20056151%2F20056151_0030.jpg&w=452&h=339",
       "yearBuilt": 1990,
-      "address": "静岡県賀茂郡河津町浜１４４－１ [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡河津町浜１４４－１",
       "firstSeen": "2026-04-29"
     },
     {
@@ -2088,7 +2203,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F652%2F20799652%2F20799652_0004.jpg&w=452&h=339",
       "yearBuilt": 1987,
-      "address": "静岡県賀茂郡東伊豆町奈良本北川 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町奈良本北川",
       "firstSeen": "2026-05-07"
     },
     {
@@ -2103,7 +2218,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F543%2F77015543%2F77015543_0004.jpg&w=452&h=339",
       "yearBuilt": 1977,
-      "address": "静岡県賀茂郡東伊豆町奈良本 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2118,7 +2233,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F712%2F20840712%2F20840712_0001.jpg&w=452&h=339",
       "yearBuilt": 1978,
-      "address": "静岡県賀茂郡河津町峰 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡河津町峰",
       "firstSeen": "2026-05-12"
     },
     {
@@ -2133,7 +2248,7 @@
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F544%2F20762544%2F20762544_0026.jpg&w=452&h=339",
       "yearBuilt": 1991,
-      "address": "静岡県賀茂郡東伊豆町大川 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町大川",
       "firstSeen": "2026-04-30"
     },
     {
@@ -2147,7 +2262,7 @@
       "priceJpy": 3250000,
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F211%2F76806211%2F76806211_0001.jpg&w=452&h=339",
-      "address": "静岡県下田市高馬 [ ■周辺環境 ]",
+      "address": "静岡県下田市高馬",
       "firstSeen": "2026-04-06"
     },
     {
@@ -2161,7 +2276,7 @@
       "priceJpy": 3300000,
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F505%2F77470505%2F77470505_0001.jpg&w=452&h=339",
-      "address": "静岡県下田市高馬 [ ■周辺環境 ]",
+      "address": "静岡県下田市高馬",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2175,7 +2290,7 @@
       "priceJpy": 5850000,
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F029%2F20614029%2F20614029_0007.jpg&w=452&h=339",
-      "address": "静岡県下田市吉佐美 [ ■周辺環境 ]",
+      "address": "静岡県下田市吉佐美",
       "firstSeen": "2026-04-09"
     },
     {
@@ -2189,7 +2304,7 @@
       "priceJpy": 6800000,
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F962%2F76546962%2F76546962_0001.jpg&w=452&h=339",
-      "address": "静岡県下田市六丁目 [ ■周辺環境 ]",
+      "address": "静岡県下田市六丁目",
       "firstSeen": "2026-03-23"
     },
     {
@@ -2203,8 +2318,10 @@
       "priceJpy": 7000000,
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F703%2F20164703%2F20164703_0001.jpg&w=452&h=339",
-      "address": "静岡県下田市柿崎 [ ■周辺環境 ]",
-      "firstSeen": "2026-03-07"
+      "address": "静岡県下田市柿崎",
+      "firstSeen": "2026-03-07",
+      "lat": 34.6600145,
+      "lng": 138.982519
     },
     {
       "id": "suumo-8b2d4055a1342c8e",
@@ -2217,7 +2334,7 @@
       "priceJpy": 1000000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F852%2F78818852%2F78818852_0001.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡西伊豆町仁科 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡西伊豆町仁科",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2231,7 +2348,7 @@
       "priceJpy": 6200000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F246%2F77740246%2F77740246_0001.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡南伊豆町加納 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡南伊豆町加納",
       "firstSeen": "2026-03-17"
     },
     {
@@ -2245,7 +2362,7 @@
       "priceJpy": 9900000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F111%2F79108111%2F79108111_0001.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡松崎町櫻田 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡松崎町櫻田",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2259,7 +2376,7 @@
       "priceJpy": 18600000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F836%2F53001836%2F53001836_0001.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡河津町笹原 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡河津町笹原",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2273,7 +2390,7 @@
       "priceJpy": 25000000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F078%2F53002078%2F53002078_0001.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡河津町川津筏場 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡河津町川津筏場",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2287,7 +2404,7 @@
       "priceJpy": 33600000,
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F856%2F78110856%2F78110856_0002.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡河津町見高 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡河津町見高",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2301,7 +2418,7 @@
       "priceJpy": 108000000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F666%2F72755666%2F72755666_0001.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡東伊豆町稲取 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡東伊豆町稲取",
       "firstSeen": "2026-03-02"
     },
     {
@@ -2315,7 +2432,7 @@
       "priceJpy": 110000000,
       "seaViewScore": 2,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F171%2F20783171%2F20783171_0008.jpg&w=452&h=339",
-      "address": "静岡県賀茂郡西伊豆町仁科 [ ■周辺環境 ]",
+      "address": "静岡県賀茂郡西伊豆町仁科",
       "firstSeen": "2026-05-02"
     }
   ]
