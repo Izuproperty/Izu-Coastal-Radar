@@ -269,28 +269,46 @@ def extract_year_built(soup, full_text):
                 return y
         return None
 
-    # ── <table> rows  (<tr><th>label</th><td>value</td>) ──────────────────────
-    for row in soup.find_all("tr"):
-        cells = row.find_all(["th", "td"])
-        if len(cells) >= 2:
-            label = cells[0].get_text(strip=True)
-            if any(k in label for k in YEAR_LABELS):
-                val = cells[1].get_text(strip=True)
-                result = _parse_val(label, val)
-                if result:
-                    return result
+    # Prefer exact-date labels over age-in-years to avoid wrong results when
+    # both "築年数" (age) and "築年月" (absolute date) appear in the same table
+    # and the age value is stale/incorrect (e.g. based on renovation not build date).
+    EXACT_DATE_LABELS = ("築年月", "建築年", "完成時期", "竣工年")
+    AGE_LABELS        = ("築年数",)
 
-    # ── <dl> lists  (<dt>label</dt><dd>value</dd>)  — used by SUUMO ──────────
-    for dl in soup.find_all("dl"):
-        dts = dl.find_all("dt")
-        dds = dl.find_all("dd")
-        for dt, dd in zip(dts, dds):
-            label = dt.get_text(strip=True)
-            if any(k in label for k in YEAR_LABELS):
-                val = dd.get_text(strip=True)
-                result = _parse_val(label, val)
-                if result:
-                    return result
+    def _search_rows(label_filter):
+        for row in soup.find_all("tr"):
+            cells = row.find_all(["th", "td"])
+            if len(cells) >= 2:
+                label = cells[0].get_text(strip=True)
+                if any(k in label for k in label_filter):
+                    val = cells[1].get_text(strip=True)
+                    result = _parse_val(label, val)
+                    if result:
+                        return result
+        return None
+
+    def _search_dls(label_filter):
+        for dl in soup.find_all("dl"):
+            dts = dl.find_all("dt")
+            dds = dl.find_all("dd")
+            for dt_tag, dd_tag in zip(dts, dds):
+                label = dt_tag.get_text(strip=True)
+                if any(k in label for k in label_filter):
+                    val = dd_tag.get_text(strip=True)
+                    result = _parse_val(label, val)
+                    if result:
+                        return result
+        return None
+
+    # ── Pass 1: exact date labels (築年月, 建築年, 完成時期, 竣工年) ────────────
+    result = _search_rows(EXACT_DATE_LABELS) or _search_dls(EXACT_DATE_LABELS)
+    if result:
+        return result
+
+    # ── Pass 2: age-in-years label (築年数) — only if no exact date found ─────
+    result = _search_rows(AGE_LABELS) or _search_dls(AGE_LABELS)
+    if result:
+        return result
 
     # ── Full-text fallbacks ────────────────────────────────────────────────────
     # "築年数：50.5年"
@@ -541,9 +559,16 @@ def get_location_trust(soup, full_text, context_city=None):
     # 2. Address Table - Check with whitespace normalization
     markers = ["所在地", "住所", "Location", "物件所在地", "エリア"]
     for tag in soup.find_all(["th", "td", "dt", "dd", "div", "span"]):
-        tag_text = tag.get_text()
+        tag_text = tag.get_text(strip=True)
         # Normalize whitespace for matching
         tag_normalized = re.sub(r"\s+", "", tag_text)
+
+        # Skip large container div/span elements: find_all returns outer wrappers
+        # before their children, and a wrapper's text combines property address
+        # with broker address, causing the wrong city (e.g. broker's 下田市) to
+        # be returned first. Structural cells (th/td/dt/dd) are always short.
+        if tag.name in ("div", "span") and len(tag_normalized) > 80:
+            continue
 
         for marker in markers:
             marker_normalized = re.sub(r"\s+", "", marker)
