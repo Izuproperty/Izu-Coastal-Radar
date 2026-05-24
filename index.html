@@ -90,8 +90,21 @@
     .card-footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: #555; align-items: center; }
     .view-btn { color: var(--accent); font-weight: 600; text-decoration: none; text-transform: uppercase; }
 
+    /* PAGE NAV */
+    .page-nav {
+      background: #000; border-bottom: 1px solid #1a1a1c;
+      display: flex; justify-content: center; gap: 0; flex-shrink: 0;
+    }
+    .nav-tab {
+      padding: 9px 20px; color: #555; text-decoration: none;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.3px;
+      border-bottom: 2px solid transparent; white-space: nowrap; transition: 0.15s;
+    }
+    .nav-tab:hover { color: #aaa; }
+    .nav-tab.active { color: #fff; border-bottom-color: var(--accent); pointer-events: none; }
+
     /* PAGE FOOTER */
-    footer { border-top: 1px solid var(--border); background: #000; padding: 40px 20px; margin-top: 40px; text-align: center; }
+    footer { border-top: 1px solid var(--border); background: #000; padding: 24px 20px; margin-top: 40px; text-align: center; }
     .footer-link { color: var(--text-secondary); text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: 0.2s; }
     .footer-link:hover { color: #fff; border-bottom-color: #fff; }
   </style>
@@ -102,6 +115,13 @@
   <h1>IZU COASTAL RADAR</h1>
   <div class="subtitle">Shimoda • Kawazu • Higashi-Izu</div>
 </header>
+
+<nav class="page-nav">
+  <span class="nav-tab active">List View</span>
+  <a href="map.html" class="nav-tab">Map View</a>
+  <a href="scatter.html" class="nav-tab">Price Scatter</a>
+  <a href="links.html" class="nav-tab">Izu Links</a>
+</nav>
 
 <div class="container">
   
@@ -127,13 +147,18 @@
       <option value="land">Land</option>
       <option value="condo">Condo</option>
     </select>
+    <select id="sea-select" onchange="render()">
+      <option value="all">All Sea Views</option>
+      <option value="4">Ocean View</option>
+      <option value="3">Beach Area</option>
+      <option value="2">Close to Sea</option>
+    </select>
     <div class="toggle-group">
       <button class="toggle-btn active" id="sort-btn" onclick="toggleSort(this)">↓ Price</button>
     </div>
     <div class="toggle-group">
       <button class="toggle-btn" id="new-btn" onclick="toggleNewOnly(this)">New</button>
     </div>
-    <a href="map.html" style="padding: 8px 12px; background: #000; border: 1px solid #333; border-radius: 8px; color: #86868b; font-size: 0.78rem; font-weight: 600; text-decoration: none; white-space: nowrap;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#86868b'">Map View</a>
     <div class="price-slider">
       <div class="slider-values">
         <span id="price-min-label">¥0</span>
@@ -155,18 +180,14 @@
 </div>
 
 <footer>
-  <a href="links.html" class="footer-link" id="link-useful">Useful Izu Links</a>
-  &nbsp;·&nbsp;
-  <a href="scatter.html" class="footer-link">Price vs. Age Scatter</a>
-  &nbsp;·&nbsp;<a href="map.html" class="footer-link">Map View</a>
-  <div id="forex-rate" style="margin-top: 10px; font-size: 0.75rem; color: #666;">
+  <div id="forex-rate" style="font-size: 0.75rem; color: #444;">
     USD conversions at ¥155/$1
   </div>
 </footer>
 
 <script>
   let DATA = [];
-  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all', sortAsc: false, newOnly: false };
+  let STATE = { lang: 'EN', curr: 'JPY', loc: 'all', type: 'all', source: 'all', sea: 'all', sortAsc: false, newOnly: false };
   let FX_USD = 155; // Default fallback, will be updated from buildInfo.json
   const TODAY = new Date().toISOString().slice(0, 10);
   const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -306,9 +327,6 @@
     document.querySelectorAll('.toggle-group:first-child .toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
-    // Update footer link text
-    document.getElementById('link-useful').innerText = TXT[l].useful;
-
     populateFilters();
     const minIdx = parseInt(document.getElementById('price-min-slider').value);
     const maxIdx = parseInt(document.getElementById('price-max-slider').value);
@@ -368,6 +386,7 @@
     STATE.loc = document.getElementById('loc-select').value;
     STATE.type = document.getElementById('type-select').value;
     STATE.source = document.getElementById('source-select').value;
+    STATE.sea = document.getElementById('sea-select').value;
 
     const minIdx = parseInt(document.getElementById('price-min-slider').value);
     const maxIdx = parseInt(document.getElementById('price-max-slider').value);
@@ -378,6 +397,7 @@
       if (STATE.loc !== 'all' && normCity(l.city) !== STATE.loc) return false;
       if (STATE.type !== 'all' && l.propertyType !== STATE.type) return false;
       if (STATE.source !== 'all' && l.source !== STATE.source) return false;
+      if (STATE.sea !== 'all' && l.seaViewScore !== parseInt(STATE.sea)) return false;
       if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) return false;
 
       // Price filtering (slider)
