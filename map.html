@@ -25,9 +25,6 @@
       background: #000; border-bottom: 1px solid var(--border);
       padding: 12px 20px; display: flex; align-items: center; gap: 16px; flex-shrink: 0;
     }
-    .header-left { display: flex; align-items: center; gap: 16px; }
-    .nav-back { color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
-    .nav-back:hover { color: #fff; }
     .header-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; white-space: nowrap; }
     .header-sub { color: var(--text-secondary); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -114,6 +111,19 @@
     .popup-source { font-size: 0.65rem; color: #444; margin-top: 5px; }
     .popup-approx { font-size: 0.65rem; color: #444; margin-top: 4px; }
 
+    /* PAGE NAV */
+    .page-nav {
+      background: #000; border-bottom: 1px solid #1a1a1c;
+      display: flex; justify-content: center; gap: 0; flex-shrink: 0;
+    }
+    .nav-tab {
+      padding: 9px 20px; color: #555; text-decoration: none;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.3px;
+      border-bottom: 2px solid transparent; white-space: nowrap; transition: 0.15s;
+    }
+    .nav-tab:hover { color: #aaa; }
+    .nav-tab.active { color: #fff; border-bottom-color: var(--accent); pointer-events: none; }
+
     .map-legend {
       position: absolute; bottom: 32px; right: 12px; z-index: 1000;
       background: rgba(8,8,10,0.88); border: 1px solid #2a2a2c;
@@ -123,32 +133,21 @@
     .legend-row { display: flex; align-items: center; gap: 8px; color: #aaa; margin-bottom: 5px; }
     .legend-row:last-child { margin-bottom: 0; }
     .legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-    .legend-approx { margin-top: 7px; padding-top: 7px; border-top: 1px solid #222; color: #444; font-size: 0.62rem; }
-
-    .city-bucket-panel {
-      position: absolute; bottom: 32px; left: 12px; z-index: 1000;
-      background: rgba(8,8,10,0.88); border: 1px solid #2a2a2c;
-      border-radius: 10px; padding: 10px 14px; font-size: 0.72rem;
-      backdrop-filter: blur(8px); pointer-events: none; display: none;
-    }
-    .bucket-title { color: #555; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .bucket-row { display: flex; align-items: center; gap: 8px; color: #888; margin-bottom: 4px; }
-    .bucket-row:last-child { margin-bottom: 0; }
-    .bucket-sq { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-    .bucket-count { margin-left: auto; padding-left: 12px; color: #666; font-weight: 600; }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="header-left">
-    <a href="index.html" class="nav-back">← List View</a>
-    <div>
-      <div class="header-title">IZU COASTAL RADAR</div>
-      <div class="header-sub">Map View · Shimoda · Higashi-Izu · South Izu</div>
-    </div>
-  </div>
+  <div class="header-title">IZU COASTAL RADAR</div>
+  <div class="header-sub">Shimoda · Higashi-Izu · South Izu</div>
 </header>
+
+<nav class="page-nav">
+  <a href="index.html" class="nav-tab">List View</a>
+  <span class="nav-tab active">Map View</span>
+  <a href="scatter.html" class="nav-tab">Price Scatter</a>
+  <a href="links.html" class="nav-tab">Izu Links</a>
+</nav>
 
 <div class="controls">
   <div class="toggle-group" id="curr-group">
@@ -164,6 +163,13 @@
     <option value="house">House</option>
     <option value="land">Land</option>
     <option value="condo">Condo</option>
+  </select>
+
+  <select id="sea-select" onchange="applyFilters()">
+    <option value="all">All Sea Views</option>
+    <option value="4">Ocean View</option>
+    <option value="3">Beach Area</option>
+    <option value="2">Close to Sea</option>
   </select>
 
   <div class="toggle-group">
@@ -189,13 +195,10 @@
 
 <div id="map"></div>
 
-<div class="city-bucket-panel" id="city-bucket"></div>
-
 <div class="map-legend">
   <div class="legend-row"><div class="legend-dot" style="background:#2997ff"></div> House</div>
   <div class="legend-row"><div class="legend-dot" style="background:#30d158"></div> Land</div>
   <div class="legend-row"><div class="legend-dot" style="background:#ff9f0a"></div> Condo</div>
-  <div class="legend-approx">Pins = address resolved at scrape time<br>Unmapped listings shown in side panel</div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -204,7 +207,7 @@
 let DATA = [];
 let MARKERS = [];
 let FX_USD = 155;
-let STATE = { curr: 'JPY', loc: 'all', type: 'all', source: 'all', newOnly: false };
+let STATE = { curr: 'JPY', loc: 'all', type: 'all', source: 'all', sea: 'all', newOnly: false };
 
 const TWO_DAYS_AGO = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
@@ -212,7 +215,14 @@ const CITY_EN = {
   "下田": "Shimoda", "河津": "Higashi-Izu",
   "東伊豆": "Higashi-Izu", "南伊豆": "Minami-Izu", "賀茂郡": "Minami-Izu"
 };
-const BUCKET_COLORS = { "Shimoda": "#2997ff", "Higashi-Izu": "#ff9f0a", "Minami-Izu": "#30d158" };
+// Fallback coords for properties without a geocoded address
+const CITY_CENTERS = {
+  "下田":   [34.6788, 138.9432],
+  "河津":   [34.7571, 138.9875],
+  "東伊豆": [34.8285, 139.0693],
+  "南伊豆": [34.6490, 138.8862],
+  "賀茂郡": [34.6490, 138.8862]
+};
 function normCity(c) { return c === '河津' ? '東伊豆' : c; }
 
 const TYPE_COLORS = { house: '#2997ff', land: '#30d158', condo: '#ff9f0a' };
@@ -247,7 +257,7 @@ function shortName(l) {
   return l.titleEn || 'Property';
 }
 
-function makePopupHTML(l) {
+function makePopupHTML(l, isApprox) {
   const img = l.imageUrl || 'https://placehold.co/230x140?text=No+Image';
   const city = CITY_EN[normCity(l.city)] || l.city;
   const ptype = l.propertyType || 'house';
@@ -266,16 +276,18 @@ function makePopupHTML(l) {
       <div class="popup-title">${shortName(l)}</div>
       <a href="${l.sourceUrl}" target="_blank" rel="noopener" class="popup-link">View Listing &rarr;</a>
       <div class="popup-source">${l.source}</div>
+      ${isApprox ? `<div class="popup-approx">~ ${city} city centre (no exact address)</div>` : ''}
     </div>
   </div>`;
 }
 
 function passesFilters(l) {
   const city = normCity(l.city);
-  if (STATE.loc    !== 'all' && city          !== STATE.loc)    return false;
-  if (STATE.source !== 'all' && l.source      !== STATE.source) return false;
-  if (STATE.type   !== 'all' && l.propertyType !== STATE.type)  return false;
-  if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO)) return false;
+  if (STATE.loc    !== 'all' && city           !== STATE.loc)              return false;
+  if (STATE.source !== 'all' && l.source       !== STATE.source)           return false;
+  if (STATE.type   !== 'all' && l.propertyType !== STATE.type)             return false;
+  if (STATE.sea    !== 'all' && l.seaViewScore !== parseInt(STATE.sea))    return false;
+  if (STATE.newOnly && !(l.firstSeen && l.firstSeen >= TWO_DAYS_AGO))     return false;
   const minIdx = parseInt(document.getElementById('price-min-slider').value);
   const maxIdx = parseInt(document.getElementById('price-max-slider').value);
   const priceMin = PRICE_STEPS[minIdx] !== null ? PRICE_STEPS[minIdx] * 10000 : null;
@@ -300,11 +312,16 @@ function buildMarkers() {
 
   MARKERS = [];
   DATA.forEach(l => {
-    const markerObj = { listing: l, marker: null };
-    if (l.lat && l.lng) {
+    let lat = l.lat, lng = l.lng, isApprox = false;
+    if (!lat || !lng) {
+      const cc = CITY_CENTERS[l.city];
+      if (cc) { lat = cc[0]; lng = cc[1]; isApprox = true; }
+    }
+    const markerObj = { listing: l, marker: null, isApprox };
+    if (lat && lng) {
       const color = TYPE_COLORS[l.propertyType] || '#2997ff';
-      const marker = L.marker([l.lat, l.lng], { icon: makeIcon(color) });
-      marker.bindPopup(makePopupHTML(l), { maxWidth: 230 });
+      const marker = L.marker([lat, lng], { icon: makeIcon(color) });
+      marker.bindPopup(makePopupHTML(l, isApprox), { maxWidth: 230 });
       markerObj.marker = marker;
     }
     MARKERS.push(markerObj);
@@ -316,42 +333,20 @@ function applyFilters() {
   STATE.loc    = document.getElementById('loc-select').value;
   STATE.source = document.getElementById('source-select').value;
   STATE.type   = document.getElementById('type-select').value;
+  STATE.sea    = document.getElementById('sea-select').value;
   refreshCounts();
 }
 
 function refreshCounts() {
   clusterGroup.clearLayers();
-  let mappedCount = 0;
-  const buckets = {};
+  let count = 0;
   MARKERS.forEach(mo => {
-    const l = mo.listing;
-    const show = passesFilters(l);
-    if (mo.marker) {
-      if (show) { clusterGroup.addLayer(mo.marker); mappedCount++; }
-    } else if (show) {
-      const cityEn = CITY_EN[normCity(l.city)] || l.city;
-      buckets[cityEn] = (buckets[cityEn] || 0) + 1;
+    if (passesFilters(mo.listing) && mo.marker) {
+      clusterGroup.addLayer(mo.marker);
+      count++;
     }
   });
-  const bucketTotal = Object.values(buckets).reduce((a, b) => a + b, 0);
-  document.getElementById('count').textContent = bucketTotal > 0
-    ? `${mappedCount} on map · ${bucketTotal} by city`
-    : `${mappedCount} listings`;
-  updateCityBucketPanel(buckets);
-}
-
-function updateCityBucketPanel(buckets) {
-  const panel = document.getElementById('city-bucket');
-  const entries = Object.entries(buckets).sort((a, b) => b[1] - a[1]);
-  if (entries.length === 0) { panel.style.display = 'none'; return; }
-  panel.style.display = 'block';
-  panel.innerHTML = '<div class="bucket-title">Address unknown — city estimate</div>' +
-    entries.map(([city, n]) =>
-      `<div class="bucket-row">
-        <div class="bucket-sq" style="background:${BUCKET_COLORS[city] || '#888'}"></div>
-        <span>${city}</span><span class="bucket-count">${n}</span>
-      </div>`
-    ).join('');
+  document.getElementById('count').textContent = `${count} listings`;
 }
 
 function populateLocFilter() {
