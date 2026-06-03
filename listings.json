@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-02T21:00:18.384436",
+  "generatedAt": "2026-06-03T21:25:41.966175",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1599,7 +1599,7 @@
       "propertyType": "house",
       "city": "東伊豆",
       "priceJpy": 12000000,
-      "seaViewScore": 4,
+      "seaViewScore": 3,
       "imageUrl": "https://www.maple-h.co.jp/wp-content/uploads/2025/10/6780-1.jpg",
       "yearBuilt": 2000,
       "address": "賀茂郡東伊豆町大川",
@@ -1705,7 +1705,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01780302204",
-      "yearBuilt": 1977,
+      "yearBuilt": 1963,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1719,7 +1719,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01780302400",
-      "yearBuilt": 1992,
+      "yearBuilt": 1993,
       "firstSeen": "2026-04-17"
     },
     {
@@ -1733,7 +1733,7 @@
       "priceJpy": 5000000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01780302133",
-      "yearBuilt": 1992,
+      "yearBuilt": 1993,
       "firstSeen": "2026-03-17"
     },
     {
@@ -1747,7 +1747,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01780302141",
-      "yearBuilt": 1994,
+      "yearBuilt": 1986,
       "firstSeen": "2026-03-02"
     },
     {
@@ -1803,7 +1803,7 @@
       "priceJpy": 6200000,
       "seaViewScore": 2,
       "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01780302187",
-      "yearBuilt": 1992,
+      "yearBuilt": 1957,
       "firstSeen": "2026-06-02"
     },
     {
@@ -1817,7 +1817,7 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01780302192",
-      "yearBuilt": 1985,
+      "yearBuilt": 1983,
       "firstSeen": "2026-05-14"
     },
     {
