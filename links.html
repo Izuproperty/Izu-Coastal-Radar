@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%232997ff'/><path d='M8 58 Q25 42 42 58 Q59 74 76 58 Q88 50 95 52' fill='none' stroke='white' stroke-width='10' stroke-linecap='round'/></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Useful Izu Links</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,7 +12,7 @@
       --bg-card: #1c1c1e;
       --text-primary: #f5f5f7;
       --text-secondary: #86868b;
-      --accent: #0a84ff;
+      --accent: #2997ff;
       --border: #333;
       --footer-bg: #0b0b0c;
       --footer-border: #1f1f21;
@@ -33,6 +34,19 @@
 
     .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px 50px; }
 
+    /* PAGE NAV */
+    .page-nav {
+      background: #000; border-bottom: 1px solid #1a1a1c;
+      display: flex; justify-content: center; gap: 0; flex-shrink: 0;
+    }
+    .nav-tab {
+      padding: 9px 20px; color: #555; text-decoration: none;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.3px;
+      border-bottom: 2px solid transparent; white-space: nowrap; transition: 0.15s;
+    }
+    .nav-tab:hover { color: #aaa; }
+    .nav-tab.active { color: #fff; border-bottom-color: var(--accent); pointer-events: none; }
+
     .controls {
       background: rgba(28,28,30,0.9); padding: 15px; border-radius: 12px; border: 1px solid #333;
       display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 24px;
@@ -42,10 +56,6 @@
     .toggle-group { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333; }
     .toggle-btn { padding: 8px 14px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 600; transition: 0.2s; border-radius: 6px; }
     .toggle-btn.active { background: #333; color: #fff; }
-
-    .nav-links { margin-left: auto; display: flex; gap: 12px; flex-wrap: wrap; }
-    .nav-links a { color: #cfcfd2; text-decoration: none; font-weight: 700; }
-    .nav-links a:hover { color: #fff; }
 
     .links-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
     .link-card {
@@ -117,16 +127,19 @@
   </div>
 </header>
 
+<nav class="page-nav">
+  <a href="index.html" class="nav-tab">List View</a>
+  <a href="map.html" class="nav-tab">Map View</a>
+  <a href="scatter.html" class="nav-tab">Price Scatter</a>
+  <span class="nav-tab active">Izu Links</span>
+</nav>
+
 <div class="container">
   <div class="controls">
     <div class="toggle-group">
       <button class="toggle-btn active" id="btn-en" onclick="setLang('EN')">EN</button>
       <button class="toggle-btn" id="btn-jp" onclick="setLang('JP')">JP</button>
       <button class="toggle-btn" id="btn-cn" onclick="setLang('CN')">CN</button>
-    </div>
-
-    <div class="nav-links">
-      <a href="index.html" id="back-home">← Back to Radar</a>
     </div>
   </div>
 
@@ -146,7 +159,6 @@
     EN: {
       title: "USEFUL IZU LINKS",
       subtitle: "Curated references for living, moving, and exploring",
-      back: "← Back to Radar",
       watch: "WATCH →",
       read: "READ →",
       open: "OPEN →",
@@ -155,7 +167,6 @@
     JP: {
       title: "役立つ伊豆リンク",
       subtitle: "移住・暮らし・旅の参考リンク集",
-      back: "← レーダーへ戻る",
       watch: "視聴 →",
       read: "読む →",
       open: "開く →",
@@ -164,7 +175,6 @@
     CN: {
       title: "伊豆实用链接",
       subtitle: "移居、生活与旅行的精选参考",
-      back: "← 返回雷达",
       watch: "观看 →",
       read: "阅读 →",
       open: "打开 →",
@@ -233,7 +243,6 @@
     const t = TXT[STATE.lang];
     document.getElementById("page-title").innerText = t.title;
     document.getElementById("subtitle").innerText = t.subtitle;
-    document.getElementById("back-home").innerText = t.back;
   }
 
   function getCta(itemType) {
@@ -266,7 +275,7 @@
         <div class="link-card">
           <div class="link-meta">
             <span class="pill">${pill}</span>
-            <span style="opacity:0.9">${item.url}</span>
+            <span style="opacity:0.7">${new URL(item.url).hostname}</span>
           </div>
           <div class="link-title">${title}</div>
           ${note ? `<div style="color:#b8b8bd; font-size:0.95rem; line-height:1.5">${note}</div>` : ""}
