@@ -33,6 +33,7 @@
       padding: 24px 20px;
       text-align: center;
     }
+    .header-inner { display: inline-flex; align-items: center; gap: 16px; text-align: left; }
     header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; }
     header .sub { color: var(--muted); margin-top: 4px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -158,8 +159,16 @@
 <body>
 
 <header>
-  <h1>IZU COASTAL RADAR — SCATTER</h1>
-  <div class="sub">Price vs. Property Age · Houses &amp; Condos · Shimoda &amp; South Izu</div>
+  <div class="header-inner">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="44" height="44" style="flex-shrink:0;">
+      <rect width="100" height="100" rx="18" fill="#2997ff"/>
+      <path d="M8 58 Q25 42 42 58 Q59 74 76 58 Q88 50 95 52" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1>IZU COASTAL RADAR — SCATTER</h1>
+      <div class="sub">Price vs. Property Age · Houses &amp; Condos · Shimoda &amp; South Izu</div>
+    </div>
+  </div>
 </header>
 
 <nav class="page-nav">
