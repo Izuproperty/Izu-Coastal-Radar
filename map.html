@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%232997ff'/><path d='M8 58 Q25 42 42 58 Q59 74 76 58 Q88 50 95 52' fill='none' stroke='white' stroke-width='10' stroke-linecap='round'/></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Izu Coastal Radar — Map View</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -87,7 +88,6 @@
     .leaflet-control-zoom a { background: #111 !important; color: #aaa !important; border-color: #333 !important; }
     .leaflet-control-zoom a:hover { background: #222 !important; color: #fff !important; }
     .leaflet-bar { border: 1px solid #333 !important; }
-    /* Cluster icon — dark theme */
     .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large { background-color: rgba(136,136,136,0.25) !important; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(136,136,136,0.7) !important; color: #fff !important; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.75rem; }
 
@@ -216,7 +216,6 @@ const CITY_EN = {
   "下田": "Shimoda", "河津": "Higashi-Izu",
   "東伊豆": "Higashi-Izu", "南伊豆": "Minami-Izu", "賀茂郡": "Minami-Izu"
 };
-// Fallback coords for properties without a geocoded address
 const CITY_CENTERS = {
   "下田":   [34.6788, 138.9432],
   "河津":   [34.7571, 138.9875],
@@ -237,7 +236,6 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   subdomains: 'abcd', maxZoom: 19
 }).addTo(map);
 
-// "Back to overview" button — sits below the +/− zoom controls
 L.Control.Overview = L.Control.extend({
   options: { position: 'topleft' },
   onAdd() {
@@ -439,7 +437,6 @@ async function init() {
   updatePriceLabels(0, PRICE_STEPS.length - 1);
   updateSliderTrack(0, PRICE_STEPS.length - 1);
   buildMarkers();
-  // Cinematic fly-in from wide Pacific view
   setTimeout(() => {
     map.flyTo(OVERVIEW.center, OVERVIEW.zoom, { duration: 2.8, easeLinearity: 0.12 });
   }, 150);
