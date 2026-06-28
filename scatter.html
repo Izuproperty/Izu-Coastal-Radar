@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%232997ff'/><path d='M8 58 Q25 42 42 58 Q59 74 76 58 Q88 50 95 52' fill='none' stroke='white' stroke-width='10' stroke-linecap='round'/></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Property Scatter — Izu Coastal Radar</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -34,9 +35,19 @@
     }
     header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; }
     header .sub { color: var(--muted); margin-top: 4px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-    .nav { margin-top: 10px; }
-    .nav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
-    .nav a:hover { color: var(--text); }
+
+    /* PAGE NAV */
+    .page-nav {
+      background: #000; border-bottom: 1px solid #1a1a1c;
+      display: flex; justify-content: center; gap: 0; flex-shrink: 0;
+    }
+    .nav-tab {
+      padding: 9px 20px; color: #555; text-decoration: none;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.3px;
+      border-bottom: 2px solid transparent; white-space: nowrap; transition: 0.15s;
+    }
+    .nav-tab:hover { color: #aaa; }
+    .nav-tab.active { color: #fff; border-bottom-color: var(--accent); pointer-events: none; }
 
     .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; width: 100%; }
 
@@ -68,23 +79,18 @@
       position: absolute; top: 50%; transform: translateY(-50%);
       height: 4px; background: var(--accent); border-radius: 2px; pointer-events: none;
     }
-    /*
-     * Mac/Safari dual-range fix: set pointer-events:none on the input element
-     * so the tracks don't block each other, then re-enable only on thumbs.
-     * This lets both thumbs be independently draggable regardless of z-index.
-     */
     .slider-container input[type="range"] {
       position: absolute; width: 100%; top: 50%; transform: translateY(-50%);
       -webkit-appearance: none; appearance: none;
       background: transparent;
-      pointer-events: none;   /* track is non-interactive */
+      pointer-events: none;
       margin: 0; z-index: 3;
     }
     .slider-container input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none; appearance: none;
       width: 18px; height: 18px; border-radius: 50%;
       background: var(--accent); cursor: pointer; border: 2px solid #000;
-      pointer-events: all;    /* thumb IS interactive */
+      pointer-events: all;
     }
     .slider-container input[type="range"]::-moz-range-thumb {
       width: 18px; height: 18px; border-radius: 50%;
@@ -112,7 +118,6 @@
     }
     svg#scatter { width: 100%; display: block; }
 
-    /* Tooltip — pointer-events:auto lets the user move onto it and click the link */
     #tooltip {
       position: fixed;
       background: #1c1c1e;
@@ -120,7 +125,7 @@
       border-radius: 10px;
       padding: 12px 14px;
       font-size: 0.82rem;
-      pointer-events: auto;   /* hoverable so user can click the link */
+      pointer-events: auto;
       z-index: 999;
       width: 230px;
       opacity: 0;
@@ -155,8 +160,14 @@
 <header>
   <h1>IZU COASTAL RADAR — SCATTER</h1>
   <div class="sub">Price vs. Property Age · Houses &amp; Condos · Shimoda &amp; South Izu</div>
-  <div class="nav"><a href="index.html">← Back to Radar</a></div>
 </header>
+
+<nav class="page-nav">
+  <a href="index.html" class="nav-tab">List View</a>
+  <a href="map.html" class="nav-tab">Map View</a>
+  <span class="nav-tab active">Price Scatter</span>
+  <a href="links.html" class="nav-tab">Izu Links</a>
+</nav>
 
 <div class="container">
 
@@ -235,7 +246,6 @@ function fmtStep(k) {
 }
 
 function stepToJpy(k) {
-  // k is USD thousands; null = no limit
   return k === null ? null : k * 1000 * FX;
 }
 
@@ -281,7 +291,6 @@ async function loadData() {
     const bi = await buildRes.json();
     if (bi.forexRate) FX = bi.forexRate;
   }
-  // Exclude land listings — they will never have age data and skew the chart
   return listings.filter(l => l.propertyType !== 'land');
 }
 
@@ -330,8 +339,6 @@ function showTooltip(dotEl, l) {
     <div class="tt-sub">${age}</div>
     <a class="tt-link" href="${l.sourceUrl}" target="_blank" rel="noopener">View listing →</a>
   `;
-  // Anchor tooltip to the dot rather than the cursor, so the user can
-  // move onto it without it jumping away.
   const rect = dotEl.getBoundingClientRect();
   const tw = 230, th = 140;
   let tx = rect.right + 12;
@@ -348,7 +355,6 @@ function scheduleHide() {
   hideTimer = setTimeout(() => tooltip.classList.remove("visible"), 220);
 }
 
-// Keep tooltip alive while mouse is over it
 tooltip.addEventListener("mouseenter", () => clearTimeout(hideTimer));
 tooltip.addEventListener("mouseleave", () => tooltip.classList.remove("visible"));
 
@@ -370,11 +376,10 @@ function redraw() {
 async function main() {
   ALL_DATA = await loadData();
 
-  // Wire slider events (programmatic, not inline, for reliable Safari behaviour)
   document.getElementById('price-min-slider').addEventListener('input', () => syncSlider('min'));
   document.getElementById('price-max-slider').addEventListener('input', () => syncSlider('max'));
 
-  syncSlider(null);   // initialise labels + track without clamping
+  syncSlider(null);
 }
 
 function renderStats(listings, withAge) {
@@ -418,7 +423,6 @@ function drawChart(listings, withAge, withoutAge) {
     return;
   }
 
-  // ── Scales ──────────────────────────────────────────────────────────────────
   const ages    = withAge.map(l => CURRENT_YEAR - l.yearBuilt);
   const maxAge  = Math.max(...(ages.length ? ages : [50]), 50);
   const prices  = listings.map(l => jpy2usd(l.priceJpy));
@@ -428,7 +432,6 @@ function drawChart(listings, withAge, withoutAge) {
   function scaleY(usd) { return MARGIN.top + plotH - (usd / maxP) * plotH; }
   const noDataX = W - MARGIN.right + 15;
 
-  // ── Grid & axes ─────────────────────────────────────────────────────────────
   const g = svgEl("g");
 
   for (const tick of niceYTicks(0, maxP, 6)) {
@@ -455,12 +458,10 @@ function drawChart(listings, withAge, withoutAge) {
     "text-anchor": "middle", fill: "#888", "font-size": "12", "font-family": "Inter, sans-serif"
   }));
 
-  // "Age Unknown" column
   g.appendChild(svgEl("line", { x1: W - MARGIN.right + 5, y1: MARGIN.top, x2: W - MARGIN.right + 5, y2: MARGIN.top + plotH, stroke: "#333", "stroke-dasharray": "4 4", "stroke-width": 1 }));
   g.appendChild(svgText("Age",     { x: noDataX, y: MARGIN.top - 18, "text-anchor": "middle", fill: "#555", "font-size": "10", "font-family": "Inter, sans-serif" }));
   g.appendChild(svgText("Unknown", { x: noDataX, y: MARGIN.top - 6,  "text-anchor": "middle", fill: "#555", "font-size": "10", "font-family": "Inter, sans-serif" }));
 
-  // ── Average reference lines ──────────────────────────────────────────────────
   if (withAge.length > 0) {
     const avgAge   = withAge.reduce((s, l) => s + (CURRENT_YEAR - l.yearBuilt), 0) / withAge.length;
     const avgPriceUsd = prices.reduce((s, p) => s + p, 0) / prices.length;
@@ -469,7 +470,6 @@ function drawChart(listings, withAge, withoutAge) {
     const AVG_COLOR  = "rgba(255,200,0,0.55)";
     const AVG_LABEL  = "rgba(255,200,0,0.8)";
 
-    // Vertical line — average age
     g.appendChild(svgEl("line", {
       x1: avgAgeX, y1: MARGIN.top, x2: avgAgeX, y2: MARGIN.top + plotH,
       stroke: AVG_COLOR, "stroke-width": 1.5, "stroke-dasharray": "6 4"
@@ -479,7 +479,6 @@ function drawChart(listings, withAge, withoutAge) {
       fill: AVG_LABEL, "font-size": "10", "font-family": "Inter, sans-serif"
     }));
 
-    // Horizontal line — average price
     g.appendChild(svgEl("line", {
       x1: MARGIN.left, y1: avgPriceY, x2: MARGIN.left + plotW, y2: avgPriceY,
       stroke: AVG_COLOR, "stroke-width": 1.5, "stroke-dasharray": "6 4"
@@ -492,7 +491,6 @@ function drawChart(listings, withAge, withoutAge) {
 
   svg.appendChild(g);
 
-  // ── Dots ─────────────────────────────────────────────────────────────────────
   function makeDot(l, cx, cy, grey) {
     const r      = 6;
     const color  = grey ? "rgba(140,140,150,0.45)" : "rgba(41,151,255,0.65)";
