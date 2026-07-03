@@ -584,6 +584,12 @@ def get_location_trust(soup, full_text, context_city=None):
                 for c in candidates:
                     city = normalize_city(c)
                     if city: return city
+                # Address present but in a non-target city -> reject rather
+                # than fall through to the search-context fallback.
+                for c in candidates:
+                    m = re.search(r'(?:静岡県|神奈川県|千葉県|東京都|山梨県)\s*([^\s、,]{1,12}?[市町村])', c)
+                    if m and not normalize_city(m.group(1)):
+                        return "WRONG_CITY"
 
     # 3. Title with normalize_city
     if h1:
@@ -1402,6 +1408,11 @@ class Suumo(BaseScraper):
         found = {}
         for a in soup.find_all("a", href=re.compile(r"/nc_\d+")):
             href = a["href"]
+            # SUUMO search pages embed "recommended" cards from other cities
+            # (e.g. sc_shizuokashisuruga = Shizuoka City). Detail URLs carry
+            # the true city slug, so only keep target-area links.
+            if ("/sc_shimoda/" not in href) and ("/sc_kamogun/" not in href):
+                continue
             full = urljoin(self.BASE, href)
             if full in found:
                 continue
