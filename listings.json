@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-14T19:30:54.041413",
+  "generatedAt": "2026-07-15T19:23:25.744004",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1694,7 +1694,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01783126694",
-      "yearBuilt": 1963,
+      "yearBuilt": 1977,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1708,7 +1708,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01783126668",
-      "yearBuilt": 1990,
+      "yearBuilt": 1977,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1726,6 +1726,20 @@
       "firstSeen": "2026-07-04"
     },
     {
+      "id": "aoba-91a5e98f68c2129e",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room75420316.html",
+      "title": "エンゼルフォレスト伊豆熱川別荘地 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 5000000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01783126779",
+      "yearBuilt": 1993,
+      "firstSeen": "2026-07-15"
+    },
+    {
       "id": "aoba-d13b68bb62cd5a8a",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room80136217.html",
@@ -1736,7 +1750,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01783126750",
-      "yearBuilt": 1986,
+      "yearBuilt": 1994,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1764,7 +1778,7 @@
       "priceJpy": 6800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/89640081_1_500_500_3.jpg?t=01783126726",
-      "yearBuilt": 1999,
+      "yearBuilt": 1982,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1778,22 +1792,8 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01783126711",
-      "yearBuilt": 2014,
+      "yearBuilt": 1988,
       "firstSeen": "2026-07-07"
-    },
-    {
-      "id": "aoba-6cda0a39e5cf2f39",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
-      "title": "オーナーチェンジ物件 東伊豆町奈良本 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 6200000,
-      "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01783126710",
-      "yearBuilt": 2001,
-      "firstSeen": "2026-07-14"
     },
     {
       "id": "aoba-da5ab2b3e196bd5d",
@@ -1806,7 +1806,7 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01783126704",
-      "yearBuilt": 1992,
+      "yearBuilt": 1974,
       "firstSeen": "2026-07-12"
     },
     {
