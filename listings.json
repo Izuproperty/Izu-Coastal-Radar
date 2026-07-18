@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-17T19:21:57.919657",
+  "generatedAt": "2026-07-18T19:16:01.353544",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -891,7 +891,7 @@
       "priceJpy": 6500000,
       "seaViewScore": 2,
       "imageUrl": "https://www.izutaiyo.co.jp/bb/kw/kwb400ha.jpg",
-      "yearBuilt": 1976,
+      "yearBuilt": 1975,
       "address": "静岡県賀茂郡河津町見高字端戸",
       "firstSeen": "2026-06-30"
     },
@@ -1694,7 +1694,7 @@
       "priceJpy": 29800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98036165_1_500_500_3.jpg?t=01784160798",
-      "yearBuilt": 1977,
+      "yearBuilt": 1963,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1708,7 +1708,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01784160821",
-      "yearBuilt": 1994,
+      "yearBuilt": 1972,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1736,7 +1736,7 @@
       "priceJpy": 5000000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01784160735",
-      "yearBuilt": 2018,
+      "yearBuilt": 1992,
       "firstSeen": "2026-07-17"
     },
     {
@@ -1750,7 +1750,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01784160746",
-      "yearBuilt": 1984,
+      "yearBuilt": 1994,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1778,7 +1778,7 @@
       "priceJpy": 6800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/89640081_1_500_500_3.jpg?t=01784160768",
-      "yearBuilt": 1999,
+      "yearBuilt": 1982,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1792,7 +1792,7 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01784160783",
-      "yearBuilt": 2002,
+      "yearBuilt": 1981,
       "firstSeen": "2026-07-07"
     },
     {
@@ -1806,7 +1806,7 @@
       "priceJpy": 6200000,
       "seaViewScore": 2,
       "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01784160784",
-      "yearBuilt": 2001,
+      "yearBuilt": 1995,
       "firstSeen": "2026-07-17"
     },
     {
@@ -1820,7 +1820,7 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01784160789",
-      "yearBuilt": 1981,
+      "yearBuilt": 2002,
       "firstSeen": "2026-07-12"
     },
     {
@@ -1834,7 +1834,7 @@
       "priceJpy": 13800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01784160800",
-      "yearBuilt": 2019,
+      "yearBuilt": 1991,
       "firstSeen": "2026-07-17"
     },
     {
@@ -2134,21 +2134,6 @@
       "firstSeen": "2026-07-16"
     },
     {
-      "id": "suumo-28ddfe0b43021e7f",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78750459/",
-      "title": "見高（今井浜海岸駅） 650万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 6500000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F459%2F78750459%2F78750459_0001.jpg&w=452&h=339",
-      "yearBuilt": 1975,
-      "address": "静岡県賀茂郡河津町見高",
-      "firstSeen": "2026-06-17"
-    },
-    {
       "id": "suumo-00139d4987cc5292",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21115793/",
@@ -2299,21 +2284,6 @@
       "firstSeen": "2026-03-23"
     },
     {
-      "id": "suumo-5aeec6aa1a8ed309",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21058561/",
-      "title": "片瀬 1980万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 19800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F561%2F21058561%2F21058561_0001.jpg&w=452&h=339",
-      "yearBuilt": 1957,
-      "address": "静岡県賀茂郡東伊豆町片瀬",
-      "firstSeen": "2026-06-28"
-    },
-    {
       "id": "suumo-9acb553368bbee0b",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20553203/",
@@ -2327,6 +2297,21 @@
       "yearBuilt": 1962,
       "address": "静岡県賀茂郡東伊豆町稲取",
       "firstSeen": "2026-03-30"
+    },
+    {
+      "id": "suumo-5aeec6aa1a8ed309",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21058561/",
+      "title": "片瀬 1980万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 19800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F561%2F21058561%2F21058561_0001.jpg&w=452&h=339",
+      "yearBuilt": 1957,
+      "address": "静岡県賀茂郡東伊豆町片瀬",
+      "firstSeen": "2026-06-28"
     },
     {
       "id": "suumo-e167b0c1e8df0c2a",
