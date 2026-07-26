@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-25T19:19:37.517164",
+  "generatedAt": "2026-07-26T19:22:38.699782",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -794,7 +794,7 @@
       "id": "izutaiyo-dedd483780fcbefc",
       "source": "Izu Taiyo",
       "sourceUrl": "https://www.izutaiyo.co.jp/d.php?hpno=SMB365M",
-      "title": "下田市 リゾート129 碁石が浜パートV（1480万円）のマンション情報はこちら！2026.7.5下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
+      "title": "下田市 リゾート129 碁石が浜パートV（1480万円）のマンション情報はこちら！下田店 大上 が担当させて頂いてます。お気軽にお問合せ下さい。 熱海、湯河原、伊豆高原など、伊豆の中古別荘・リゾートマンション・ 不動産情報量日本一で安心と信頼の伊豆太陽ホームにお任せください！",
       "titleEn": "Shimoda Property",
       "propertyType": "condo",
       "city": "下田",
@@ -1738,7 +1738,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01784160821",
-      "yearBuilt": 1989,
+      "yearBuilt": 1982,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1766,7 +1766,7 @@
       "priceJpy": 13000000,
       "seaViewScore": 2,
       "imageUrl": "https://cdn.img-asp.jp/bkn/106018567_1_500_500_3.jpg?t=01784795970",
-      "yearBuilt": 1971,
+      "yearBuilt": 2007,
       "firstSeen": "2026-07-23"
     },
     {
@@ -1780,7 +1780,7 @@
       "priceJpy": 5000000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01784160735",
-      "yearBuilt": 1992,
+      "yearBuilt": 1993,
       "firstSeen": "2026-07-17"
     },
     {
@@ -1794,7 +1794,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01784160746",
-      "yearBuilt": 1990,
+      "yearBuilt": 1998,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1822,7 +1822,7 @@
       "priceJpy": 6800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/89640081_1_500_500_3.jpg?t=01784160768",
-      "yearBuilt": 1982,
+      "yearBuilt": 1997,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1836,22 +1836,8 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01784160783",
-      "yearBuilt": 1975,
+      "yearBuilt": 2002,
       "firstSeen": "2026-07-23"
-    },
-    {
-      "id": "aoba-6cda0a39e5cf2f39",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
-      "title": "オーナーチェンジ物件 東伊豆町奈良本 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 6200000,
-      "seaViewScore": 2,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01784160784",
-      "yearBuilt": 1982,
-      "firstSeen": "2026-07-24"
     },
     {
       "id": "aoba-da5ab2b3e196bd5d",
@@ -1864,7 +1850,7 @@
       "priceJpy": 8800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/96311271_1_500_500_3.jpg?t=01784160789",
-      "yearBuilt": 1982,
+      "yearBuilt": 1981,
       "firstSeen": "2026-07-22"
     },
     {
@@ -2058,11 +2044,11 @@
       "id": "suumo-a368bb79ece26dbf",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_shimoda/nc_20759536/",
-      "title": "田牛 5800万円",
+      "title": "田牛 4980万円",
       "titleEn": "Shimoda Property",
       "propertyType": "house",
       "city": "下田",
-      "priceJpy": 58000000,
+      "priceJpy": 49800000,
       "seaViewScore": 3,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F536%2F20759536%2F20759536_0001.jpg&w=452&h=339",
       "yearBuilt": 1988,
@@ -2209,21 +2195,6 @@
       "firstSeen": "2026-07-25"
     },
     {
-      "id": "suumo-1a290850ecbd37ad",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78977844/",
-      "title": "大川 800万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 8000000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F844%2F78977844%2F78977844_0001.jpg&w=452&h=339",
-      "yearBuilt": 1995,
-      "address": "静岡県賀茂郡東伊豆町大川",
-      "firstSeen": "2026-07-05"
-    },
-    {
       "id": "suumo-3ba44c37702a2b4a",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_73209962/",
@@ -2299,21 +2270,6 @@
       "firstSeen": "2026-03-23"
     },
     {
-      "id": "suumo-9acb553368bbee0b",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20553203/",
-      "title": "稲取（伊豆稲取駅） 1980万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 19800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F203%2F20553203%2F20553203_0035.jpg&w=452&h=339",
-      "yearBuilt": 1962,
-      "address": "静岡県賀茂郡東伊豆町稲取",
-      "firstSeen": "2026-03-30"
-    },
-    {
       "id": "suumo-5aeec6aa1a8ed309",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21058561/",
@@ -2327,6 +2283,21 @@
       "yearBuilt": 1957,
       "address": "静岡県賀茂郡東伊豆町片瀬",
       "firstSeen": "2026-06-28"
+    },
+    {
+      "id": "suumo-9acb553368bbee0b",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20553203/",
+      "title": "稲取（伊豆稲取駅） 1980万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 19800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F203%2F20553203%2F20553203_0035.jpg&w=452&h=339",
+      "yearBuilt": 1962,
+      "address": "静岡県賀茂郡東伊豆町稲取",
+      "firstSeen": "2026-03-30"
     },
     {
       "id": "suumo-e167b0c1e8df0c2a",
