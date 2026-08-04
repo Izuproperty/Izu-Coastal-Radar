@@ -44,13 +44,16 @@ CITY_EN_MAP = {
 HIGH_SEA_KEYWORDS = [
     "海一望", "海を望", "海望", "海が見え", "海見え", "オーシャンビュー",
     "海の見え", "海眺望", "海を一望", "海が一望", "オーシャンフロント",
-    "シービュー", "ベイビュー", "ウォーターフロント", "海 ：一望", "海： 一望", "海 ： 一望"
+    "シービュー", "ベイビュー", "ウォーターフロント", "海 ：一望", "海： 一望", "海 ： 一望",
+    "海の眺望",  # e.g. homes.co.jp phrasing variant of 海眺望
+    "海を臨"     # 海を臨む／海を臨んで — synonym of 海を望む using 臨む
 ]
 
 # MEDIUM CONFIDENCE: Beach names, ocean names (score 3)
 MEDIUM_SEA_KEYWORDS = [
     "白浜", "吉佐美", "入田", "多々戸", "相模湾", "太平洋", "オーシャン", "Ocean",
-    "城ヶ崎海岸"  # Jogasaki Coast
+    "城ヶ崎海岸",  # Jogasaki Coast
+    "海沿い"       # coastal/seaside — used as a theme label on homes.co.jp
 ]
 
 # For proximity scoring - used with "海" mention
@@ -1656,6 +1659,175 @@ class IzuMirai(BaseScraper):
         self.add_item(item)
 
 
+class Homes(BaseScraper):
+    """
+    Scraper for LIFULL HOME'S (homes.co.jp), one of Japan's largest real
+    estate portals. Searches for houses, land, and condos in the target
+    Izu coastal areas.
+
+    URL scheme (confirmed by manual probing):
+      houses: /kodate/chuko/shizuoka/{slug}/list/   detail: /kodate/b-{id}/
+      land:   /tochi/shizuoka/{slug}/list/          detail: /tochi/b-{id}/
+      condos: /mansion/chuko/shizuoka/{slug}/list/  detail: /mansion/b-{id}/
+    Shimoda is a city (slug "shimoda-city"); the three Kamo-gun towns use a
+    "kamo_" prefix with a "-city" suffix despite being towns (e.g.
+    "kamo_kawazu-city") — this is homes.co.jp's own naming quirk, confirmed
+    from the site's own area-navigation links rather than assumed.
+    """
+    BASE = "https://www.homes.co.jp"
+
+    AREA_SLUGS = {
+        "下田": "shimoda-city",
+        "河津": "kamo_kawazu-city",
+        "東伊豆": "kamo_higashiizu-city",
+        "南伊豆": "kamo_minamiizu-city",
+    }
+
+    CATEGORY_PATHS = {
+        "house": "kodate/chuko",
+        "land": "tochi",
+        "condo": "mansion/chuko",
+    }
+
+    def run(self):
+        print("--- Scanning Homes (LIFULL HOME'S) ---")
+        candidates = {}  # url -> (city_ctx, category_root)
+
+        for city_jp, slug in self.AREA_SLUGS.items():
+            for prop_type, cat_path in self.CATEGORY_PATHS.items():
+                page = 1
+                while page <= 10:
+                    url = f"{self.BASE}/{cat_path}/shizuoka/{slug}/list/"
+                    if page > 1:
+                        url = f"{url}?page={page}"
+
+                    print(f"  Homes {prop_type} {city_jp} page {page}: {url}")
+                    soup = self.fetch(url)
+                    if not soup:
+                        break
+
+                    links = self._extract_links(soup, cat_path, city_jp)
+                    if not links:
+                        print(f"    No listings on page {page}, stopping.")
+                        break
+
+                    new = {u: c for u, c in links.items() if u not in candidates}
+                    candidates.update(new)
+                    print(f"    +{len(new)} new links (total {len(candidates)})")
+
+                    # If the "page 2" URL scheme turns out to be wrong, this page
+                    # will just re-return page 1's listings, `new` comes back
+                    # empty (already in candidates), and the loop safely stops
+                    # rather than looping or duplicating.
+                    if not new:
+                        break
+                    page += 1
+                    sleep_jitter()
+
+        print(f"  > Visiting {len(candidates)} Homes detail pages...")
+        for url, (city_ctx, category_root) in candidates.items():
+            self.parse_detail(url, city_ctx, category_root)
+            sleep_jitter()
+
+    def _extract_links(self, soup, cat_path, city_hint):
+        """Detail pages follow /{category}/b-{id}/ (e.g. /kodate/b-123.../,
+        /tochi/b-.../, /mansion/b-.../). Mansion (condo) listing pages nest
+        individual-unit links inside a parent building card; both levels
+        match the same regex, so both get queued and parsed independently.
+        """
+        category_root = cat_path.split("/")[0]  # kodate / tochi / mansion
+        found = {}
+        pattern = re.compile(rf"/{category_root}/b-[\w]+/?$")
+        for a in soup.find_all("a", href=pattern):
+            full = urljoin(self.BASE, a["href"])
+            if full in found:
+                continue
+            found[full] = (city_hint, category_root)
+        return found
+
+    def parse_detail(self, url, city_ctx, category_root):
+        inc_stat("scanned")
+        soup = self.fetch(url)
+        if not soup:
+            return
+
+        for tag in soup.find_all(["footer", "nav", "header"]):
+            tag.decompose()
+
+        h1 = soup.find("h1")
+        title = clean_text(h1.get_text()) if h1 else "Homes Property"
+        full_text = clean_text(soup.get_text())
+
+        if is_contracted(title, full_text):
+            inc_stat("skipped_sold")
+            return
+
+        city = get_location_trust(soup, full_text, city_ctx)
+        if city == "WRONG_CITY" or not city:
+            inc_stat("skipped_loc")
+            return
+
+        # Sea view scoring (same thresholds as other scrapers)
+        sea_score = 0
+        if "海は見えません" in full_text or "海眺望なし" in full_text or "海見えず" in full_text:
+            sea_score = 0
+        elif any(k in full_text for k in HIGH_SEA_KEYWORDS):
+            sea_score = 4
+        elif any(k in full_text for k in MEDIUM_SEA_KEYWORDS):
+            sea_score = 3
+        elif any(k in full_text for k in ["海", "ビーチ", "Beach"]):
+            proximity_patterns = [
+                r"海まで徒歩[0-9０-９]",
+                r"海まで.*[0-9０-９]+.*分",
+                r"海まで.*[0-9０-９]+.*[mｍメートル]",
+                r"海から[0-9０-９]+.*[mｍメートル]",
+                r"徒歩[0-9０-９]+.*分.*海",
+                r"ビーチまで.*[0-9０-９]+",
+                r"海.*徒歩圏",
+            ]
+            if any(re.search(p, full_text) for p in proximity_patterns):
+                sea_score = 2
+
+        if sea_score < 2:
+            print(f"  [SEA VIEW FILTERED] Homes score={sea_score}: {url[:60]}")
+            inc_stat("skipped_loc")
+            return
+
+        price = extract_price(full_text)
+        if not price:
+            inc_stat("skipped_sold")
+            return
+
+        if category_root == "tochi":
+            prop_type = "land"
+        elif category_root == "mansion":
+            prop_type = "condo"
+        else:
+            prop_type = determine_type(title, full_text)
+
+        year_built = extract_year_built(soup, full_text)
+        address = extract_address_str(soup)
+        img = get_best_image(soup, url)
+
+        item = {
+            "id": stable_id("homes", url),
+            "source": "Homes",
+            "sourceUrl": url,
+            "title": title,
+            "titleEn": f"{CITY_EN_MAP.get(city, city)} Property",
+            "propertyType": prop_type,
+            "city": city,
+            "priceJpy": price,
+            "seaViewScore": sea_score,
+            "imageUrl": img,
+        }
+        if year_built:
+            item["yearBuilt"] = year_built
+        if address:
+            item["address"] = address
+        self.add_item(item)
+
+
 def deduplicate(listings):
     """
     Remove listings that represent the same physical property appearing on
@@ -1676,9 +1848,9 @@ def deduplicate(listings):
       year is unknown).
 
     When cross-source duplicates collide, the source with higher priority wins:
-        Izu Taiyo > Maple Housing > Aoba Resort > Izu Mirai > SUUMO
+        Izu Taiyo > Maple Housing > Aoba Resort > Izu Mirai > SUUMO > Homes
     """
-    SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "Izu Mirai": 3, "SUUMO": 4}
+    SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "Izu Mirai": 3, "SUUMO": 4, "Homes": 5}
 
     # Process preferred sources first so they "win" the fingerprint slot
     ranked = sorted(listings, key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 99))
@@ -1912,8 +2084,8 @@ def main():
     except (FileNotFoundError, json.JSONDecodeError):
         pass  # No existing file or invalid JSON
 
-    SCRAPER_NAMES = ["Izu Taiyo", "Maple Housing", "Aoba Resort", "Izu Mirai", "SUUMO"]
-    scrapers = [IzuTaiyo(), Maple(), Aoba(), IzuMirai(), Suumo()]
+    SCRAPER_NAMES = ["Izu Taiyo", "Maple Housing", "Aoba Resort", "Izu Mirai", "SUUMO", "Homes"]
+    scrapers = [IzuTaiyo(), Maple(), Aoba(), IzuMirai(), Suumo(), Homes()]
     all_data = []
     scraper_diag = {}  # name -> {saved, fetchErrors, pagesOk}
 
