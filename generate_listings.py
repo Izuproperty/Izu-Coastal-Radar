@@ -1771,6 +1771,13 @@ class Homes(BaseScraper):
         title = clean_text(h1.get_text()) if h1 else "Homes Property"
         full_text = clean_text(soup.get_text())
 
+        # TEMP DEBUG: confirm whether homes.co.jp is serving full page content
+        # to this scraper, or a stripped-down version (e.g. missing the
+        # free-text property description) under suspected-bot conditions.
+        # Remove once the sea-view score=0-for-everything issue is diagnosed.
+        print(f"  [HOMES DEBUG] len={len(full_text)} has_umi={'海' in full_text} "
+              f"has_terrace_phrase={'海を臨' in full_text} url={url[:60]}")
+
         if is_contracted(title, full_text):
             inc_stat("skipped_sold")
             return
