@@ -630,7 +630,11 @@ class BaseScraper:
     def fetch(self, url, params=None):
         try:
             r = self.session.get(url, params=params, timeout=15, verify=False)
-            if r.status_code != 200:
+            # Accept any 2xx/3xx as success, not just exactly 200.
+            # homes.co.jp serves fully-rendered pages under HTTP 202 (Accepted)
+            # rather than 200 — treating that as an error was discarding every
+            # real page it returned.
+            if r.status_code >= 400:
                 print(f"  [HTTP {r.status_code}] {url[:80]}")
                 inc_stat("error")
                 self.fetch_errors += 1
@@ -1733,13 +1737,22 @@ class Homes(BaseScraper):
         """Detail pages follow /{category}/b-{id}/ (e.g. /kodate/b-123.../,
         /tochi/b-.../, /mansion/b-.../). Mansion (condo) listing pages nest
         individual-unit links inside a parent building card; both levels
-        match the same regex, so both get queued and parsed independently.
+        match the same pattern, so both get queued and parsed independently.
+
+        We resolve each href to an absolute URL and match against its path
+        component (anchored at the start) rather than regex-searching the
+        raw href string. A plain substring/search regex also matches
+        homes.co.jp's "/inquire/bukken/kodate/b-{id}/" contact-form links,
+        since they happen to end with the same "/kodate/b-{id}/" suffix —
+        those aren't real listing pages and 405 when fetched.
         """
         category_root = cat_path.split("/")[0]  # kodate / tochi / mansion
+        path_pattern = re.compile(rf"^/{category_root}/b-[\w]+/?$")
         found = {}
-        pattern = re.compile(rf"/{category_root}/b-[\w]+/?$")
-        for a in soup.find_all("a", href=pattern):
+        for a in soup.find_all("a", href=True):
             full = urljoin(self.BASE, a["href"])
+            if not path_pattern.match(urlparse(full).path):
+                continue
             if full in found:
                 continue
             found[full] = (city_hint, category_root)
