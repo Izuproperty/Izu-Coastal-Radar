@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T18:52:45.108001",
+  "generatedAt": "2026-08-10T19:07:28.052381",
   "listings": [
     {
       "id": "izutaiyo-fd42da06ef8633bc",
@@ -1799,7 +1799,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01786248860",
-      "yearBuilt": 1974,
+      "yearBuilt": 1995,
       "firstSeen": "2026-06-07"
     },
     {
@@ -1827,8 +1827,22 @@
       "priceJpy": 13000000,
       "seaViewScore": 2,
       "imageUrl": "https://cdn.img-asp.jp/bkn/106018567_1_500_500_3.jpg?t=01786248847",
-      "yearBuilt": 1983,
+      "yearBuilt": 1971,
       "firstSeen": "2026-07-23"
+    },
+    {
+      "id": "aoba-91a5e98f68c2129e",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room75420316.html",
+      "title": "エンゼルフォレスト伊豆熱川別荘地 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 5000000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01786248941",
+      "yearBuilt": 1974,
+      "firstSeen": "2026-08-10"
     },
     {
       "id": "aoba-d13b68bb62cd5a8a",
@@ -1873,6 +1887,20 @@
       "firstSeen": "2026-06-07"
     },
     {
+      "id": "aoba-2bf77c07319364e4",
+      "source": "Aoba Resort",
+      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room94642399.html",
+      "title": "エンゼルフォレスト伊豆熱川別荘地 戸建",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 7800000,
+      "seaViewScore": 3,
+      "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01786248887",
+      "yearBuilt": 1998,
+      "firstSeen": "2026-08-10"
+    },
+    {
       "id": "aoba-6cda0a39e5cf2f39",
       "source": "Aoba Resort",
       "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room95106919.html",
@@ -1883,7 +1911,7 @@
       "priceJpy": 6200000,
       "seaViewScore": 2,
       "imageUrl": "https://cdn.img-asp.jp/bkn/95106919_1_500_500_3.jpg?t=01786248886",
-      "yearBuilt": 1960,
+      "yearBuilt": 1993,
       "firstSeen": "2026-08-09"
     },
     {
