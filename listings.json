@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-28T22:27:53.901389",
+  "generatedAt": "2026-10-29T22:40:57.344621",
   "listings": [
     {
       "id": "maple-215a0bf3d64a0a9e",
@@ -56,7 +56,7 @@
       "priceJpy": 4900000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/103353744_1_500_500_3.jpg?t=01792803190",
-      "yearBuilt": 1992,
+      "yearBuilt": 1975,
       "firstSeen": "2026-10-22"
     },
     {
@@ -98,7 +98,7 @@
       "priceJpy": 5000000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/75420316_1_500_500_3.jpg?t=01792803133",
-      "yearBuilt": 1992,
+      "yearBuilt": 1989,
       "firstSeen": "2026-10-22"
     },
     {
@@ -112,7 +112,7 @@
       "priceJpy": 8600000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/80136217_1_500_500_3.jpg?t=01792803141",
-      "yearBuilt": 1989,
+      "yearBuilt": 1990,
       "firstSeen": "2026-10-22"
     },
     {
@@ -140,22 +140,8 @@
       "priceJpy": 7800000,
       "seaViewScore": 3,
       "imageUrl": "https://cdn.img-asp.jp/bkn/94642399_1_500_500_3.jpg?t=01792803168",
-      "yearBuilt": 1975,
+      "yearBuilt": 1988,
       "firstSeen": "2026-10-22"
-    },
-    {
-      "id": "aoba-8ca83a289f0677eb",
-      "source": "Aoba Resort",
-      "sourceUrl": "https://www.aoba-resort.com/area-b2/bknarea-ao22301/room98586218.html",
-      "title": "エンゼルフォレスト大川汐見崎 戸建",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 13800000,
-      "seaViewScore": 3,
-      "imageUrl": "https://cdn.img-asp.jp/bkn/98586218_1_500_500_3.jpg?t=01792803180",
-      "yearBuilt": 2001,
-      "firstSeen": "2026-10-28"
     },
     {
       "id": "suumo-9fc1c66f3395235b",
@@ -503,6 +489,21 @@
       "firstSeen": "2026-10-22"
     },
     {
+      "id": "suumo-59ca8a56285619a3",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_shimoda/nc_20444801/",
+      "title": "田牛 3980万円",
+      "titleEn": "Shimoda Property",
+      "propertyType": "house",
+      "city": "下田",
+      "priceJpy": 39800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F801%2F20444801%2F20444801_0001.jpg&w=452&h=339",
+      "yearBuilt": 1989,
+      "address": "静岡県下田市田牛",
+      "firstSeen": "2026-10-29"
+    },
+    {
       "id": "suumo-1b5a6fb92d3174c3",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_shimoda/nc_20938282/",
@@ -613,21 +614,6 @@
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F921%2F21640921%2F21640921_0001.jpg&w=452&h=339",
       "yearBuilt": 1994,
       "address": "静岡県下田市田牛",
-      "firstSeen": "2026-10-22"
-    },
-    {
-      "id": "suumo-f11198a73fac055b",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21791097/",
-      "title": "片瀬 250万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 2500000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F097%2F21791097%2F21791097_0001.jpg&w=452&h=339",
-      "yearBuilt": 1976,
-      "address": "静岡県賀茂郡東伊豆町片瀬",
       "firstSeen": "2026-10-22"
     },
     {
@@ -766,6 +752,21 @@
       "firstSeen": "2026-10-22"
     },
     {
+      "id": "suumo-8d2c6c18e1b58faa",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_20723268/",
+      "title": "奈良本 600万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 6000000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F268%2F20723268%2F20723268_0001.jpg&w=452&h=339",
+      "yearBuilt": 1974,
+      "address": "静岡県賀茂郡東伊豆町奈良本",
+      "firstSeen": "2026-10-29"
+    },
+    {
       "id": "suumo-28ddfe0b43021e7f",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78750459/",
@@ -826,21 +827,6 @@
       "firstSeen": "2026-10-22"
     },
     {
-      "id": "suumo-8ea6bba0b00899d1",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_74889310/",
-      "title": "奈良本 980万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 9800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F310%2F74889310%2F74889310_0099.jpg&w=452&h=339",
-      "yearBuilt": 1990,
-      "address": "静岡県賀茂郡東伊豆町奈良本",
-      "firstSeen": "2026-10-22"
-    },
-    {
       "id": "suumo-3ba44c37702a2b4a",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_73209962/",
@@ -856,18 +842,18 @@
       "firstSeen": "2026-10-22"
     },
     {
-      "id": "suumo-9c288d05578c380b",
+      "id": "suumo-8ea6bba0b00899d1",
       "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21814079/",
-      "title": "加納 1200万円",
-      "titleEn": "Minami-Izu Property",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_74889310/",
+      "title": "奈良本 980万円",
+      "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
-      "city": "南伊豆",
-      "priceJpy": 12000000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F079%2F21814079%2F21814079_0001.jpg&w=452&h=339",
-      "yearBuilt": 1993,
-      "address": "静岡県賀茂郡南伊豆町加納",
+      "city": "東伊豆",
+      "priceJpy": 9800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F310%2F74889310%2F74889310_0099.jpg&w=452&h=339",
+      "yearBuilt": 1990,
+      "address": "静岡県賀茂郡東伊豆町奈良本",
       "firstSeen": "2026-10-22"
     },
     {
@@ -886,6 +872,21 @@
       "firstSeen": "2026-10-22"
     },
     {
+      "id": "suumo-9c288d05578c380b",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21814079/",
+      "title": "加納 1200万円",
+      "titleEn": "Minami-Izu Property",
+      "propertyType": "house",
+      "city": "南伊豆",
+      "priceJpy": 12000000,
+      "seaViewScore": 2,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F079%2F21814079%2F21814079_0001.jpg&w=452&h=339",
+      "yearBuilt": 1993,
+      "address": "静岡県賀茂郡南伊豆町加納",
+      "firstSeen": "2026-10-22"
+    },
+    {
       "id": "suumo-d4e27f719be28a7b",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_77818662/",
@@ -901,21 +902,6 @@
       "firstSeen": "2026-10-22"
     },
     {
-      "id": "suumo-dccc5157f9ca0919",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78249491/",
-      "title": "大川 1380万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 13800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F491%2F78249491%2F78249491_0001.jpg&w=452&h=339",
-      "yearBuilt": 1973,
-      "address": "静岡県賀茂郡東伊豆町大川",
-      "firstSeen": "2026-10-22"
-    },
-    {
       "id": "suumo-eb7f151427d4681a",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78366915/",
@@ -926,6 +912,21 @@
       "priceJpy": 13800000,
       "seaViewScore": 4,
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F915%2F78366915%2F78366915_0001.jpg&w=452&h=339",
+      "yearBuilt": 1973,
+      "address": "静岡県賀茂郡東伊豆町大川",
+      "firstSeen": "2026-10-22"
+    },
+    {
+      "id": "suumo-dccc5157f9ca0919",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_78249491/",
+      "title": "大川 1380万円",
+      "titleEn": "Higashi-Izu Property",
+      "propertyType": "house",
+      "city": "東伊豆",
+      "priceJpy": 13800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F491%2F78249491%2F78249491_0001.jpg&w=452&h=339",
       "yearBuilt": 1973,
       "address": "静岡県賀茂郡東伊豆町大川",
       "firstSeen": "2026-10-22"
@@ -991,21 +992,6 @@
       "firstSeen": "2026-10-22"
     },
     {
-      "id": "suumo-5aeec6aa1a8ed309",
-      "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21058561/",
-      "title": "片瀬 1980万円",
-      "titleEn": "Higashi-Izu Property",
-      "propertyType": "house",
-      "city": "東伊豆",
-      "priceJpy": 19800000,
-      "seaViewScore": 4,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F561%2F21058561%2F21058561_0001.jpg&w=452&h=339",
-      "yearBuilt": 1957,
-      "address": "静岡県賀茂郡東伊豆町片瀬",
-      "firstSeen": "2026-10-22"
-    },
-    {
       "id": "suumo-e279f698b28d00f1",
       "source": "SUUMO",
       "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21679195/",
@@ -1021,18 +1007,18 @@
       "firstSeen": "2026-10-22"
     },
     {
-      "id": "suumo-c60531b513b031b4",
+      "id": "suumo-5aeec6aa1a8ed309",
       "source": "SUUMO",
-      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21782617/",
-      "title": "手石 2200万円",
-      "titleEn": "Minami-Izu Property",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21058561/",
+      "title": "片瀬 1980万円",
+      "titleEn": "Higashi-Izu Property",
       "propertyType": "house",
-      "city": "南伊豆",
-      "priceJpy": 22000000,
-      "seaViewScore": 2,
-      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F617%2F21782617%2F21782617_0001.jpg&w=452&h=339",
-      "yearBuilt": 1985,
-      "address": "静岡県賀茂郡南伊豆町手石",
+      "city": "東伊豆",
+      "priceJpy": 19800000,
+      "seaViewScore": 4,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F561%2F21058561%2F21058561_0001.jpg&w=452&h=339",
+      "yearBuilt": 1957,
+      "address": "静岡県賀茂郡東伊豆町片瀬",
       "firstSeen": "2026-10-22"
     },
     {
@@ -1048,6 +1034,21 @@
       "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F473%2F20366473%2F20366473_0001.jpg&w=452&h=339",
       "yearBuilt": 2005,
       "address": "静岡県賀茂郡河津町笹原",
+      "firstSeen": "2026-10-22"
+    },
+    {
+      "id": "suumo-c60531b513b031b4",
+      "source": "SUUMO",
+      "sourceUrl": "https://suumo.jp/chukoikkodate/shizuoka/sc_kamogun/nc_21782617/",
+      "title": "手石 2200万円",
+      "titleEn": "Minami-Izu Property",
+      "propertyType": "house",
+      "city": "南伊豆",
+      "priceJpy": 22000000,
+      "seaViewScore": 2,
+      "imageUrl": "https://img01.suumo.com/jj/resizeImage?src=gazo%2Fbukken%2F050%2FN010000%2Fimg%2F617%2F21782617%2F21782617_0001.jpg&w=452&h=339",
+      "yearBuilt": 1985,
+      "address": "静岡県賀茂郡南伊豆町手石",
       "firstSeen": "2026-10-22"
     },
     {
