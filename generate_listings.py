@@ -1417,7 +1417,10 @@ class Suumo(BaseScraper):
             # the true city slug, so only keep target-area links.
             if ("/sc_shimoda/" not in href) and ("/sc_kamogun/" not in href):
                 continue
-            full = urljoin(self.BASE, href)
+            # Strip query/fragment: SUUMO appends tracking params (e.g. ?fmlg=bo001)
+            # to some cards, so the same listing was being harvested twice under
+            # two URLs and saved as two separate entries.
+            full = urljoin(self.BASE, href).split("?")[0].split("#")[0]
             if full in found:
                 continue
             # Try to detect city from surrounding card; fall back to page hint
@@ -1683,6 +1686,20 @@ def deduplicate(listings):
         Izu Taiyo > Maple Housing > Aoba Resort > Izu Mirai > SUUMO
     """
     SOURCE_PRIORITY = {"Izu Taiyo": 0, "Maple Housing": 1, "Aoba Resort": 2, "Izu Mirai": 3, "SUUMO": 4}
+
+    # Safety net: drop exact repeats of the same page (same URL ignoring any
+    # ?tracking params), regardless of source.
+    _seen_urls = set()
+    _unique = []
+    for it in listings:
+        key = (it.get("sourceUrl") or "").split("?")[0].split("#")[0]
+        if key and key in _seen_urls:
+            print(f"  [DEDUP] Removed same-URL duplicate: {key[:70]}")
+            inc_stat("skipped_dup")
+            continue
+        _seen_urls.add(key)
+        _unique.append(it)
+    listings = _unique
 
     # Process preferred sources first so they "win" the fingerprint slot
     ranked = sorted(listings, key=lambda x: SOURCE_PRIORITY.get(x.get("source", ""), 99))
